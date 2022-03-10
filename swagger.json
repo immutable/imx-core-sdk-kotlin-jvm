@@ -350,31 +350,36 @@
                         "type": "integer",
                         "description": "Page size of the result",
                         "name": "page_size",
-                        "in": "query"
+                        "in": "query",
+                        "default": 20
                     },
                     {
                         "type": "string",
                         "description": "Cursor",
                         "name": "cursor",
-                        "in": "query"
+                        "in": "query",
+                        "default": null
                     },
                     {
                         "type": "string",
                         "description": "Property to sort by",
                         "name": "order_by",
-                        "in": "query"
+                        "in": "query",
+                        "default": null
                     },
                     {
                         "type": "string",
                         "description": "Direction to sort (asc/desc)",
                         "name": "direction",
-                        "in": "query"
+                        "in": "query",
+                        "default": null
                     },
                     {
                         "type": "string",
                         "description": "List of collections not to be displayed, separated by commas",
                         "name": "blacklist",
-                        "in": "query"
+                        "in": "query",
+                        "default": null
                     }
                 ],
                 "responses": {

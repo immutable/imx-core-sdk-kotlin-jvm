@@ -1,0 +1,67 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id "org.openapi.generator" version "5.3.0"
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        minSdk 21
+        targetSdk 32
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    openApiGenerate {
+        generatorName = "kotlin"
+        inputSpec = "$rootDir/swagger.json".toString()
+        outputDir = "$buildDir/generated".toString()
+        apiPackage = "com.immutable.sdk.api"
+        invokerPackage = "com.immutable.sdk.invoker"
+        modelPackage = "com.immutable.sdk.model"
+        configOptions = [
+                dateLibrary: "java8"
+        ]
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = ["$buildDir/generated/src/main/kotlin"]
+        }
+    }
+
+    // Generate all apis before every build
+    preBuild.dependsOn(tasks.openApiGenerate)
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.7.0'
+    implementation 'androidx.appcompat:appcompat:1.4.1'
+    implementation 'com.google.android.material:material:1.5.0'
+    testImplementation 'junit:junit:4.+'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
+
+    // Required for the generated SDK code
+    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+}

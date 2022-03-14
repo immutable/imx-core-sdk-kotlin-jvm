@@ -7,4 +7,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ImmutableX Android SDK"
 include ':app'
-include ':ImmutableX Android SDK'
+include ':imx-android-sdk'

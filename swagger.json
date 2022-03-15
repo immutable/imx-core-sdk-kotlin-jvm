@@ -2707,10 +2707,7 @@
                 },
                 "metadata": {
                     "description": "Metadata of this asset",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "object"
                 },
                 "name": {
                     "description": "Name of this NFT",
@@ -3992,12 +3989,33 @@
                     "description": "Sell orders for this asset",
                     "type": "array",
                     "items": {
-                        "description": "Metadata of this asset",
-                        "type": "array",
-                        "items": {
-                            "type": "integer"
-                        }
+                        "$ref": "#/definitions/SellOrders"
                     }
+                }
+            }
+        },
+        "SellOrders": {
+            "type": "object",
+            "properties": {
+                "order_id": {
+                    "description": "The order ID",
+                    "type": "integer"
+                },
+                "user": {
+                    "description": "Ethereum address of the user who submitted the order",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "Order status",
+                    "type": "string"
+                },
+                "buy_quantity": {
+                    "description": "Quantity of this asset",
+                    "type": "string"
+                },
+                "buy_decimals": {
+                    "description": "Number of decimals supported by this asset",
+                    "type": "integer"
                 }
             }
         },

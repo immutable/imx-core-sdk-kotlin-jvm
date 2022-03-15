@@ -2,13 +2,14 @@ plugins {
     id 'com.android.library'
     id 'kotlin-android'
     id "org.openapi.generator" version "5.3.0"
+    id 'maven-publish'
 }
 
 android {
     compileSdk 32
 
     defaultConfig {
-        minSdk 21
+        minSdk 27
         targetSdk 32
         versionCode 1
         versionName "1.0"
@@ -59,4 +60,37 @@ dependencies {
     // Required for the generated SDK code
     implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
+}
+
+def githubProperties = new Properties()
+githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+
+def getVersionName = { ->
+    return "0.0.1"
+}
+
+def getArtificatId = { ->
+    return "imx-android-sdk"
+}
+
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId 'com.immutable.sdk' // Replace with group ID
+            artifactId getArtificatId()
+            version getVersionName()
+            artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "imx-android-sdk"
+            url = uri("https://maven.pkg.github.com/immutable/imx-android-sdk")
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
+    }
 }

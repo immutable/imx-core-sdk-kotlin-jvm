@@ -11,8 +11,6 @@ android {
     defaultConfig {
         minSdk 27
         targetSdk 32
-        versionCode 1
-        versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -66,10 +64,10 @@ def githubProperties = new Properties()
 githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
 
 def getVersionName = { ->
-    return "0.0.1"
+    return "0.0.5"
 }
 
-def getArtificatId = { ->
+def getArtifactId = { ->
     return "imx-android-sdk"
 }
 
@@ -77,9 +75,9 @@ publishing {
     publications {
         bar(MavenPublication) {
             groupId 'com.immutable.sdk' // Replace with group ID
-            artifactId getArtificatId()
+            artifactId getArtifactId()
             version getVersionName()
-            artifact("$buildDir/outputs/aar/${getArtificatId()}-release.aar")
+            artifact("$buildDir/outputs/aar/${getArtifactId()}-release.aar")
         }
     }
 

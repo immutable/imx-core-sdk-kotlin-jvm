@@ -4651,16 +4651,6 @@
                 }
             }
         },
-        "Token": {
-            "type": "object",
-            "properties": {
-                "data": {},
-                "type": {
-                    "type": "string",
-                    "example": "ETH/ERC20/ERC721"
-                }
-            }
-        },
         "response.SuccessResponse": {
             "type": "object",
             "properties": {

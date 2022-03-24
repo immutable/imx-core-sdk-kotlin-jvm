@@ -104,9 +104,9 @@ internal object StarkCurve {
 
         val sig = ECDSASignature(components[0], components[1]).toCanonicalised()
         return (
-                sig.r.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO) +
-                        sig.s.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO)
-                ).addHexPrefix()
+            sig.r.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO) +
+                sig.s.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO)
+            ).addHexPrefix()
     }
 
     @VisibleForTesting

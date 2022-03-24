@@ -22,7 +22,7 @@ class StarkCurveTest {
         )
         assertEquals(
             "0x0752063caed87ef11d6e91c4a226ebfe98f190d248b857d882ae331771e6e462" +
-                    "0364a2c46e2190bbb243309a40da051b88f0657ea9d1c2ca11510fe18a8a22ae",
+                "0364a2c46e2190bbb243309a40da051b88f0657ea9d1c2ca11510fe18a8a22ae",
             StarkCurve.sign(keyPair, encodedMessage)
         )
     }

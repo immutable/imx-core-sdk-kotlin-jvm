@@ -72,7 +72,7 @@ object Crypto {
 
     private fun hashKeyWithIndex(key: String, index: Int): BigInteger {
         val hexString = key.hexRemovePrefix() +
-                Integer.toHexString(index).sanitizeBytes(byteSize = 2)
+            Integer.toHexString(index).sanitizeBytes(byteSize = 2)
 
         val hash = hashSha256Update(hexString.hexToByteArray())
         return BigInteger(hash, HEX_RADIX)

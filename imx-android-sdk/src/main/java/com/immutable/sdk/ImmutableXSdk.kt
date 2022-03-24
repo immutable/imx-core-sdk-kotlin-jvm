@@ -48,24 +48,23 @@ object ImmutableXSdk {
             ?: throw ImmutableException("Failed to generate Stark key pair")
 
         val isRegistered = api.getUser(address).accounts?.isNotEmpty() == true
-        return if (isRegistered) {
-            keyPair
-        } else {
+        if (!isRegistered) {
             val ethSignature = signer.signMessage(Constants.REGISTER_SIGN_MESSAGE).get()
             val starkPublicKey = keyPair.getStarkPublicKey()
-                api.registerUser(
-                    RegisterUserRequestVerifyEth(
-                        ethSignature = ethSignature,
-                        etherKey = address,
-                        starkKey = starkPublicKey,
-                        starkSignature = StarkCurve.sign(
-                            keyPair,
-                            CryptoUtil.getRegisterUserMsgVerifyEth(address, starkPublicKey)
-                        )
+            api.registerUser(
+                RegisterUserRequestVerifyEth(
+                    ethSignature = ethSignature,
+                    etherKey = address,
+                    starkKey = starkPublicKey,
+                    starkSignature = StarkCurve.sign(
+                        keyPair,
+                        CryptoUtil.getRegisterUserMsgVerifyEth(address, starkPublicKey)
                     )
                 )
-            keyPair
+            )
         }
+
+        return keyPair
     }
 
     private fun ECKeyPair.getStarkPublicKey() =

@@ -4,9 +4,9 @@ import java.util.concurrent.CompletableFuture
 
 interface Signer {
     /**
-     * Returns a Promise that resolves to the account address.
+     * Returns a CompletableFuture that resolves to the account address.
      *
-     * This is a Promise so that a Signer can be designed around an asynchronous source,
+     * This is a CompletableFuture so that a Signer can be designed around an asynchronous source,
      * such as hardware wallets.
      */
     fun getAddress(): CompletableFuture<String>

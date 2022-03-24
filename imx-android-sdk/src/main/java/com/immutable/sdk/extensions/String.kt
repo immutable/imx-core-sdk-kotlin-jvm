@@ -27,9 +27,9 @@ internal fun String.hexToByteArray(): ByteArray {
         var i = 0
         while (i < cleanInput.length) {
             this[i / 2] = (
-                    (hexToBin(cleanInput[i]) shl 4) +
-                            hexToBin(cleanInput[i + 1])
-                    ).toByte()
+                (hexToBin(cleanInput[i]) shl 4) +
+                    hexToBin(cleanInput[i + 1])
+                ).toByte()
             i += 2
         }
     }

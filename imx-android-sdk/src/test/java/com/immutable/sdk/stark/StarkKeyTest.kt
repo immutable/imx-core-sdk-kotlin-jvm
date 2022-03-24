@@ -17,7 +17,7 @@ class StarkKeyTest {
     fun testGetKeyFromRawSignature() {
         val signature =
             "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
-                    "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
+                "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
         val ethAddress = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
         val keypair = StarkKey.getKeyFromRawSignature(
             signature = signature,

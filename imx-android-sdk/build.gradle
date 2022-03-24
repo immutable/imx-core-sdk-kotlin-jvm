@@ -75,7 +75,10 @@ dependencies {
 }
 
 def githubProperties = new Properties()
-githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
+def githubPropertiesFile = file("github.properties")
+if (githubPropertiesFile.exists()) {
+    githubProperties.load(new FileInputStream(githubPropertiesFile))
+}
 
 def getVersionName = { ->
     return "0.0.8"

@@ -103,6 +103,7 @@ internal object StarkCurve {
         val components = signer.generateSignature(msgArray)
 
         val sig = ECDSASignature(components[0], components[1]).toCanonicalised()
+        // Serialise signature
         return (
             sig.r.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO) +
                 sig.s.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO)

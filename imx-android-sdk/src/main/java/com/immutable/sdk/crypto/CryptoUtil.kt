@@ -1,5 +1,6 @@
 package com.immutable.sdk.crypto
 
+import com.immutable.sdk.extensions.hexRemovePrefix
 import com.immutable.sdk.utils.Constants.HEX_RADIX
 import java.math.BigInteger
 
@@ -40,8 +41,8 @@ object CryptoUtil {
         var serialized = BigInteger(REGISTER_USER)
         serialized = serialized
             .shl(160)
-            .add(BigInteger(etherKey))
-        return sanitizeHex(serialized.toString(16))
+            .add(BigInteger(etherKey.hexRemovePrefix(), HEX_RADIX))
+        return sanitizeHex(serialized.toString(HEX_RADIX))
     }
 
     private fun sanitizeHex(hexString: String): String {

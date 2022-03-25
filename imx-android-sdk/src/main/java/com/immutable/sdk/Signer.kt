@@ -19,5 +19,5 @@ interface Signer {
      * Sub-classes must implement this, however they may throw if signing a message is not
      * supported, such as in a Contract-based Wallet or Meta-Transaction-based Wallet.
      */
-    fun signMessage(message: String): CompletableFuture<String>
+    fun signMessage(address: String, message: String): CompletableFuture<String>
 }

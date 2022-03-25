@@ -77,16 +77,18 @@ object ImmutableXSdk {
         return keyPairFuture.thenApply { it to data }
     }
 
-    private fun isUserRegistered(keyPairAndData: Pair<ECKeyPair, LoginData>)
-            : CompletableFuture<Pair<ECKeyPair, LoginData>> {
+    @Suppress("MagicNumber")
+    private fun isUserRegistered(
+        keyPairAndData: Pair<ECKeyPair, LoginData>
+    ): CompletableFuture<Pair<ECKeyPair, LoginData>> {
         val isRegisteredFuture = CompletableFuture<Boolean>()
         CompletableFuture.runAsync {
             try {
                 val isRegistered =
                     UsersApi().getUser(keyPairAndData.second.address).accounts?.isNotEmpty() == true
                 isRegisteredFuture.complete(isRegistered)
-            } catch (e: Exception) {
-                if ((e as? ClientException)?.statusCode == 404)
+            } catch (e: ClientException) {
+                if (e.statusCode == 404)
                     isRegisteredFuture.complete(false)
                 else
                     isRegisteredFuture.completeExceptionally(e)
@@ -99,8 +101,10 @@ object ImmutableXSdk {
         }
     }
 
-    private fun getRegisterMessage(signer: Signer, keyPairAndData: Pair<ECKeyPair, LoginData>)
-            : CompletableFuture<Pair<ECKeyPair, LoginData>> {
+    private fun getRegisterMessage(
+        signer: Signer,
+        keyPairAndData: Pair<ECKeyPair, LoginData>
+    ): CompletableFuture<Pair<ECKeyPair, LoginData>> {
         return if (keyPairAndData.second.isRegistered)
             CompletableFuture.supplyAsync { keyPairAndData }
         else
@@ -114,6 +118,7 @@ object ImmutableXSdk {
             }
     }
 
+    @Suppress("TooGenericExceptionCaught")
     private fun registerUser(keyPairAndData: Pair<ECKeyPair, LoginData>): CompletableFuture<ECKeyPair> {
         val registerFuture = CompletableFuture<String>()
         return if (keyPairAndData.second.isRegistered)

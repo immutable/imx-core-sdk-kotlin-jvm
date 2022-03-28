@@ -60,7 +60,13 @@ object ImmutableXSdk {
             .thenCompose { keyPairAndData -> isUserRegistered(keyPairAndData) }
             .thenCompose { keyPairAndData -> getRegisterMessage(signer, keyPairAndData) }
             .thenCompose { keyPairAndData -> registerUser(keyPairAndData) }
-            .thenAccept { future.complete(it) }
+            .whenComplete { ecKeyPair, throwable ->
+                // Forward any exceptions from the compose chain to the login future
+                if (throwable != null)
+                    future.completeExceptionally(throwable)
+                else
+                    future.complete(ecKeyPair)
+            }
 
         return future
     }
@@ -88,6 +94,7 @@ object ImmutableXSdk {
                     UsersApi().getUser(keyPairAndData.second.address).accounts?.isNotEmpty() == true
                 isRegisteredFuture.complete(isRegistered)
             } catch (e: ClientException) {
+                // Endpoint returns 404 when the user isn't registered
                 if (e.statusCode == 404)
                     isRegisteredFuture.complete(false)
                 else

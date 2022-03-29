@@ -48,7 +48,7 @@ object ImmutableXSdk {
      * @throws [ServerException] if the api requests fail due to a server error
      * @throws [UnsupportedOperationException] if the api response is informational or redirect
      */
-    fun login(signer: Signer): CompletableFuture<ECKeyPair> {
+    fun login(signer: Signer, api: UsersApi = UsersApi()): CompletableFuture<ECKeyPair> {
         val future = CompletableFuture<ECKeyPair>()
 
         signer.getAddress().thenApply { LoginData(address = it) }
@@ -57,9 +57,9 @@ object ImmutableXSdk {
                     .thenApply { data.copy(seed = it) }
             }
             .thenCompose { data -> generateStarkKeyPair(data) }
-            .thenCompose { keyPairAndData -> isUserRegistered(keyPairAndData) }
+            .thenCompose { keyPairAndData -> isUserRegistered(keyPairAndData, api) }
             .thenCompose { keyPairAndData -> getRegisterMessage(signer, keyPairAndData) }
-            .thenCompose { keyPairAndData -> registerUser(keyPairAndData) }
+            .thenCompose { keyPairAndData -> registerUser(keyPairAndData, api) }
             .whenComplete { ecKeyPair, throwable ->
                 // Forward any exceptions from the compose chain to the login future
                 if (throwable != null)
@@ -71,41 +71,51 @@ object ImmutableXSdk {
         return future
     }
 
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
     private fun generateStarkKeyPair(data: LoginData): CompletableFuture<Pair<ECKeyPair, LoginData>> {
         val keyPairFuture = CompletableFuture<ECKeyPair>()
         CompletableFuture.runAsync {
-            val keyPair = StarkKey.getKeyFromRawSignature(data.seed, data.address)
-            if (keyPair == null)
+            try {
+                val keyPair = StarkKey.getKeyFromRawSignature(data.seed, data.address)
+                if (keyPair == null)
+                    keyPairFuture.completeExceptionally(ImmutableException("Failed to generate Stark key pair"))
+                else
+                    keyPairFuture.complete(keyPair)
+            } catch (e: Exception) {
                 keyPairFuture.completeExceptionally(ImmutableException("Failed to generate Stark key pair"))
-            else
-                keyPairFuture.complete(keyPair)
+            }
         }
         return keyPairFuture.thenApply { it to data }
     }
 
     @Suppress("MagicNumber")
     private fun isUserRegistered(
-        keyPairAndData: Pair<ECKeyPair, LoginData>
+        keyPairAndData: Pair<ECKeyPair, LoginData>,
+        api: UsersApi
     ): CompletableFuture<Pair<ECKeyPair, LoginData>> {
-        val isRegisteredFuture = CompletableFuture<Boolean>()
+        val isRegisteredFuture = CompletableFuture<Pair<ECKeyPair, LoginData>>()
         CompletableFuture.runAsync {
             try {
                 val isRegistered =
-                    UsersApi().getUser(keyPairAndData.second.address).accounts?.isNotEmpty() == true
-                isRegisteredFuture.complete(isRegistered)
+                    api.getUser(keyPairAndData.second.address).accounts?.isNotEmpty() == true
+                isRegisteredFuture.complete(
+                    keyPairAndData.first to keyPairAndData.second.copy(
+                        isRegistered = isRegistered
+                    )
+                )
             } catch (e: ClientException) {
                 // Endpoint returns 404 when the user isn't registered
                 if (e.statusCode == 404)
-                    isRegisteredFuture.complete(false)
+                    isRegisteredFuture.complete(
+                        keyPairAndData.first to keyPairAndData.second.copy(
+                            isRegistered = false
+                        )
+                    )
                 else
                     isRegisteredFuture.completeExceptionally(e)
             }
         }
-        return isRegisteredFuture.thenApply {
-            keyPairAndData.first to keyPairAndData.second.copy(
-                isRegistered = it
-            )
-        }
+        return isRegisteredFuture
     }
 
     private fun getRegisterMessage(
@@ -126,10 +136,13 @@ object ImmutableXSdk {
     }
 
     @Suppress("TooGenericExceptionCaught")
-    private fun registerUser(keyPairAndData: Pair<ECKeyPair, LoginData>): CompletableFuture<ECKeyPair> {
-        val registerFuture = CompletableFuture<String>()
-        return if (keyPairAndData.second.isRegistered)
-            CompletableFuture.supplyAsync { keyPairAndData.first }
+    private fun registerUser(
+        keyPairAndData: Pair<ECKeyPair, LoginData>,
+        api: UsersApi
+    ): CompletableFuture<ECKeyPair> {
+        val registerFuture = CompletableFuture<ECKeyPair>()
+        if (keyPairAndData.second.isRegistered)
+            registerFuture.complete(keyPairAndData.first)
         else {
             CompletableFuture.runAsync {
                 try {
@@ -146,17 +159,14 @@ object ImmutableXSdk {
                             )
                         )
                     )
-                    val response = UsersApi().registerUser(
-                        body
-                    )
-                    registerFuture.complete(response.txHash)
+                    api.registerUser(body)
+                    registerFuture.complete(keyPairAndData.first)
                 } catch (e: Exception) {
                     registerFuture.completeExceptionally(e)
                 }
-            }.thenApply {
-                keyPairAndData.first
             }
         }
+        return registerFuture
     }
 
     private fun ECKeyPair.getStarkPublicKey() =

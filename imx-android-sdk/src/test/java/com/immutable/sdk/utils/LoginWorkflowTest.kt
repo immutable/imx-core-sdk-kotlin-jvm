@@ -1,9 +1,10 @@
-package com.immutable.sdk
+package com.immutable.sdk.utils
 
+import com.immutable.sdk.ImmutableException
+import com.immutable.sdk.Signer
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.model.GetUsersApiResponse
 import com.immutable.sdk.model.RegisterUserResponse
-import com.immutable.sdk.utils.Constants
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -17,7 +18,7 @@ import java.util.concurrent.CompletionException
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.TimeUnit
 
-class ImmutableXSdkTest {
+class LoginWorkflowTest {
     @MockK
     private lateinit var api: UsersApi
 
@@ -44,7 +45,7 @@ class ImmutableXSdkTest {
         every { api.getUser(address) } returns GetUsersApiResponse(listOf("account"))
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -87,7 +88,7 @@ class ImmutableXSdkTest {
         every { api.registerUser(any()) } returns RegisterUserResponse("txHash")
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -117,7 +118,7 @@ class ImmutableXSdkTest {
         every { signer.getAddress() } returns addressFuture
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -147,7 +148,7 @@ class ImmutableXSdkTest {
         every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -180,7 +181,7 @@ class ImmutableXSdkTest {
         every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -215,7 +216,7 @@ class ImmutableXSdkTest {
         every { api.getUser(any()) } throws ClientException()
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -257,7 +258,7 @@ class ImmutableXSdkTest {
         every { api.getUser(address) } throws ClientException(statusCode = 404)
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false
@@ -303,7 +304,7 @@ class ImmutableXSdkTest {
         every { api.registerUser(any()) } throws ClientException()
 
         val latch = CountDownLatch(1)
-        val future = ImmutableXSdk.login(signer, api)
+        val future = login(signer, api)
         var throwable: Throwable? = null
         var ecKeyPair: ECKeyPair? = null
         var completed = false

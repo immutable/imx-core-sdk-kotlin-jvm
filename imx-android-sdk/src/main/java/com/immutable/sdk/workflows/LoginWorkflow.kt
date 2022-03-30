@@ -1,6 +1,5 @@
 package com.immutable.sdk.workflows
 
-import android.os.NetworkOnMainThreadException
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.api.UsersApi
@@ -14,10 +13,8 @@ import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.stark.StarkKey
 import com.immutable.sdk.utils.Constants
 import org.openapitools.client.infrastructure.ClientException
-import org.openapitools.client.infrastructure.ServerException
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutionException
 
 private data class LoginData(
     val address: String = "",
@@ -28,14 +25,7 @@ private data class LoginData(
 
 /**
  * This is a utility function that will register a user to Immutable X if they aren't already
- * and then return their Stark key pair. This must be called from a background thread.
- *
- * @throws [InterruptedException]
- * @throws [ExecutionException]
- * @throws [NetworkOnMainThreadException] if this method isn't run on a background thread
- * @throws [ClientException] if the api requests fail due to a client error
- * @throws [ServerException] if the api requests fail due to a server error
- * @throws [UnsupportedOperationException] if the api response is informational or redirect
+ * and then return their Stark key pair.
  */
 internal fun login(signer: Signer, api: UsersApi = UsersApi()): CompletableFuture<ECKeyPair> {
     val future = CompletableFuture<ECKeyPair>()

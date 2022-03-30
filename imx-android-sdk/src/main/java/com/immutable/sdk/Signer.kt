@@ -21,3 +21,7 @@ interface Signer {
      */
     fun signMessage(message: String): CompletableFuture<String>
 }
+
+interface StarkSigner {
+    fun starkSign(message: String): CompletableFuture<String>
+}

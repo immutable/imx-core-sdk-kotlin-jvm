@@ -1,13 +1,8 @@
 package com.immutable.sdk
 
-import android.os.NetworkOnMainThreadException
-import com.immutable.sdk.api.UsersApi
-import com.immutable.sdk.workflows.login
-import org.openapitools.client.infrastructure.ClientException
-import org.openapitools.client.infrastructure.ServerException
+import com.immutable.sdk.stark.StarkCurve
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.ExecutionException
 
 enum class ImmutableXBase(val url: String) {
     Production("https://api.x.immutable.com"),
@@ -23,15 +18,40 @@ object ImmutableXSdk {
     }
 
     /**
-     * This is a utility function that will register a user to Immutable X if they aren't already
-     * and then return their Stark key pair. This must be called from a background thread.
+     * This function is for signing L2 transactions
      *
-     * @throws [InterruptedException]
-     * @throws [ExecutionException]
-     * @throws [NetworkOnMainThreadException] if this method isn't run on a background thread
-     * @throws [ClientException] if the api requests fail due to a client error
-     * @throws [ServerException] if the api requests fail due to a server error
-     * @throws [UnsupportedOperationException] if the api response is informational or redirect
+     * @param keyPair keys used for the users L2 wallet
+     * @param message to be signed by the key pair
      */
-    fun login(signer: Signer): CompletableFuture<ECKeyPair> = login(signer, UsersApi())
+    fun starkSign(keyPair: ECKeyPair, message: String): String {
+        return StarkCurve.sign(keyPair, message)
+    }
+
+    /**
+     * This is a utility function that will register a user to Immutable X if they aren't already
+     * and then return their Stark key pair.
+     *
+     * @param signer represents the users L1 wallet to get the address and sign the registration
+     *
+     * @return a [CompletableFuture] that will provide the Stark key pair if successful. This
+     * key pair needs to be securely stored as exposing this risks the users assets and wallet.
+     */
+    fun login(signer: Signer): CompletableFuture<ECKeyPair> =
+        com.immutable.sdk.workflows.login(signer)
+
+    /**
+     * This is a utility function that will chain the necessary calls to buy an existing order.
+     *
+     * @param orderId the id of an existing order to be bought
+     * @param signer represents the users L1 wallet to get the address
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     *
+     * @return a [CompletableFuture] that will provide the Trade id if successful.
+     */
+    fun buy(
+        orderId: String,
+        signer: Signer,
+        starkSigner: StarkSigner
+    ): CompletableFuture<Int> =
+        com.immutable.sdk.workflows.buy(orderId, signer, starkSigner)
 }

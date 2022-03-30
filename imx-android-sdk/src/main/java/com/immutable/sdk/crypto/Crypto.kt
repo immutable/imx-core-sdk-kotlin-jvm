@@ -3,6 +3,7 @@ package com.immutable.sdk.crypto
 import com.immutable.sdk.extensions.*
 import com.immutable.sdk.stark.Points
 import com.immutable.sdk.stark.StarkCurve
+import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.Constants.HEX_RADIX
 import org.web3j.crypto.Bip32ECKeyPair
 import org.web3j.crypto.ECKeyPair
@@ -103,5 +104,25 @@ object Crypto {
             }
         }
         return point.xCoord.toString()
+    }
+
+    @Suppress("MagicNumber")
+    internal fun serializeEthSignature(signature: String, size: Int = 64): String {
+        val sig = signature.hexRemovePrefix()
+        val v = BigInteger(sig.substring(size * 2, size * 2 + 2), HEX_RADIX)
+
+        return (
+            sig.substring(0, size).padStart(64, Constants.CHAR_ZERO) +
+                sig.substring(size, size * 2).padStart(64, Constants.CHAR_ZERO) +
+                importRecoveryParam(v).padStart(2, Constants.CHAR_ZERO)
+            ).addHexPrefix()
+    }
+
+    private fun importRecoveryParam(v: BigInteger): String {
+        val comp = BigInteger("27")
+        return if (v.compareTo(comp) != -1)
+            v.subtract(comp).toString(HEX_RADIX)
+        else
+            v.toString(HEX_RADIX)
     }
 }

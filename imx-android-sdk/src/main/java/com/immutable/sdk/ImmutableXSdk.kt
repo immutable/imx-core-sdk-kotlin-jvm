@@ -2,17 +2,11 @@ package com.immutable.sdk
 
 import android.os.NetworkOnMainThreadException
 import com.immutable.sdk.api.UsersApi
-import com.immutable.sdk.crypto.CryptoUtil
-import com.immutable.sdk.extensions.hexToByteArray
-import com.immutable.sdk.extensions.sanitizeBytes
-import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.model.RegisterUserRequestVerifyEth
-import com.immutable.sdk.stark.StarkCurve
-import com.immutable.sdk.stark.StarkKey
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.workflows.login
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
 import org.web3j.crypto.ECKeyPair
+import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 
 enum class ImmutableXBase(val url: String) {
@@ -39,37 +33,5 @@ object ImmutableXSdk {
      * @throws [ServerException] if the api requests fail due to a server error
      * @throws [UnsupportedOperationException] if the api response is informational or redirect
      */
-    fun login(signer: Signer): ECKeyPair {
-        val api = UsersApi()
-        val address = signer.getAddress().get()
-        val starkSeed = signer.signMessage(Constants.STARK_MESSAGE).get()
-
-        val keyPair = StarkKey.getKeyFromRawSignature(starkSeed, address)
-            ?: throw ImmutableException("Failed to generate Stark key pair")
-
-        val isRegistered = api.getUser(address).accounts?.isNotEmpty() == true
-        if (!isRegistered) {
-            val ethSignature = signer.signMessage(Constants.REGISTER_SIGN_MESSAGE).get()
-            val starkPublicKey = keyPair.getStarkPublicKey()
-            api.registerUser(
-                RegisterUserRequestVerifyEth(
-                    ethSignature = ethSignature,
-                    etherKey = address,
-                    starkKey = starkPublicKey,
-                    starkSignature = StarkCurve.sign(
-                        keyPair,
-                        CryptoUtil.getRegisterUserMsgVerifyEth(address, starkPublicKey)
-                    )
-                )
-            )
-        }
-
-        return keyPair
-    }
-
-    private fun ECKeyPair.getStarkPublicKey() =
-        publicKey.toString(Constants.HEX_RADIX)
-            .sanitizeBytes()
-            .hexToByteArray()
-            .toHexString(byteLength = Constants.STARK_KEY_PUBLIC_BYTE_LENGTH)
+    fun login(signer: Signer): CompletableFuture<ECKeyPair> = login(signer, UsersApi())
 }

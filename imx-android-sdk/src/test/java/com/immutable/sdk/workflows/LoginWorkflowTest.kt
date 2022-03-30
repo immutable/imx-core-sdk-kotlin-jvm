@@ -1,10 +1,11 @@
-package com.immutable.sdk.utils
+package com.immutable.sdk.workflows
 
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.model.GetUsersApiResponse
 import com.immutable.sdk.model.RegisterUserResponse
+import com.immutable.sdk.utils.Constants
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -41,7 +42,7 @@ class LoginWorkflowTest {
         val starkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
         every { api.getUser(address) } returns GetUsersApiResponse(listOf("account"))
 
         val latch = CountDownLatch(1)
@@ -77,12 +78,9 @@ class LoginWorkflowTest {
         val registerStarkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
         every {
-            signer.signMessage(
-                address,
-                Constants.REGISTER_SIGN_MESSAGE
-            )
+            signer.signMessage(Constants.REGISTER_SIGN_MESSAGE)
         } returns registerStarkSignatureFuture
         every { api.getUser(address) } throws ClientException(statusCode = 404)
         every { api.registerUser(any()) } returns RegisterUserResponse("txHash")
@@ -145,7 +143,7 @@ class LoginWorkflowTest {
         val starkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
 
         val latch = CountDownLatch(1)
         val future = login(signer, api)
@@ -178,7 +176,7 @@ class LoginWorkflowTest {
         val starkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
 
         val latch = CountDownLatch(1)
         val future = login(signer, api)
@@ -212,7 +210,7 @@ class LoginWorkflowTest {
         val starkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
         every { api.getUser(any()) } throws ClientException()
 
         val latch = CountDownLatch(1)
@@ -248,12 +246,9 @@ class LoginWorkflowTest {
         val registerStarkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
         every {
-            signer.signMessage(
-                address,
-                Constants.REGISTER_SIGN_MESSAGE
-            )
+            signer.signMessage(Constants.REGISTER_SIGN_MESSAGE)
         } returns registerStarkSignatureFuture
         every { api.getUser(address) } throws ClientException(statusCode = 404)
 
@@ -293,12 +288,9 @@ class LoginWorkflowTest {
         val registerStarkSignatureFuture = CompletableFuture<String>()
 
         every { signer.getAddress() } returns addressFuture
-        every { signer.signMessage(address, Constants.STARK_MESSAGE) } returns starkSignatureFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSignatureFuture
         every {
-            signer.signMessage(
-                address,
-                Constants.REGISTER_SIGN_MESSAGE
-            )
+            signer.signMessage(Constants.REGISTER_SIGN_MESSAGE)
         } returns registerStarkSignatureFuture
         every { api.getUser(address) } throws ClientException(statusCode = 404)
         every { api.registerUser(any()) } throws ClientException()

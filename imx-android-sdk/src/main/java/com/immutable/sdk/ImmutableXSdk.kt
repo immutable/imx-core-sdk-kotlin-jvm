@@ -2,7 +2,7 @@ package com.immutable.sdk
 
 import android.os.NetworkOnMainThreadException
 import com.immutable.sdk.api.UsersApi
-import com.immutable.sdk.utils.login
+import com.immutable.sdk.workflows.login
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
 import org.web3j.crypto.ECKeyPair

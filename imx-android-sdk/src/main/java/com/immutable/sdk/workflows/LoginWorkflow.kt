@@ -1,4 +1,4 @@
-package com.immutable.sdk.utils
+package com.immutable.sdk.workflows
 
 import android.os.NetworkOnMainThreadException
 import com.immutable.sdk.ImmutableException
@@ -12,6 +12,7 @@ import com.immutable.sdk.extensions.toHexString
 import com.immutable.sdk.model.RegisterUserRequestVerifyEth
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.stark.StarkKey
+import com.immutable.sdk.utils.Constants
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
 import org.web3j.crypto.ECKeyPair
@@ -41,8 +42,7 @@ internal fun login(signer: Signer, api: UsersApi = UsersApi()): CompletableFutur
 
     signer.getAddress().thenApply { LoginData(address = it) }
         .thenCompose { data ->
-            signer.signMessage(data.address, Constants.STARK_MESSAGE)
-                .thenApply { data.copy(seed = it) }
+            signer.signMessage(Constants.STARK_MESSAGE).thenApply { data.copy(seed = it) }
         }
         .thenCompose { data -> generateStarkKeyPair(data) }
         .thenCompose { keyPairAndData -> isUserRegistered(keyPairAndData, api) }
@@ -113,10 +113,7 @@ private fun getRegisterMessage(
     return if (keyPairAndData.second.isRegistered)
         CompletableFuture.supplyAsync { keyPairAndData }
     else
-        signer.signMessage(
-            keyPairAndData.second.address,
-            Constants.REGISTER_SIGN_MESSAGE
-        ).thenApply {
+        signer.signMessage(Constants.REGISTER_SIGN_MESSAGE).thenApply {
             keyPairAndData.first to keyPairAndData.second.copy(
                 ethSignature = Crypto.serializeEthSignature(it)
             )

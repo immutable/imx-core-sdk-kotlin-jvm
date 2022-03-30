@@ -9,6 +9,10 @@ private const val CANCEL_ORDER = "1003"
 private val TWO_POW_22_BN = BigInteger("400000", 16)
 private val TWO_POW_31_BN = BigInteger("80000000", 16)
 private val TWO_POW_63_BN = BigInteger("8000000000000000", 16)
+private val prime =
+    BigInteger("800000000000011000000000000000000000000000000000000000000000001", 16)
+private val MAX_ECDSA_BN =
+    BigInteger("800000000000000000000000000000000000000000000000000000000000000", 16)
 
 // Can be removed once API returns encoded and serialised message ready to be signed with the Stark keys
 @Suppress("TooManyFunctions")
@@ -56,6 +60,125 @@ object CryptoUtil {
         val remainder = length % byteSize
         return if (remainder != 0) ((length - remainder) / byteSize) * byteSize + byteSize else length
     }
+
+    @Suppress("MagicNumber", "LongParameterList")
+    fun getLimitOrderMsgWithFee(
+        tokenSell: String,
+        tokenBuy: String,
+        vaultSell: String,
+        vaultBuy: String,
+        amountSell: String,
+        amountBuy: String,
+        nonce: String,
+        expirationTimestamp: String,
+        feeToken: String,
+        feeVault: String,
+        feeLimit: String,
+    ): String {
+        // assert tokens in range
+        assertInRange(BigInteger(tokenSell.hexRemovePrefix(), 16), prime)
+        assertInRange(BigInteger(tokenBuy.hexRemovePrefix(), 16), prime)
+        assertInRange(BigInteger(feeToken.hexRemovePrefix(), 16), prime)
+        // w1 is the assetId to be sold
+        // w2 is the assetId to be bought
+        // w3 is the assetId used to pay the fee
+        val w1 = tokenSell
+        val w2 = tokenBuy
+        val w3 = feeToken
+        // there are more words to encode for instructions with fees so a
+        // temp hash is used to keep the message within the max 256 bit field size
+        val tempHash = hashMessage(w1, w2, w3)
+        // definitions for w4 and w5 defined in formatMessageWithFee
+        val (w4, w5) = formatMessageWithFee(
+            "3",
+            vaultSell,
+            vaultBuy,
+            amountSell,
+            amountBuy,
+            nonce,
+            expirationTimestamp,
+            feeVault,
+            feeLimit,
+        )
+        // message to sign: H(H(H(H(w1,w2),w3),w4),w5)
+        val hash = hashMessage(tempHash, w4, w5)
+        assertInRange(BigInteger(hash.hexRemovePrefix(), 16), MAX_ECDSA_BN)
+        return hash
+    }
+
+    @Suppress("LongParameterList")
+    fun formatMessageWithFee(
+        instruction: String,
+        vaultSell: String,
+        vaultBuy: String,
+        amountSell: String,
+        amountBuy: String,
+        nonce: String,
+        expirationTimestamp: String,
+        feeVault: String,
+        feeLimit: String
+    ): Pair<String, String> {
+        val message = convertBnAndAssertRange(
+            instruction,
+            vaultSell,
+            vaultBuy,
+            amountSell,
+            amountBuy,
+            nonce,
+            expirationTimestamp,
+            feeVault,
+            feeLimit
+        )
+        return serializeOrderMsgWithFee(message)
+    }
+
+    @Suppress("MagicNumber")
+    private fun serializeOrderMsgWithFee(message: Message): Pair<String, String> {
+        with(message) {
+            // Left bit shifting to construct the 251 bit message below for serialized1
+            //
+            //          +-------+--------------+--------------+--------------+--------+
+            // #bits    | 27    |   64         |   64         |      64      |   32   |
+            //          +-------+--------------+--------------+--------------+--------+
+            // label      A               B            C                 D       E
+            // A: padding of zeros
+            // B: quantizedAmount to be sold.
+            // C: quantizedAmount to be bought
+            // D: quantizedAmount to pay fees
+            // E: nonce for the transaction.
+            var serialized1 = message.amountSellBn
+            serialized1 = serialized1.shl(64).add(amountBuyBn)
+            serialized1 = serialized1.shl(64).add(feeLimitBn)
+            serialized1 = serialized1.shl(32).add(nonceBn)
+
+            // Left bit shifting to construct the 251 bit message below for serialized2
+            //          +---+--------------+--------------+--------------+-----+-----+
+            // #bits    | 10|   64         |   64         |         64   | 32  |  17 |
+            //          +---+--------------+--------------+--------------+-----+-----+
+            // label      A      B            C                 D           E     F
+            // A:  order type
+            // 3 for a Limit Order with Fees
+            // B: vaultId from which the user wants to use to pay fees.
+            // C: vaultId from which the user wants to take the sold asset
+            // D: vaultId from which the user wants to receive the bought asset.
+            // E: expirationTimestamp, in hours since the Unix epoch.
+            // F: padding of zeros
+            // see https://docs.starkware.co/starkex-v3/starkex-deep-dive/message-encodings/signatures
+            var serialized2 = instructionTypeBn
+            serialized2 = serialized2.shl(64).add(feeVaultBn)
+            serialized2 = serialized2.shl(64).add(vaultSellBn)
+            serialized2 = serialized2.shl(64).add(vaultBuyBn)
+            serialized2 = serialized2.shl(32).add(expirationTimestampBn)
+            serialized2 = serialized2.shl(17).add(BigInteger.ZERO)
+
+            val w4 = sanitizeHex(serialized1.toString(16))
+            val w5 = sanitizeHex(serialized2.toString(16))
+            return w4 to w5
+        }
+    }
+
+    private fun hashMessage(w1: String, w2: String, w3: String): String =
+        Crypto.pedersenHash(arrayOf(Crypto.pedersenHash(arrayOf(w1, w2)), w3))
 
     @Suppress("MagicNumber", "LongParameterList")
     fun getLimitOrderMsg(

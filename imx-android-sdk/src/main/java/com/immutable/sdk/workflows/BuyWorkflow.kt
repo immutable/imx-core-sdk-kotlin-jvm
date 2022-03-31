@@ -111,7 +111,7 @@ private fun getSignableTrade(
                                             tokenBuy = order.sell.clean()!!,
                                             tokenSell = order.buy.clean()!!,
                                             user = address,
-                                            fees = listOf(), // map fees order.fees,
+                                            fees = listOf(), // add support for maker/taker fees
                                             includeFees = true
                                         )
                                     )

@@ -6,42 +6,11 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.crypto.CryptoUtil
-import com.immutable.sdk.model.*
-import com.immutable.sdk.utils.TokenType
+import com.immutable.sdk.extensions.clean
+import com.immutable.sdk.model.CreateTradeRequest
+import com.immutable.sdk.model.GetSignableOrderRequest
+import com.immutable.sdk.model.GetSignableOrderResponse
 import java.util.concurrent.CompletableFuture
-
-/**
- * We need to strip the Token back to the required only fields otherwise the api validation will fail.
- */
-internal fun Token.clean(): Token? = data?.let {
-    when (type) {
-        TokenType.ETH.name -> {
-            if (it.decimals != null)
-                Token(TokenData(decimals = it.decimals), type = TokenType.ETH.name)
-            else
-                null
-        }
-        TokenType.ERC20.name -> {
-            if (it.tokenAddress != null && it.decimals != null)
-                Token(
-                    TokenData(decimals = it.decimals, tokenAddress = it.tokenAddress),
-                    type = TokenType.ERC20.name
-                )
-            else
-                null
-        }
-        TokenType.ERC721.name -> {
-            if (it.tokenAddress != null && it.tokenId != null)
-                Token(
-                    TokenData(tokenId = it.tokenId, tokenAddress = it.tokenAddress),
-                    type = TokenType.ERC721.name
-                )
-            else
-                null
-        }
-        else -> null
-    }
-}
 
 internal fun buy(
     orderId: String,
@@ -73,7 +42,7 @@ internal fun buy(
     return future
 }
 
-@Suppress("TooGenericExceptionCaught", "SwallowedException")
+@Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 private fun getSignableTrade(
     orderId: String,
     address: String,
@@ -94,34 +63,29 @@ private fun getSignableTrade(
                 order.status != "active" ->
                     future.completeExceptionally(ImmutableException("Order not available for purchase"))
                 else -> {
-                    val buyAmount = order.sell?.data?.quantity
-                    val sellAmount = order.buy?.data?.quantity
-                    when {
-                        buyAmount == null ->
-                            future.completeExceptionally(ImmutableException("Unable to get buy amount"))
-                        sellAmount == null ->
-                            future.completeExceptionally(ImmutableException("Unable to get sell amount"))
-                        else -> {
-                            try {
-                                future.complete(
-                                    api.getSignableOrder(
-                                        GetSignableOrderRequest(
-                                            amountBuy = buyAmount,
-                                            amountSell = sellAmount,
-                                            tokenBuy = order.sell.clean()!!,
-                                            tokenSell = order.buy.clean()!!,
-                                            user = address,
-                                            fees = listOf(), // add support for maker/taker fees
-                                            includeFees = true
-                                        )
-                                    )
+                    try {
+                        future.complete(
+                            api.getSignableOrder(
+                                GetSignableOrderRequest(
+                                    amountBuy = order.sell!!.data!!.quantity!!,
+                                    amountSell = order.buy!!.data!!.quantity!!,
+                                    tokenBuy = order.sell.clean()!!,
+                                    tokenSell = order.buy.clean()!!,
+                                    user = address,
+                                    fees = listOf(), // add support for maker/taker fees
+                                    includeFees = true
                                 )
-                            } catch (e: Exception) {
-                                future.completeExceptionally(
-                                    ImmutableException("Unable to get signable order: ${e.message}")
-                                )
-                            }
-                        }
+                            )
+                        )
+                    } catch (e: Exception) {
+                        if (e is NullPointerException)
+                            future.completeExceptionally(
+                                ImmutableException("Order is missing buy and/or sell data: ${e.message}")
+                            )
+                        else
+                            future.completeExceptionally(
+                                ImmutableException("Unable to get signable order: ${e.message}")
+                            )
                     }
                 }
             }

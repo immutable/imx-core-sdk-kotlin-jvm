@@ -7,47 +7,12 @@ import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.model.*
-import com.immutable.sdk.utils.ConvertedToken
 import com.immutable.sdk.utils.TokenType
 import java.util.concurrent.CompletableFuture
 
-internal fun Token.getAmount(): String? = data?.quantity
-
-internal fun Token.convert(): ConvertedToken? = data?.let {
-    when (type) {
-        TokenType.ETH.name -> {
-            if (it.quantity != null && it.decimals != null)
-                ConvertedToken.ETH(
-                    it.decimals,
-                    it.quantity
-                )
-            else
-                null
-        }
-        TokenType.ERC20.name -> {
-            if (it.tokenAddress != null && it.quantity != null && it.decimals != null)
-                ConvertedToken.ERC20(
-                    it.tokenAddress,
-                    it.decimals,
-                    it.quantity
-                )
-            else
-                null
-        }
-        TokenType.ERC721.name -> {
-            if (it.tokenAddress != null && it.quantity != null && it.tokenId != null)
-                ConvertedToken.ERC721(
-                    it.tokenAddress,
-                    it.tokenId,
-                    it.quantity
-                )
-            else
-                null
-        }
-        else -> null
-    }
-}
-
+/**
+ * We need to strip the Token back to the required only fields otherwise the api validation will fail.
+ */
 internal fun Token.clean(): Token? = data?.let {
     when (type) {
         TokenType.ETH.name -> {
@@ -116,48 +81,52 @@ private fun getSignableTrade(
 ): CompletableFuture<GetSignableOrderResponse> {
     val future = CompletableFuture<GetSignableOrderResponse>()
     CompletableFuture.runAsync {
-        val order = api.getOrder(
-            id = orderId,
-            includeFees = true,
-            auxiliaryFeePercentages = null,
-            auxiliaryFeeRecipients = null
-        )
-        when {
-            order.user == address ->
-                future.completeExceptionally(ImmutableException("Cannot purchase own order"))
-            order.status != "active" ->
-                future.completeExceptionally(ImmutableException("Order not available for purchase"))
-            else -> {
-                val buyAmount = order.sell?.getAmount()
-                val sellAmount = order.buy?.getAmount()
-                when {
-                    buyAmount == null ->
-                        future.completeExceptionally(ImmutableException("Unable to get buy amount"))
-                    sellAmount == null ->
-                        future.completeExceptionally(ImmutableException("Unable to get sell amount"))
-                    else -> {
-                        try {
-                            future.complete(
-                                api.getSignableOrder(
-                                    GetSignableOrderRequest(
-                                        amountBuy = buyAmount,
-                                        amountSell = sellAmount,
-                                        tokenBuy = order.sell.clean()!!,
-                                        tokenSell = order.buy.clean()!!,
-                                        user = address,
-                                        fees = listOf(), // map fees order.fees,
-                                        includeFees = true
+        try {
+            val order = api.getOrder(
+                id = orderId,
+                includeFees = true,
+                auxiliaryFeePercentages = null,
+                auxiliaryFeeRecipients = null
+            )
+            when {
+                order.user == address ->
+                    future.completeExceptionally(ImmutableException("Cannot purchase own order"))
+                order.status != "active" ->
+                    future.completeExceptionally(ImmutableException("Order not available for purchase"))
+                else -> {
+                    val buyAmount = order.sell?.data?.quantity
+                    val sellAmount = order.buy?.data?.quantity
+                    when {
+                        buyAmount == null ->
+                            future.completeExceptionally(ImmutableException("Unable to get buy amount"))
+                        sellAmount == null ->
+                            future.completeExceptionally(ImmutableException("Unable to get sell amount"))
+                        else -> {
+                            try {
+                                future.complete(
+                                    api.getSignableOrder(
+                                        GetSignableOrderRequest(
+                                            amountBuy = buyAmount,
+                                            amountSell = sellAmount,
+                                            tokenBuy = order.sell.clean()!!,
+                                            tokenSell = order.buy.clean()!!,
+                                            user = address,
+                                            fees = listOf(), // map fees order.fees,
+                                            includeFees = true
+                                        )
                                     )
                                 )
-                            )
-                        } catch (e: Exception) {
-                            future.completeExceptionally(
-                                ImmutableException("Unable to get signable order: ${e.message}")
-                            )
+                            } catch (e: Exception) {
+                                future.completeExceptionally(
+                                    ImmutableException("Unable to get signable order: ${e.message}")
+                                )
+                            }
                         }
                     }
                 }
             }
+        } catch (e: Exception) {
+            future.completeExceptionally(ImmutableException("Unable to get order details: ${e.message}"))
         }
     }
     return future
@@ -190,8 +159,8 @@ private fun getStarkSignature(
             } ?: CryptoUtil.getLimitOrderMsg(
                 tokenSell = response.assetIdSell!!,
                 tokenBuy = response.assetIdBuy!!,
-                vaultSell = response.assetIdSell.toString(),
-                vaultBuy = response.assetIdBuy.toString(),
+                vaultSell = response.vaultIdSell.toString(),
+                vaultBuy = response.vaultIdBuy.toString(),
                 amountSell = response.amountSell!!,
                 amountBuy = response.amountBuy!!,
                 nonce = response.nonce.toString(),

@@ -23,5 +23,9 @@ interface Signer {
 }
 
 interface StarkSigner {
+    /**
+     * Sign a message with the users L2 Stark keys. This is needed to perform transactions on
+     * Immutable.
+     */
     fun starkSign(message: String): CompletableFuture<String>
 }

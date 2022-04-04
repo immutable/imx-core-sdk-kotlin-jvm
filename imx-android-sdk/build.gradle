@@ -7,6 +7,19 @@ plugins {
     id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
 }
 
+def getArtifactId = { ->
+    return "imx-android-sdk"
+}
+
+def getVersionName = { ->
+    return "0.0.9"
+}
+
+task addHeader(type:Exec) {
+    workingDir '..'
+    commandLine 'python', 'addHeaderScript.py', getVersionName()
+}
+
 android {
     compileSdk 32
 
@@ -53,6 +66,10 @@ android {
     // Generate all apis before every build
     preBuild.dependsOn(tasks.openApiGenerate)
 
+    // Add SDK version header to all API endpoint
+    preBuild.dependsOn(tasks.addHeader)
+    tasks.addHeader.shouldRunAfter(tasks.openApiGenerate)
+
     preBuild.dependsOn(tasks.ktlintCheck)
     preBuild.dependsOn(tasks.detekt)
 }
@@ -78,14 +95,6 @@ def githubProperties = new Properties()
 def githubPropertiesFile = file("github.properties")
 if (githubPropertiesFile.exists()) {
     githubProperties.load(new FileInputStream(githubPropertiesFile))
-}
-
-def getVersionName = { ->
-    return "0.0.9"
-}
-
-def getArtifactId = { ->
-    return "imx-android-sdk"
 }
 
 publishing {

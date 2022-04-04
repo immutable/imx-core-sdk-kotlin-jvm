@@ -11,14 +11,14 @@ internal fun Token.clean(): Token? = data?.let {
     when (type) {
         TokenType.ETH.name -> {
             if (it.decimals != null)
-                Token(TokenData(decimals = it.decimals), type = TokenType.ETH.name)
+                Token(data = TokenData(decimals = it.decimals), type = TokenType.ETH.name)
             else
                 null
         }
         TokenType.ERC20.name -> {
             if (it.tokenAddress != null && it.decimals != null)
                 Token(
-                    TokenData(decimals = it.decimals, tokenAddress = it.tokenAddress),
+                    data = TokenData(decimals = it.decimals, tokenAddress = it.tokenAddress),
                     type = TokenType.ERC20.name
                 )
             else
@@ -27,7 +27,7 @@ internal fun Token.clean(): Token? = data?.let {
         TokenType.ERC721.name -> {
             if (it.tokenAddress != null && it.tokenId != null)
                 Token(
-                    TokenData(tokenId = it.tokenId, tokenAddress = it.tokenAddress),
+                    data = TokenData(tokenId = it.tokenId, tokenAddress = it.tokenAddress),
                     type = TokenType.ERC721.name
                 )
             else

@@ -28,7 +28,7 @@ internal fun getStarkSignature(
                     expirationTimestamp = response.expirationTimestamp!!.toString(),
                     feeToken = feeInfo.assetId,
                     feeLimit = feeInfo.feeLimit,
-                    feeVault = feeInfo.sourceVaultId!!.toString()
+                    feeVault = feeInfo.sourceVaultId.toString()
                 )
             } ?: CryptoUtil.getLimitOrderMsg(
                 tokenSell = response.assetIdSell!!,

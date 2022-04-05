@@ -61,7 +61,7 @@ object ImmutableXSdk {
      * @param tokenAddress the address of the ERC721 contract
      * @param tokenId the token id of the ERC721 asset
      * @param sellTokenAmount the amount to sell the ERC721 asset
-     * @param sellTokenAddress (optional) the address of the ERC20 contract to be used for the [sellAmount].
+     * @param sellTokenAddress (optional) the address of the ERC20 contract to be used for the [sellTokenAmount].
      * If this is not set, the default token address will be for ETH.
      * @param sellTokenDecimals (optional) the number of decimals for the sell token. This needs to be set if [sellTokenAddress] is set.
      * @param signer represents the users L1 wallet to get the address

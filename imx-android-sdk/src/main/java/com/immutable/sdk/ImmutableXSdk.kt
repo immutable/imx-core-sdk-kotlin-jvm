@@ -54,4 +54,61 @@ object ImmutableXSdk {
         starkSigner: StarkSigner
     ): CompletableFuture<Int> =
         com.immutable.sdk.workflows.buy(orderId, signer, starkSigner)
+
+    /**
+     * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
+     *
+     * @param tokenAddress the address of the ERC721 contract
+     * @param tokenId the token id of the ERC721 asset
+     * @param sellTokenAmount the amount to sell the ERC721 asset
+     * @param sellTokenAddress (optional) the address of the ERC20 contract to be used for the [sellAmount].
+     * If this is not set, the default token address will be for ETH.
+     * @param sellTokenDecimals (optional) the number of decimals for the sell token. This needs to be set if [sellTokenAddress] is set.
+     * @param signer represents the users L1 wallet to get the address
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     *
+     * @return a [CompletableFuture] that will provide the cancelled Order id if successful.
+     */
+    @Suppress("LongParameterList")
+    fun sell(
+        tokenAddress: String,
+        tokenId: String,
+        sellTokenAmount: String,
+        sellTokenAddress: String? = null,
+        sellTokenDecimals: Int? = null,
+        signer: Signer,
+        starkSigner: StarkSigner
+    ): CompletableFuture<Int> {
+        require(
+            (sellTokenAddress != null && sellTokenDecimals != null) ||
+                (sellTokenAddress == null && sellTokenDecimals == null)
+        ) {
+            "If sellTokenAddress is not null, sellTokenDecimals also cannot be null"
+        }
+
+        return com.immutable.sdk.workflows.sell(
+            tokenAddress,
+            tokenId,
+            sellTokenAmount,
+            sellTokenAddress,
+            sellTokenDecimals,
+            signer,
+            starkSigner
+        )
+    }
+
+    /**
+     * This is a utility function that will chain the necessary calls to cancel an existing order.
+     *
+     * @param orderId the id of an existing order to be bought
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     *
+     * @return a [CompletableFuture] that will provide the Order id if successful.
+     */
+    @Suppress("LongParameterList")
+    fun cancel(
+        orderId: String,
+        starkSigner: StarkSigner
+    ): CompletableFuture<Int> =
+        com.immutable.sdk.workflows.cancel(orderId, starkSigner)
 }

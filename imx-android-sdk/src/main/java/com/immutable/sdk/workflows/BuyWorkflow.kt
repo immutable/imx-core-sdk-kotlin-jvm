@@ -5,7 +5,6 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
-import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.CreateTradeRequest
 import com.immutable.sdk.model.GetSignableOrderRequest
@@ -93,57 +92,6 @@ private fun getSignableTrade(
             future.completeExceptionally(ImmutableException("Unable to get order details: ${e.message}"))
         }
     }
-    return future
-}
-
-@Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
-private fun getStarkSignature(
-    response: GetSignableOrderResponse,
-    signer: StarkSigner
-): CompletableFuture<Pair<GetSignableOrderResponse, String>> {
-    val future = CompletableFuture<Pair<GetSignableOrderResponse, String>>()
-
-    // Temporary until API returns message to sign
-    CompletableFuture.runAsync {
-        try {
-            val msg = response.feeInfo?.let { feeInfo ->
-                CryptoUtil.getLimitOrderMsgWithFee(
-                    tokenSell = response.assetIdSell!!,
-                    tokenBuy = response.assetIdBuy!!,
-                    vaultSell = response.vaultIdSell.toString(),
-                    vaultBuy = response.vaultIdBuy.toString(),
-                    amountSell = response.amountSell!!,
-                    amountBuy = response.amountBuy!!,
-                    nonce = response.nonce.toString(),
-                    expirationTimestamp = response.expirationTimestamp.toString(),
-                    feeToken = feeInfo.assetId,
-                    feeLimit = feeInfo.feeLimit,
-                    feeVault = feeInfo.sourceVaultId.toString()
-                )
-            } ?: CryptoUtil.getLimitOrderMsg(
-                tokenSell = response.assetIdSell!!,
-                tokenBuy = response.assetIdBuy!!,
-                vaultSell = response.vaultIdSell.toString(),
-                vaultBuy = response.vaultIdBuy.toString(),
-                amountSell = response.amountSell!!,
-                amountBuy = response.amountBuy!!,
-                nonce = response.nonce.toString(),
-                expirationTimestamp = response.expirationTimestamp.toString()
-            )
-
-            signer.starkSign(msg).whenComplete { signature, error ->
-                if (error != null)
-                    future.completeExceptionally(
-                        ImmutableException("Unable to generate stark signature")
-                    )
-                else
-                    future.complete(response to signature)
-            }
-        } catch (e: Exception) {
-            future.completeExceptionally(e)
-        }
-    }
-
     return future
 }
 

@@ -7,21 +7,10 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.*
 import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.utils.Constants.ERC721_SELL_AMOUNT
 import com.immutable.sdk.utils.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
-
-private const val AMOUNT_SELL = "1"
-
-sealed class SellToken {
-    object ETH : SellToken()
-
-    /**
-     * @param tokenAddress the address of the ERC20 contract.
-     * @param decimals the number of decimals for the token.
-     */
-    data class ERC20(val tokenAddress: String, val decimals: Int) : SellToken()
-}
 
 @Suppress("LongParameterList")
 internal fun sell(
@@ -52,7 +41,7 @@ internal fun sell(
                 ordersApi
             )
         }.whenComplete { tradeId, error ->
-            // Forward any exceptions from the compose chain to the login future
+            // Forward any exceptions from the compose chain
             if (error != null)
                 future.completeExceptionally(error)
             else
@@ -79,7 +68,7 @@ private fun getSignableOrder(
         try {
             val request = GetSignableOrderRequest(
                 amountBuy = convertAmount(sellAmount, sellToken),
-                amountSell = AMOUNT_SELL,
+                amountSell = ERC721_SELL_AMOUNT,
                 tokenBuy = createTokenBuy(sellToken),
                 tokenSell = createTokenSell(asset),
                 user = address,

@@ -39,7 +39,7 @@ internal fun login(signer: Signer, api: UsersApi = UsersApi()): CompletableFutur
         .thenCompose { keyPairAndData -> getRegisterMessage(signer, keyPairAndData) }
         .thenCompose { keyPairAndData -> registerUser(keyPairAndData, api) }
         .whenComplete { ecKeyPair, throwable ->
-            // Forward any exceptions from the compose chain to the login future
+            // Forward any exceptions from the compose chain
             if (throwable != null)
                 future.completeExceptionally(throwable)
             else

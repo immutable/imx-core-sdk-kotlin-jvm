@@ -1,5 +1,6 @@
 package com.immutable.sdk.model
 
+import com.immutable.sdk.utils.Constants.ERC721_SELL_AMOUNT
 import com.immutable.sdk.utils.TokenType
 
 class Erc721Asset(
@@ -11,7 +12,7 @@ class Erc721Asset(
      * The token id of this ERC721 asset
      */
     val tokenId: String
-) : AssetModel("1") {
+) : AssetModel(ERC721_SELL_AMOUNT) {
     override fun toToken(): Token = Token(
         type = TokenType.ERC721.name,
         data = TokenData(tokenAddress = tokenAddress, tokenId = tokenId)

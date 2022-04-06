@@ -7,7 +7,7 @@ import com.immutable.sdk.model.GetSignableOrderResponse
 import java.util.concurrent.CompletableFuture
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
-internal fun getStarkSignature(
+internal fun getOrderStarkSignature(
     response: GetSignableOrderResponse,
     signer: StarkSigner
 ): CompletableFuture<Pair<GetSignableOrderResponse, String>> {

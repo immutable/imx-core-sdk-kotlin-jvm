@@ -44,7 +44,7 @@ internal fun sell(
                 ordersApi
             )
         }
-        .thenCompose { response -> getStarkSignature(response, starkSigner) }
+        .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
         .thenCompose { responseToSignature ->
             createOrder(
                 responseToSignature.first,

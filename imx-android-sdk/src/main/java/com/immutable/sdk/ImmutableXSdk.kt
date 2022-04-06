@@ -1,5 +1,6 @@
 package com.immutable.sdk
 
+import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.workflows.SellToken
@@ -98,4 +99,23 @@ object ImmutableXSdk {
         starkSigner: StarkSigner
     ): CompletableFuture<Int> =
         com.immutable.sdk.workflows.cancel(orderId, starkSigner)
+
+    /**
+     * This is a utility function that will chain the necessary calls to transfer a token.
+     *
+     * @param token to be transferred (ETH, ERC20, or ERC721)
+     * @param recipientAddress of the wallet that will receive the token
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     * @param signer represents the users L1 wallet to get the address
+     *
+     * @return a [CompletableFuture] that will provide the transfer id if successful.
+     */
+    @Suppress("LongParameterList")
+    fun transfer(
+        token: AssetModel,
+        recipientAddress: String,
+        signer: Signer,
+        starkSigner: StarkSigner,
+    ): CompletableFuture<Int> =
+        com.immutable.sdk.workflows.transfer(token, recipientAddress, signer, starkSigner)
 }

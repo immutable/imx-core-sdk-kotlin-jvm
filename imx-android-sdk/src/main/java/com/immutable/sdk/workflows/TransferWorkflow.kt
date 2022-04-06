@@ -20,7 +20,7 @@ internal fun transfer(
         .thenCompose { signableResponse -> getTransferRequest(signableResponse, starkSigner) }
         .thenCompose { request -> createTransfer(request, api) }
         .whenComplete { response, error ->
-            // Forward any exceptions from the compose chain to the login future
+            // Forward any exceptions from the compose chain
             if (error != null)
                 future.completeExceptionally(error)
             else

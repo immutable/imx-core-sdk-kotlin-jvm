@@ -7,6 +7,7 @@ import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.CreateOrderResponse
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.GetSignableOrderResponse
+import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every

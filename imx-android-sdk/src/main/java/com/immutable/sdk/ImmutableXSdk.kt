@@ -2,8 +2,8 @@ package com.immutable.sdk
 
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.stark.StarkCurve
-import com.immutable.sdk.workflows.SellToken
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 

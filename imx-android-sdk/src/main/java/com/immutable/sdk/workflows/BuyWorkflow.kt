@@ -22,7 +22,7 @@ internal fun buy(
 
     signer.getAddress()
         .thenCompose { address -> getSignableTrade(orderId, address, ordersApi) }
-        .thenCompose { response -> getStarkSignature(response, starkSigner) }
+        .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
         .thenCompose { responseToSignature ->
             createTrade(
                 orderId.toInt(),
@@ -31,7 +31,7 @@ internal fun buy(
                 tradesApi
             )
         }.whenComplete { tradeId, error ->
-            // Forward any exceptions from the compose chain to the login future
+            // Forward any exceptions from the compose chain
             if (error != null)
                 future.completeExceptionally(error)
             else

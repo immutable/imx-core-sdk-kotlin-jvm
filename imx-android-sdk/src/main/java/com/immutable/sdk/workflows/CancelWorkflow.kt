@@ -19,7 +19,7 @@ internal fun cancel(
             cancelOrder(orderId, signature, ordersApi)
         }
         .whenComplete { cancelledOrderId, error ->
-            // Forward any exceptions from the compose chain to the login future
+            // Forward any exceptions from the compose chain
             if (error != null)
                 future.completeExceptionally(error)
             else

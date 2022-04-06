@@ -3409,6 +3409,10 @@
                     "description": "Nonce of the transfer",
                     "type": "integer"
                 },
+                "payload_hash": {
+                    "description": "Hash of the payload",
+                    "type": "string"
+                },
                 "receiver_stark_key": {
                     "description": "Receiver of the transfer",
                     "type": "string"

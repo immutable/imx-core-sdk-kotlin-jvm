@@ -12,4 +12,6 @@ internal object Constants {
     const val HEX_RADIX = 16
 
     const val ETH_DECIMALS = 18
+
+    const val ERC721_AMOUNT = "1"
 }

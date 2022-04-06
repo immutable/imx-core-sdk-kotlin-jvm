@@ -7,7 +7,6 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.*
 import com.immutable.sdk.utils.Constants
-import com.immutable.sdk.utils.Constants.ERC721_AMOUNT
 import com.immutable.sdk.utils.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
@@ -68,7 +67,7 @@ private fun getSignableOrder(
         try {
             val request = GetSignableOrderRequest(
                 amountBuy = convertAmount(sellAmount, sellToken),
-                amountSell = ERC721_AMOUNT,
+                amountSell = asset.quantity,
                 tokenBuy = createTokenBuy(sellToken),
                 tokenSell = createTokenSell(asset),
                 user = address,

@@ -22,7 +22,7 @@ internal fun buy(
 
     signer.getAddress()
         .thenCompose { address -> getSignableTrade(orderId, address, ordersApi) }
-        .thenCompose { response -> getStarkSignature(response, starkSigner) }
+        .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
         .thenCompose { responseToSignature ->
             createTrade(
                 orderId.toInt(),

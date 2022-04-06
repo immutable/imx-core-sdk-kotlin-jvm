@@ -10,4 +10,6 @@ internal object Constants {
     const val HEX_PREFIX = "0x"
     const val CHAR_ZERO = '0'
     const val HEX_RADIX = 16
+
+    const val ETH_DECIMALS = 18
 }

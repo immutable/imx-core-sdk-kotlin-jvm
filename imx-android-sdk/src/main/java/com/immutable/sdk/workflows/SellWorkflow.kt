@@ -6,9 +6,12 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.*
+import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
+
+private const val AMOUNT_SELL = "1"
 
 @Suppress("LongParameterList")
 internal fun sell(
@@ -71,36 +74,16 @@ private fun getSignableOrder(
     val future = CompletableFuture<GetSignableOrderResponse>()
     CompletableFuture.runAsync {
         try {
-            future.complete(
-                api.getSignableOrder(
-                    GetSignableOrderRequest(
-                        amountBuy = convertAmount(sellTokenAmount, sellTokenDecimals),
-                        amountSell = "1",
-                        tokenBuy = if (sellTokenAddress != null)
-                            Token(
-                                data = TokenData(
-                                    tokenAddress = sellTokenAddress,
-                                    decimals = sellTokenDecimals
-                                ),
-                                type = TokenType.ERC20.name
-                            )
-                        else Token(
-                            data = TokenData(decimals = 18),
-                            type = TokenType.ETH.name
-                        ),
-                        tokenSell = Token(
-                            data = TokenData(
-                                tokenId = tokenId,
-                                tokenAddress = tokenAddress
-                            ),
-                            type = TokenType.ERC721.name
-                        ),
-                        user = address,
-                        fees = listOf(), // add support for maker/taker fees
-                        includeFees = true
-                    )
-                )
+            val request = GetSignableOrderRequest(
+                amountBuy = convertAmount(sellTokenAmount, sellTokenDecimals),
+                amountSell = AMOUNT_SELL,
+                tokenBuy = createTokenBuy(sellTokenAddress, sellTokenDecimals),
+                tokenSell = createTokenSell(tokenAddress, tokenId),
+                user = address,
+                fees = listOf(), // add support for maker/taker fees
+                includeFees = true
             )
+            future.complete(api.getSignableOrder(request))
         } catch (e: Exception) {
             future.completeExceptionally(
                 ImmutableException("Unable to get signable order: ${e.message}")
@@ -110,10 +93,31 @@ private fun getSignableOrder(
     return future
 }
 
-@Suppress("MagicNumber")
+private fun createTokenBuy(
+    sellTokenAddress: String?,
+    sellTokenDecimals: Int?
+) = if (sellTokenAddress != null)
+    Token(
+        data = TokenData(tokenAddress = sellTokenAddress, decimals = sellTokenDecimals),
+        type = TokenType.ERC20.name
+    )
+else Token(
+    data = TokenData(decimals = Constants.ETH_DECIMALS),
+    type = TokenType.ETH.name
+)
+
+private fun createTokenSell(
+    tokenAddress: String,
+    tokenId: String
+) = Token(
+    data = TokenData(tokenId = tokenId, tokenAddress = tokenAddress),
+    type = TokenType.ERC721.name
+)
+
 @VisibleForTesting
 internal fun convertAmount(value: String, decimals: Int?): String =
-    (BigDecimal(10).pow(decimals ?: 18) * BigDecimal(value)).toBigInteger().toString()
+    (BigDecimal.TEN.pow(decimals ?: Constants.ETH_DECIMALS) * BigDecimal(value)).toBigInteger()
+        .toString()
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 private fun createOrder(

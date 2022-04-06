@@ -6,6 +6,7 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.CreateOrderResponse
 import com.immutable.sdk.model.GetSignableOrderResponse
+import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -14,10 +15,7 @@ import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CountDownLatch
-import java.util.concurrent.TimeUnit
 
-private const val LATCH_TIME_OUT_MS = 3000L
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
 private const val TOKEN_ADDRESS = "0x6ee5c0826ba5523c9f0eee40da69befa30b3d97f"
 private const val TOKEN_ID = "9"
@@ -42,11 +40,6 @@ class SellWorkflowTest {
 
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var starkSignatureFuture: CompletableFuture<String>
-    private var throwable: Throwable? = null
-    private var orderId: Int? = null
-    private var completed = false
-
-    private lateinit var latch: CountDownLatch
 
     @Before
     fun setUp() {
@@ -57,8 +50,6 @@ class SellWorkflowTest {
 
         starkSignatureFuture = CompletableFuture<String>()
         every { starkSigner.starkSign(any()) } returns starkSignatureFuture
-
-        latch = CountDownLatch(1)
 
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse(
             assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
@@ -73,25 +64,16 @@ class SellWorkflowTest {
         )
     }
 
-    private fun sell() {
-        val future = sell(
-            tokenAddress = TOKEN_ADDRESS,
-            tokenId = TOKEN_ID,
-            sellTokenAmount = SELL_AMOUNT,
-            sellTokenAddress = null,
-            sellTokenDecimals = null,
-            signer = signer,
-            starkSigner = starkSigner,
-            ordersApi = ordersApi
-        )
-        future.whenComplete { id, error ->
-            completed = true
-            orderId = id
-            throwable = error
-            latch.countDown()
-        }
-        latch.await(LATCH_TIME_OUT_MS, TimeUnit.MILLISECONDS)
-    }
+    private fun createSellFuture() = sell(
+        tokenAddress = TOKEN_ADDRESS,
+        tokenId = TOKEN_ID,
+        sellTokenAmount = SELL_AMOUNT,
+        sellTokenAddress = null,
+        sellTokenDecimals = null,
+        signer = signer,
+        starkSigner = starkSigner,
+        ordersApi = ordersApi
+    )
 
     @Test
     fun testSellInEthSuccess() {
@@ -100,11 +82,11 @@ class SellWorkflowTest {
 
         every { ordersApi.createOrder(any()) } returns CreateOrderResponse(orderId = ORDER_ID)
 
-        sell()
-
-        assert(completed)
-        assert(throwable == null)
-        assert(orderId == ORDER_ID)
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = ORDER_ID,
+            expectedError = null
+        )
     }
 
     @Test
@@ -114,42 +96,35 @@ class SellWorkflowTest {
 
         every { ordersApi.createOrder(any()) } returns CreateOrderResponse(orderId = ORDER_ID)
 
-        val future = sell(
-            TOKEN_ADDRESS,
-            TOKEN_ID,
-            SELL_AMOUNT,
-            SELL_TOKEN_ADDRESS,
-            SELL_TOKEN_DECIMALS,
-            signer = signer,
-            starkSigner = starkSigner,
-            ordersApi = ordersApi
+        testFuture(
+            future = sell(
+                TOKEN_ADDRESS,
+                TOKEN_ID,
+                SELL_AMOUNT,
+                SELL_TOKEN_ADDRESS,
+                SELL_TOKEN_DECIMALS,
+                signer = signer,
+                starkSigner = starkSigner,
+                ordersApi = ordersApi
+            ),
+            expectedResult = ORDER_ID,
+            expectedError = null
         )
-        future.whenComplete { id, error ->
-            completed = true
-            orderId = id
-            throwable = error
-            latch.countDown()
-        }
-        latch.await(LATCH_TIME_OUT_MS, TimeUnit.MILLISECONDS)
-
-        assert(completed)
-        assert(throwable == null)
-        assert(orderId == ORDER_ID)
     }
 
     @Test
     fun testSellFailedOnAddress() {
-        addressFuture.completeExceptionally(ImmutableException(""))
+        addressFuture.completeExceptionally(ImmutableException())
 
         val starkSignatureFuture = CompletableFuture<String>()
         every { starkSigner.starkSign(any()) } returns starkSignatureFuture
         starkSignatureFuture.complete(SIGNATURE)
 
-        sell()
-
-        assert(completed)
-        assert(throwable != null)
-        assert(orderId == null)
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException()
+        )
     }
 
     @Test
@@ -157,11 +132,11 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         every { ordersApi.getSignableOrder(any()) } throws ClientException()
 
-        sell()
-
-        assert(completed)
-        assert(throwable != null)
-        assert(orderId == null)
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException()
+        )
     }
 
     @Test
@@ -169,11 +144,11 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.completeExceptionally(ImmutableException())
 
-        sell()
-
-        assert(completed)
-        assert(throwable != null)
-        assert(orderId == null)
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException()
+        )
     }
 
     @Test
@@ -182,11 +157,11 @@ class SellWorkflowTest {
         starkSignatureFuture.completeExceptionally(ImmutableException())
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
 
-        sell()
-
-        assert(completed)
-        assert(throwable != null)
-        assert(orderId == null)
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException()
+        )
     }
 
     @Test
@@ -195,11 +170,11 @@ class SellWorkflowTest {
         starkSignatureFuture.complete(SIGNATURE)
         every { ordersApi.createOrder(any()) } throws ClientException()
 
-        sell()
-
-        assert(completed)
-        assert(throwable != null)
-        assert(orderId == null)
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException()
+        )
     }
 
     @Test

@@ -13,5 +13,5 @@ internal object Constants {
 
     const val ETH_DECIMALS = 18
 
-    const val ERC721_SELL_AMOUNT = "1"
+    const val ERC721_AMOUNT = "1"
 }

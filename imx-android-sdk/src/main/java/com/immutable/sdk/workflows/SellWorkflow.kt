@@ -13,13 +13,21 @@ import java.util.concurrent.CompletableFuture
 
 private const val AMOUNT_SELL = "1"
 
+sealed class SellToken {
+    object ETH : SellToken()
+
+    /**
+     * @param tokenAddress the address of the ERC20 contract.
+     * @param decimals the number of decimals for the token.
+     */
+    data class ERC20(val tokenAddress: String, val decimals: Int) : SellToken()
+}
+
 @Suppress("LongParameterList")
 internal fun sell(
-    tokenAddress: String,
-    tokenId: String,
-    sellTokenAmount: String,
-    sellTokenAddress: String?, // If this is null, the default sell token address will be for ETH
-    sellTokenDecimals: Int?, // If this is null, the default value will be the number of decimals for ETH
+    asset: Erc721Asset,
+    sellAmount: String,
+    sellToken: SellToken,
     signer: Signer,
     starkSigner: StarkSigner,
     ordersApi: OrdersApi = OrdersApi()
@@ -29,11 +37,9 @@ internal fun sell(
     signer.getAddress()
         .thenCompose { address ->
             getSignableOrder(
-                tokenAddress,
-                tokenId,
-                sellTokenAmount,
-                sellTokenAddress,
-                sellTokenDecimals,
+                asset,
+                sellAmount,
+                sellToken,
                 address,
                 ordersApi
             )
@@ -59,15 +65,12 @@ internal fun sell(
 @Suppress(
     "TooGenericExceptionCaught",
     "SwallowedException",
-    "InstanceOfCheckForException",
-    "LongParameterList"
+    "InstanceOfCheckForException"
 )
 private fun getSignableOrder(
-    tokenAddress: String,
-    tokenId: String,
-    sellTokenAmount: String,
-    sellTokenAddress: String?,
-    sellTokenDecimals: Int?,
+    asset: Erc721Asset,
+    sellAmount: String,
+    sellToken: SellToken,
     address: String,
     api: OrdersApi
 ): CompletableFuture<GetSignableOrderResponse> {
@@ -75,10 +78,10 @@ private fun getSignableOrder(
     CompletableFuture.runAsync {
         try {
             val request = GetSignableOrderRequest(
-                amountBuy = convertAmount(sellTokenAmount, sellTokenDecimals),
+                amountBuy = convertAmount(sellAmount, sellToken),
                 amountSell = AMOUNT_SELL,
-                tokenBuy = createTokenBuy(sellTokenAddress, sellTokenDecimals),
-                tokenSell = createTokenSell(tokenAddress, tokenId),
+                tokenBuy = createTokenBuy(sellToken),
+                tokenSell = createTokenSell(asset),
                 user = address,
                 fees = listOf(), // add support for maker/taker fees
                 includeFees = true
@@ -93,31 +96,31 @@ private fun getSignableOrder(
     return future
 }
 
-private fun createTokenBuy(
-    sellTokenAddress: String?,
-    sellTokenDecimals: Int?
-) = if (sellTokenAddress != null)
-    Token(
-        data = TokenData(tokenAddress = sellTokenAddress, decimals = sellTokenDecimals),
+private fun createTokenBuy(sellToken: SellToken) = when (sellToken) {
+    SellToken.ETH -> Token(
+        data = TokenData(decimals = Constants.ETH_DECIMALS),
+        type = TokenType.ETH.name
+    )
+    is SellToken.ERC20 -> Token(
+        data = TokenData(tokenAddress = sellToken.tokenAddress, decimals = sellToken.decimals),
         type = TokenType.ERC20.name
     )
-else Token(
-    data = TokenData(decimals = Constants.ETH_DECIMALS),
-    type = TokenType.ETH.name
-)
+}
 
-private fun createTokenSell(
-    tokenAddress: String,
-    tokenId: String
-) = Token(
-    data = TokenData(tokenId = tokenId, tokenAddress = tokenAddress),
+private fun createTokenSell(asset: Erc721Asset) = Token(
+    data = TokenData(tokenId = asset.tokenId, tokenAddress = asset.tokenAddress),
     type = TokenType.ERC721.name
 )
 
 @VisibleForTesting
-internal fun convertAmount(value: String, decimals: Int?): String =
-    (BigDecimal.TEN.pow(decimals ?: Constants.ETH_DECIMALS) * BigDecimal(value)).toBigInteger()
+internal fun convertAmount(value: String, sellToken: SellToken): String {
+    val decimals = when (sellToken) {
+        is SellToken.ERC20 -> sellToken.decimals
+        SellToken.ETH -> Constants.ETH_DECIMALS
+    }
+    return (BigDecimal.TEN.pow(decimals) * BigDecimal(value)).toBigInteger()
         .toString()
+}
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 private fun createOrder(

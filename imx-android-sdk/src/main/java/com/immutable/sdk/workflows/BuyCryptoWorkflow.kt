@@ -3,7 +3,6 @@ package com.immutable.sdk.workflows
 import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
-import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
 import com.immutable.sdk.extensions.getJson
@@ -136,7 +135,7 @@ private fun getBuyCryptoUrl(
 ): String {
     val currenciesJson = JSONObject(currencies).toURLEncodedString()
     println(currenciesJson)
-    val requestParams = "apiKey=${ImmutableConfig.getMoonpayApiKey()}" +
+    val requestParams = "apiKey=${base.moonpayApiKey}" +
         "&baseCurrencyCode=usd" +
         "&colorCode=%23${colourCodeHex.replace(HASH_SIGN, "")}" +
         "&externalTransactionId=$transactionId" +

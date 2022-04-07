@@ -12,9 +12,9 @@ import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
-enum class ImmutableXBase(val url: String) {
-    Production("https://api.x.immutable.com"),
-    Ropsten("https://api.ropsten.x.immutable.com")
+enum class ImmutableXBase(val url: String, val moonpayApiKey: String) {
+    Production("https://api.x.immutable.com", "pk_live_lgGxv3WyWjnWff44ch4gmolN0953"),
+    Ropsten("https://api.ropsten.x.immutable.com", "pk_test_S33EgzH3XY5kfJSOS6GW0uxUWvoIUF")
 }
 
 object ImmutableXSdk {

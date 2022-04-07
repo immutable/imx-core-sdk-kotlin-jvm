@@ -1,7 +1,6 @@
 package com.immutable.sdk.workflows
 
 import android.content.Context
-import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
 import com.immutable.sdk.extensions.getJson
@@ -27,6 +26,7 @@ private const val COLOUR_HEX = "81d8d0"
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
 private const val MOONPAY_SIGNED_REQUEST = "1234567890abcdef="
 private const val TRANSACTION_ID = 8L
+private const val BASE_URL = "https://ropsten.immutable.com"
 private const val API_KEY = "pk_test_api"
 private const val CURRENCY_CODE_VALUE = "usdc"
 private const val ENCODED_CURRENCIES = "%7B%22eth_immutable"
@@ -57,6 +57,9 @@ class BuyCryptoWorkflowTest {
     @MockK
     private lateinit var jsonArray: JSONArray
 
+    @MockK
+    private lateinit var base: ImmutableXBase
+
     private lateinit var addressFuture: CompletableFuture<String>
 
     @Before
@@ -83,19 +86,19 @@ class BuyCryptoWorkflowTest {
         mockkStatic(URLEncoder::class)
         every { URLEncoder.encode(any(), any()) } returns ENCODED_CURRENCIES
 
-        mockkObject(ImmutableConfig)
-        every { ImmutableConfig.getMoonpayApiKey() } returns API_KEY
-
         every { jsonObject.getLong(ID) } returns TRANSACTION_ID
         every { jsonObject.getString(SIGNATURE) } returns MOONPAY_SIGNED_REQUEST
 
         mockkObject(Utils)
         every { Utils.launchCustomTabs(any(), any(), any()) } returns Unit
+
+        every { base.url } returns BASE_URL
+        every { base.moonpayApiKey } returns API_KEY
     }
 
     private fun buyCrypto() {
         buyCrypto(
-            base = ImmutableXBase.Ropsten,
+            base = base,
             context = context,
             signer = signer,
             client = client,

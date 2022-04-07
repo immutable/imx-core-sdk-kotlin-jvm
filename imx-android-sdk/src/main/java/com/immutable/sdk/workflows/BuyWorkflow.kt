@@ -9,7 +9,12 @@ import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.CreateTradeRequest
 import com.immutable.sdk.model.GetSignableOrderRequest
 import com.immutable.sdk.model.GetSignableOrderResponse
+import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
+
+private const val SIGNABLE_ORDER = "Signable order"
+private const val ORDER_DETAILS = "Order details"
+private const val CREATE_TRADE = "Create trade"
 
 internal fun buy(
     orderId: String,
@@ -58,9 +63,13 @@ private fun getSignableTrade(
             )
             when {
                 order.user == address ->
-                    future.completeExceptionally(ImmutableException("Cannot purchase own order"))
-                order.status != "active" ->
-                    future.completeExceptionally(ImmutableException("Order not available for purchase"))
+                    future.completeExceptionally(
+                        ImmutableException.invalidRequest("Cannot purchase own order")
+                    )
+                order.status != OrderStatus.Active.value ->
+                    future.completeExceptionally(
+                        ImmutableException.invalidRequest("Order not available for purchase")
+                    )
                 else -> {
                     try {
                         future.complete(
@@ -79,17 +88,17 @@ private fun getSignableTrade(
                     } catch (e: Exception) {
                         if (e is NullPointerException)
                             future.completeExceptionally(
-                                ImmutableException("Order is missing buy and/or sell data: ${e.message}")
+                                ImmutableException.invalidResponse(SIGNABLE_ORDER, e)
                             )
                         else
                             future.completeExceptionally(
-                                ImmutableException("Unable to get signable order: ${e.message}")
+                                ImmutableException.apiError(SIGNABLE_ORDER, e)
                             )
                     }
                 }
             }
         } catch (e: Exception) {
-            future.completeExceptionally(ImmutableException("Unable to get order details: ${e.message}"))
+            future.completeExceptionally(ImmutableException.apiError(ORDER_DETAILS, e))
         }
     }
     return future
@@ -128,13 +137,9 @@ private fun createTrade(
             )
         } catch (e: Exception) {
             if (e is NullPointerException)
-                future.completeExceptionally(
-                    ImmutableException(
-                        "Unable to complete buy: Signable order response contains unexpected null values"
-                    )
-                )
+                future.completeExceptionally(ImmutableException.invalidResponse(CREATE_TRADE, e))
             else
-                future.completeExceptionally(ImmutableException("Unable to complete buy: ${e.message}"))
+                future.completeExceptionally(ImmutableException.apiError(CREATE_TRADE, e))
         }
     }
     return future

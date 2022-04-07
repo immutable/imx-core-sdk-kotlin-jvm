@@ -32,9 +32,15 @@ android {
     }
 
     buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+            buildConfigField 'String', 'MOONPAY_API_KEY', '"pk_test_S33EgzH3XY5kfJSOS6GW0uxUWvoIUF"'
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            buildConfigField 'String', 'MOONPAY_API_KEY', '"pk_live_lgGxv3WyWjnWff44ch4gmolN0953"'
         }
     }
     compileOptions {
@@ -83,6 +89,9 @@ dependencies {
 
     // Web3
     implementation "org.web3j:core:4.8.7-android"
+
+    // Required for Moonpay
+    implementation "androidx.browser:browser:1.4.0"
 
     testImplementation 'junit:junit:4.13.2'
     testImplementation "io.mockk:mockk:1.12.3"

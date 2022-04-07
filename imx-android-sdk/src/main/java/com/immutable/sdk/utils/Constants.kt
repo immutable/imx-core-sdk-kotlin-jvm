@@ -14,4 +14,7 @@ internal object Constants {
     const val ETH_DECIMALS = 18
 
     const val ERC721_AMOUNT = "1"
+
+    const val DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR = "#191E2B"
+    const val DEFAULT_MOONPAY_COLOUR_CODE = "#00818e"
 }

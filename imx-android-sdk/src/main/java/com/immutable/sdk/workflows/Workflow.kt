@@ -6,6 +6,8 @@ import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.model.GetSignableOrderResponse
 import java.util.concurrent.CompletableFuture
 
+private const val SIGNABLE_ORDER = "Signable order"
+
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 internal fun getOrderStarkSignature(
     response: GetSignableOrderResponse,
@@ -43,19 +45,13 @@ internal fun getOrderStarkSignature(
 
             signer.starkSign(msg).whenComplete { signature, error ->
                 if (error != null)
-                    future.completeExceptionally(
-                        ImmutableException("Unable to generate stark signature")
-                    )
+                    future.completeExceptionally(error)
                 else
                     future.complete(response to signature)
             }
         } catch (e: Exception) {
             if (e is NullPointerException)
-                future.completeExceptionally(
-                    ImmutableException(
-                        "Unable to generate stark signature: Signable order response contains unexpected null values"
-                    )
-                )
+                future.completeExceptionally(ImmutableException.invalidResponse(SIGNABLE_ORDER, e))
             else
                 future.completeExceptionally(e)
         }

@@ -37,17 +37,23 @@ fun <T> testFuture(
     assertEquals(expectedResult, data)
     if (expectedError == null)
         assert(error == null)
-    else
-        assert(
-            when (error) {
-                is CompletionException -> error!!.cause
-                else -> error
-            }!!.javaClass.isInstance(expectedError)
-        )
+    else {
+        val rootCause = when (error) {
+            is CompletionException -> error!!.cause
+            else -> error
+        }
+
+        // If expected error is ImmutableException verify the type is correct otherwise just match
+        // the exception class
+        if (expectedError is ImmutableException)
+            assert(expectedError.type == (rootCause as ImmutableException).type)
+        else
+            assert(rootCause!!.javaClass.isInstance(expectedError))
+    }
 }
 
 /**
- * Helper for testing futures that will return the result abd error in the given [block] after waiting for it to
+ * Helper for testing futures that will return the result and error in the given [block] after waiting for it to
  * complete.
  *
  * @param future that is to be tested

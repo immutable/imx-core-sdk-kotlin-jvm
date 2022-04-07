@@ -1,14 +1,11 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.ImmutableException
-import com.immutable.sdk.Signer
-import com.immutable.sdk.StarkSigner
+import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.CreateOrderResponse
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.GetSignableOrderResponse
 import com.immutable.sdk.model.SellToken
-import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -112,7 +109,7 @@ class SellWorkflowTest {
 
     @Test
     fun testSellFailedOnAddress() {
-        addressFuture.completeExceptionally(ImmutableException())
+        addressFuture.completeExceptionally(TestException())
 
         val starkSignatureFuture = CompletableFuture<String>()
         every { starkSigner.starkSign(any()) } returns starkSignatureFuture
@@ -121,7 +118,7 @@ class SellWorkflowTest {
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = TestException()
         )
     }
 
@@ -133,32 +130,32 @@ class SellWorkflowTest {
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 
     @Test
     fun testSellFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(ImmutableException())
+        starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = TestException()
         )
     }
 
     @Test
     fun testSellFailedOnStarkSignatureInvalidSignableResponse() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(ImmutableException())
+        starkSignatureFuture.completeExceptionally(TestException())
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
 
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.invalidResponse("")
         )
     }
 
@@ -171,7 +168,7 @@ class SellWorkflowTest {
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 

@@ -2,6 +2,7 @@ package com.immutable.sdk.workflows
 
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.StarkSigner
+import com.immutable.sdk.TestException
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.model.CancelOrderResponse
 import com.immutable.sdk.testFuture
@@ -59,12 +60,12 @@ class CancelWorkflowTest {
 
     @Test
     fun testCancelFailedOnStarkSignature() {
-        starkSignatureFuture.completeExceptionally(ImmutableException())
+        starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = createCancelFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = TestException()
         )
     }
 
@@ -76,7 +77,7 @@ class CancelWorkflowTest {
         testFuture(
             future = createCancelFuture(),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 }

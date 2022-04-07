@@ -1,22 +1,39 @@
 package com.immutable.sdk
 
+import android.content.Context
+import android.graphics.Color
+import androidx.annotation.ColorInt
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.stark.StarkCurve
+import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
-enum class ImmutableXBase(val url: String) {
-    Production("https://api.x.immutable.com"),
-    Ropsten("https://api.ropsten.x.immutable.com")
+enum class ImmutableXBase(val url: String, val moonpayApiKey: String) {
+    Production("https://api.x.immutable.com", "pk_live_lgGxv3WyWjnWff44ch4gmolN0953"),
+    Ropsten("https://api.ropsten.x.immutable.com", "pk_test_S33EgzH3XY5kfJSOS6GW0uxUWvoIUF")
 }
 
 object ImmutableXSdk {
+
+    private var base: ImmutableXBase = ImmutableXBase.Ropsten
+
+    init {
+        setBaseUrl()
+    }
+
     /**
      * Sets the base property used by all Immutable X API classes.
      */
     fun setBase(base: ImmutableXBase) {
+        this.base = base
+        setBaseUrl()
+    }
+
+    private fun setBaseUrl() {
         System.getProperties().setProperty("org.openapitools.client.baseUrl", base.url)
     }
 
@@ -118,4 +135,28 @@ object ImmutableXSdk {
         starkSigner: StarkSigner,
     ): CompletableFuture<Int> =
         com.immutable.sdk.workflows.transfer(token, recipientAddress, signer, starkSigner)
+
+    /**
+     * Launches a Chrome Custom Tab to buy cryptocurrencies via Moonpay
+     *
+     * @param colourInt (optional) the colour of the Chrome Custom Tab address bar. The default
+     * value is [DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR]
+     * @param colourCodeHex The color code in hex (e.g. #00818e) for the Moon pay widget main color. It is used for buttons,
+     * links and highlighted text.
+     * @throws Throwable if any error occurs
+     */
+    fun buyCrypto(
+        context: Context,
+        signer: Signer,
+        @ColorInt colourInt: Int = Color.parseColor(DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR),
+        colourCodeHex: String = DEFAULT_MOONPAY_COLOUR_CODE
+    ) {
+        com.immutable.sdk.workflows.buyCrypto(
+            base = base,
+            context = context,
+            signer = signer,
+            colourInt = colourInt,
+            colourCodeHex = colourCodeHex
+        )
+    }
 }

@@ -1,12 +1,9 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.ImmutableException
-import com.immutable.sdk.Signer
-import com.immutable.sdk.StarkSigner
+import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.model.*
-import com.immutable.sdk.testFuture
 import com.immutable.sdk.utils.TokenType
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -98,12 +95,12 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuyFailedOnAddress() {
-        addressFuture.completeExceptionally(ImmutableException())
+        addressFuture.completeExceptionally(TestException())
 
         testFuture(
             future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = TestException()
         )
     }
 
@@ -122,7 +119,7 @@ class BuyWorkflowTest {
         testFuture(
             future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 
@@ -135,19 +132,19 @@ class BuyWorkflowTest {
         testFuture(
             future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 
     @Test
     fun testBuyFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(ImmutableException())
+        starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = TestException()
         )
     }
 
@@ -156,12 +153,12 @@ class BuyWorkflowTest {
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
 
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(ImmutableException())
+        starkSignatureFuture.completeExceptionally(ImmutableException.invalidResponse(""))
 
         testFuture(
             future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.invalidResponse("")
         )
     }
 
@@ -175,7 +172,7 @@ class BuyWorkflowTest {
         testFuture(
             future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
-            expectedError = ImmutableException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 }

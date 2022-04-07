@@ -35,12 +35,10 @@ android {
         debug {
             debuggable true
             minifyEnabled false
-            buildConfigField 'String', 'MOONPAY_API_KEY', '"pk_test_S33EgzH3XY5kfJSOS6GW0uxUWvoIUF"'
         }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            buildConfigField 'String', 'MOONPAY_API_KEY', '"pk_live_lgGxv3WyWjnWff44ch4gmolN0953"'
         }
     }
     compileOptions {

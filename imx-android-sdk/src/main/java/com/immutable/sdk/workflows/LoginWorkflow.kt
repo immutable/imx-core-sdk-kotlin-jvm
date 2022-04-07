@@ -16,6 +16,9 @@ import org.openapitools.client.infrastructure.ClientException
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
+private const val GET_USER = "Get user"
+private const val REGISTER_USER = "Register user"
+
 private data class LoginData(
     val address: String = "",
     val seed: String = "",
@@ -56,11 +59,11 @@ private fun generateStarkKeyPair(data: LoginData): CompletableFuture<Pair<ECKeyP
         try {
             val keyPair = StarkKey.getKeyFromRawSignature(data.seed, data.address)
             if (keyPair == null)
-                keyPairFuture.completeExceptionally(ImmutableException("Failed to generate Stark key pair"))
+                keyPairFuture.completeExceptionally(ImmutableException.clientError("Failed to generate Stark key pair"))
             else
                 keyPairFuture.complete(keyPair)
         } catch (e: Exception) {
-            keyPairFuture.completeExceptionally(ImmutableException("Failed to generate Stark key pair"))
+            keyPairFuture.completeExceptionally(ImmutableException.clientError("Failed to generate Stark key pair"))
         }
     }
     return keyPairFuture.thenApply { it to data }
@@ -90,7 +93,7 @@ private fun isUserRegistered(
                     )
                 )
             else
-                isRegisteredFuture.completeExceptionally(e)
+                isRegisteredFuture.completeExceptionally(ImmutableException.apiError(GET_USER, e))
         }
     }
     return isRegisteredFuture
@@ -137,7 +140,7 @@ private fun registerUser(
                 api.registerUser(body)
                 registerFuture.complete(keyPairAndData.first)
             } catch (e: Exception) {
-                registerFuture.completeExceptionally(e)
+                registerFuture.completeExceptionally(ImmutableException.apiError(REGISTER_USER, e))
             }
         }
     }

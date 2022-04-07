@@ -2,6 +2,7 @@ package com.immutable.sdk.workflows
 
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
+import com.immutable.sdk.TestException
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.model.GetUsersApiResponse
 import com.immutable.sdk.model.RegisterUserResponse
@@ -15,7 +16,6 @@ import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
 import java.util.concurrent.CompletableFuture
-import java.util.concurrent.CompletionException
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
 private const val SIGNATURE =
@@ -84,14 +84,13 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnAddress() {
-        addressFuture.completeExceptionally(ImmutableException("No address"))
+        addressFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = login(signer, api)
-        ) { ecKeyPair, throwable ->
-            assert(throwable is CompletionException)
-            assert(ecKeyPair == null)
-        }
+            future = login(signer, api),
+            expectedResult = null,
+            expectedError = TestException()
+        )
 
         verify(exactly = 0) { api.registerUser(any()) }
     }
@@ -99,14 +98,13 @@ class LoginWorkflowTest {
     @Test
     fun testLoginFailedOnSignature() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(ImmutableException("Seed exception"))
+        starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = login(signer, api)
-        ) { ecKeyPair, throwable ->
-            assert(throwable is CompletionException)
-            assert(ecKeyPair == null)
-        }
+            future = login(signer, api),
+            expectedResult = null,
+            expectedError = TestException()
+        )
     }
 
     @Test
@@ -118,11 +116,10 @@ class LoginWorkflowTest {
         starkSignatureFuture.complete(signature)
 
         testFuture(
-            future = login(signer, api)
-        ) { ecKeyPair, throwable ->
-            assert(throwable is CompletionException)
-            assert(ecKeyPair == null)
-        }
+            future = login(signer, api),
+            expectedResult = null,
+            expectedError = ImmutableException.clientError("")
+        )
     }
 
     @Test
@@ -132,11 +129,10 @@ class LoginWorkflowTest {
         starkSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api)
-        ) { ecKeyPair, throwable ->
-            assert(throwable is CompletionException)
-            assert(ecKeyPair == null)
-        }
+            future = login(signer, api),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
     }
 
     @Test
@@ -144,16 +140,13 @@ class LoginWorkflowTest {
         every { api.getUser(ADDRESS) } throws ClientException(statusCode = 404)
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.complete(SIGNATURE)
-        registerStarkSignatureFuture.completeExceptionally(
-            ImmutableException("No register message")
-        )
+        registerStarkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = login(signer, api)
-        ) { ecKeyPair, throwable ->
-            assert(throwable is CompletionException)
-            assert(ecKeyPair == null)
-        }
+            future = login(signer, api),
+            expectedResult = null,
+            expectedError = TestException()
+        )
     }
 
     @Test
@@ -165,11 +158,10 @@ class LoginWorkflowTest {
         registerStarkSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api)
-        ) { ecKeyPair, throwable ->
-            assert(throwable is CompletionException)
-            assert(ecKeyPair == null)
-        }
+            future = login(signer, api),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
 
         verify { api.registerUser(any()) }
     }

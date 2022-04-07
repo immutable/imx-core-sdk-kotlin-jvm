@@ -7,6 +7,8 @@ import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.model.CancelOrderRequest
 import java.util.concurrent.CompletableFuture
 
+private const val CANCEL_ORDER = "Cancel order"
+
 internal fun cancel(
     orderId: String,
     starkSigner: StarkSigner,
@@ -45,9 +47,7 @@ private fun cancelOrder(
                 ).orderId
             )
         } catch (e: Exception) {
-            future.completeExceptionally(
-                ImmutableException("Unable to cancel order: ${e.message}")
-            )
+            future.completeExceptionally(ImmutableException.apiError(CANCEL_ORDER, e))
         }
     }
     return future

@@ -11,6 +11,9 @@ import com.immutable.sdk.utils.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
 
+private const val CREATE_ORDER = "Create order"
+private const val SIGNABLE_ORDER = "Signable order"
+
 @Suppress("LongParameterList")
 internal fun sell(
     asset: Erc721Asset,
@@ -76,9 +79,7 @@ private fun getSignableOrder(
             )
             future.complete(api.getSignableOrder(request))
         } catch (e: Exception) {
-            future.completeExceptionally(
-                ImmutableException("Unable to get signable order: ${e.message}")
-            )
+            future.completeExceptionally(ImmutableException.apiError(SIGNABLE_ORDER, e))
         }
     }
     return future
@@ -140,13 +141,9 @@ private fun createOrder(
             )
         } catch (e: Exception) {
             if (e is NullPointerException)
-                future.completeExceptionally(
-                    ImmutableException(
-                        "Unable to complete sell: Signable order response contains unexpected null values"
-                    )
-                )
+                future.completeExceptionally(ImmutableException.invalidResponse(SIGNABLE_ORDER, e))
             else
-                future.completeExceptionally(ImmutableException("Unable to complete sell: ${e.message}"))
+                future.completeExceptionally(ImmutableException.apiError(CREATE_ORDER, e))
         }
     }
     return future

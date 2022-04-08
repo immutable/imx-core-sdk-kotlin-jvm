@@ -1,6 +1,7 @@
 package com.immutable.sdk.workflows
 
 import android.content.Context
+import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
 import com.immutable.sdk.extensions.getJson
@@ -93,9 +94,10 @@ class BuyCryptoWorkflowTest {
         mockkObject(Utils)
         every { Utils.launchCustomTabs(any(), any(), any()) } returns Unit
 
-        every { base.publicApiUrl } returns BASE_URL
-        every { base.moonpayApiKey } returns API_KEY
-        every { base.moonpayBuyCryptoUrl } returns BUY_CRYPTO_URL
+        mockkObject(ImmutableConfig)
+        every { ImmutableConfig.getPublicApiUrl(base) } returns BASE_URL
+        every { ImmutableConfig.getMoonpayApiKey(base) } returns API_KEY
+        every { ImmutableConfig.getBuyCryptoUrl(base) } returns BUY_CRYPTO_URL
     }
 
     private fun buyCrypto() {

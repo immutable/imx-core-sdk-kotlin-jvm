@@ -12,21 +12,8 @@ import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
-enum class ImmutableXBase(
-    val publicApiUrl: String,
-    val moonpayBuyCryptoUrl: String,
-    val moonpayApiKey: String
-) {
-    Production(
-        publicApiUrl = "https://api.x.immutable.com",
-        moonpayBuyCryptoUrl = "https://buy.moonpay.io",
-        moonpayApiKey = "pk_live_lgGxv3WyWjnWff44ch4gmolN0953"
-    ),
-    Ropsten(
-        publicApiUrl = "https://api.ropsten.x.immutable.com",
-        moonpayBuyCryptoUrl = "https://buy-staging.moonpay.io",
-        moonpayApiKey = "pk_test_S33EgzH3XY5kfJSOS6GW0uxUWvoIUF"
-    )
+enum class ImmutableXBase {
+    Production, Ropsten
 }
 
 object ImmutableXSdk {
@@ -46,7 +33,8 @@ object ImmutableXSdk {
     }
 
     private fun setBaseUrl() {
-        System.getProperties().setProperty("org.openapitools.client.baseUrl", base.publicApiUrl)
+        System.getProperties()
+            .setProperty("org.openapitools.client.baseUrl", ImmutableConfig.getPublicApiUrl(base))
     }
 
     /**

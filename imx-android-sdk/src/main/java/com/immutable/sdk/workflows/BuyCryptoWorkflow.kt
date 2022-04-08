@@ -33,8 +33,7 @@ private const val HASH_SIGN = "#"
 private const val MOONPAY = "moonpay"
 
 @VisibleForTesting
-internal const val MOONPAY_BUY_URL =
-    "https://buy-staging.moonpay.io/?%s&signature=%s"
+internal const val MOONPAY_BUY_URL = "%s/?%s&signature=%s"
 private const val GET_TRANSACTION_ID_URL_PATH = "v2/exchanges"
 private const val MOONPAY_GET_SIGNATURE_URL_PATH = "v2/moonpay/sign-url"
 private const val GET_CURRENCIES = "v2/exchanges/currencies/fiat-to-crypto"
@@ -108,7 +107,7 @@ private fun getSupportedCurrencies(
     client: OkHttpClient
 ): Map<String, String> {
     val request: Request = Request.Builder()
-        .url("${base.url}/$GET_CURRENCIES")
+        .url("${base.publicApiUrl}/$GET_CURRENCIES")
         .get()
         .addHeader(HEADER_ACCEPT, APPLICATION_JSON)
         .addHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)
@@ -155,7 +154,7 @@ private fun getBuyCryptoUrl(
     val signature = response.getString(SIGNATURE)
         // Remove equal sign at the end
         .replace(ENCODED_EQUAL_SIGN, "")
-    return String.format(MOONPAY_BUY_URL, requestParams, signature)
+    return String.format(MOONPAY_BUY_URL, base.moonpayBuyCryptoUrl, requestParams, signature)
 }
 
 @Suppress("TooGenericExceptionCaught")
@@ -166,7 +165,7 @@ private fun post(
     client: OkHttpClient
 ): JSONObject {
     val request: Request = Request.Builder()
-        .url("${base.url}/$urlPath")
+        .url("${base.publicApiUrl}/$urlPath")
         .post(jsonBody.toRequestBody())
         .addHeader(HEADER_ACCEPT, APPLICATION_JSON)
         .addHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)

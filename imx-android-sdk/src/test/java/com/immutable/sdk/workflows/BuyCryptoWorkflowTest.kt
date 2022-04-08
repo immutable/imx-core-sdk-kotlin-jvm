@@ -24,6 +24,7 @@ import java.util.concurrent.CompletableFuture
 private const val COLOUR = 0
 private const val COLOUR_HEX = "81d8d0"
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
+private const val BUY_CRYPTO_URL = "https://buy.crypto.com"
 private const val MOONPAY_SIGNED_REQUEST = "1234567890abcdef="
 private const val TRANSACTION_ID = 8L
 private const val BASE_URL = "https://ropsten.immutable.com"
@@ -92,8 +93,9 @@ class BuyCryptoWorkflowTest {
         mockkObject(Utils)
         every { Utils.launchCustomTabs(any(), any(), any()) } returns Unit
 
-        every { base.url } returns BASE_URL
+        every { base.publicApiUrl } returns BASE_URL
         every { base.moonpayApiKey } returns API_KEY
+        every { base.moonpayBuyCryptoUrl } returns BUY_CRYPTO_URL
     }
 
     private fun buyCrypto() {
@@ -123,6 +125,7 @@ class BuyCryptoWorkflowTest {
                 context,
                 String.format(
                     MOONPAY_BUY_URL,
+                    BUY_CRYPTO_URL,
                     expectedRequestParams,
                     MOONPAY_SIGNED_REQUEST
                 ),

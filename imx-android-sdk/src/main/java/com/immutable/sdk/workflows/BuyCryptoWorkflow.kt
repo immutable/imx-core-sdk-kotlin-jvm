@@ -3,6 +3,7 @@ package com.immutable.sdk.workflows
 import android.content.Context
 import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
+import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
 import com.immutable.sdk.extensions.getJson
@@ -63,7 +64,8 @@ fun buyCrypto(
         // Get transaction ID
         val transactionId = getTransactionId(walletAddress = address, base = base, client = client)
         // Get supported fiat to crypto currencies
-        val currencies = getSupportedCurrencies(walletAddress = address, base = base, client = client)
+        val currencies =
+            getSupportedCurrencies(walletAddress = address, base = base, client = client)
         // Get Moonpay buy crypto URL
         val url = getBuyCryptoUrl(
             walletAddress = address,
@@ -107,7 +109,7 @@ private fun getSupportedCurrencies(
     client: OkHttpClient
 ): Map<String, String> {
     val request: Request = Request.Builder()
-        .url("${base.publicApiUrl}/$GET_CURRENCIES")
+        .url("${ImmutableConfig.getPublicApiUrl(base)}/$GET_CURRENCIES")
         .get()
         .addHeader(HEADER_ACCEPT, APPLICATION_JSON)
         .addHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)
@@ -132,15 +134,13 @@ private fun getBuyCryptoUrl(
     client: OkHttpClient,
     colourCodeHex: String
 ): String {
-    val currenciesJson = JSONObject(currencies).toURLEncodedString()
-    println(currenciesJson)
-    val requestParams = "apiKey=${base.moonpayApiKey}" +
+    val requestParams = "apiKey=${ImmutableConfig.getMoonpayApiKey(base)}" +
         "&baseCurrencyCode=usd" +
         "&colorCode=%23${colourCodeHex.replace(HASH_SIGN, "")}" +
         "&externalTransactionId=$transactionId" +
         "&walletAddress=$walletAddress" +
         "&walletAddresses=" +
-        currenciesJson
+        JSONObject(currencies).toURLEncodedString()
     val response = post(
         urlPath = MOONPAY_GET_SIGNATURE_URL_PATH,
         jsonBody = Moshi.Builder()
@@ -154,7 +154,12 @@ private fun getBuyCryptoUrl(
     val signature = response.getString(SIGNATURE)
         // Remove equal sign at the end
         .replace(ENCODED_EQUAL_SIGN, "")
-    return String.format(MOONPAY_BUY_URL, base.moonpayBuyCryptoUrl, requestParams, signature)
+    return String.format(
+        MOONPAY_BUY_URL,
+        ImmutableConfig.getBuyCryptoUrl(base),
+        requestParams,
+        signature
+    )
 }
 
 @Suppress("TooGenericExceptionCaught")
@@ -165,7 +170,7 @@ private fun post(
     client: OkHttpClient
 ): JSONObject {
     val request: Request = Request.Builder()
-        .url("${base.publicApiUrl}/$urlPath")
+        .url("${ImmutableConfig.getPublicApiUrl(base)}/$urlPath")
         .post(jsonBody.toRequestBody())
         .addHeader(HEADER_ACCEPT, APPLICATION_JSON)
         .addHeader(HEADER_CONTENT_TYPE, APPLICATION_JSON)

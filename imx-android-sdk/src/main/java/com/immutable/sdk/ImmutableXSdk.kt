@@ -38,7 +38,8 @@ object ImmutableXSdk {
     }
 
     /**
-     * This function is for signing L2 transactions
+     * This function is for signing L2 transactions with the Stark key pair returned from the
+     * [register] function.
      *
      * @param keyPair keys used for the users L2 wallet
      * @param message to be signed by the key pair
@@ -56,7 +57,7 @@ object ImmutableXSdk {
      * @return a [CompletableFuture] that will provide the Stark key pair if successful. This
      * key pair needs to be securely stored as exposing this risks the users assets and wallet.
      */
-    fun login(signer: Signer): CompletableFuture<ECKeyPair> =
+    fun register(signer: Signer): CompletableFuture<ECKeyPair> =
         com.immutable.sdk.workflows.login(signer)
 
     /**

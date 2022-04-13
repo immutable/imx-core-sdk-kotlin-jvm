@@ -17,8 +17,14 @@ jobs:
         with:
           java-version: 11
 
-      - name: Run unit tests
-        run: ./gradlew imx-android-sdk:test --stacktrace
+      - name: Run unit tests and publish coverage
+        uses: paambaati/codeclimate-action@v3.0.0
+        env:
+          CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
+          JACOCO_SOURCE_PATH: "imx-android-sdk/src/main/java"
+        with:
+          coverageCommand: ./gradlew imx-android-sdk:testDebugUnitTestCoverage --stacktrace
+          coverageLocations: imx-android-sdk/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml:jacoco
 
       - name: Unit tests results
         uses: actions/upload-artifact@v1

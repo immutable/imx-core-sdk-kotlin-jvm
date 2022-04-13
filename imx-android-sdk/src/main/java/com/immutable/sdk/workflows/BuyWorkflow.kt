@@ -6,9 +6,9 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.extensions.clean
-import com.immutable.sdk.model.CreateTradeRequest
-import com.immutable.sdk.model.GetSignableOrderRequest
-import com.immutable.sdk.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.CreateTradeRequest
+import com.immutable.sdk.api.model.GetSignableOrderRequest
+import com.immutable.sdk.api.model.GetSignableOrderResponse
 import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
 

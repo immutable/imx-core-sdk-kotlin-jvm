@@ -4,7 +4,7 @@ import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.crypto.CryptoUtil
-import com.immutable.sdk.model.CancelOrderRequest
+import com.immutable.sdk.api.model.CancelOrderRequest
 import java.util.concurrent.CompletableFuture
 
 private const val CANCEL_ORDER = "Cancel order"

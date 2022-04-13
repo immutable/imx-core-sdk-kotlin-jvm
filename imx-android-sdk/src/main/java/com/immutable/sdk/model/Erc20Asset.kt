@@ -1,5 +1,7 @@
 package com.immutable.sdk.model
 
+import com.immutable.sdk.api.model.Token
+import com.immutable.sdk.api.model.TokenData
 import com.immutable.sdk.utils.TokenType
 
 class Erc20Asset(

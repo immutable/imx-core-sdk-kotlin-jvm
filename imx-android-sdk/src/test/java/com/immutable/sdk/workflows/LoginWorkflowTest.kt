@@ -4,8 +4,8 @@ import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.TestException
 import com.immutable.sdk.api.UsersApi
-import com.immutable.sdk.model.GetUsersApiResponse
-import com.immutable.sdk.model.RegisterUserResponse
+import com.immutable.sdk.api.model.GetUsersApiResponse
+import com.immutable.sdk.api.model.RegisterUserResponse
 import com.immutable.sdk.testFuture
 import com.immutable.sdk.utils.Constants
 import io.mockk.MockKAnnotations

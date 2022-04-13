@@ -2,9 +2,9 @@ package com.immutable.sdk.workflows
 
 import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.model.CreateOrderResponse
+import com.immutable.sdk.api.model.CreateOrderResponse
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.GetSignableOrderResponse
 import com.immutable.sdk.model.SellToken
 import io.mockk.MockKAnnotations
 import io.mockk.every

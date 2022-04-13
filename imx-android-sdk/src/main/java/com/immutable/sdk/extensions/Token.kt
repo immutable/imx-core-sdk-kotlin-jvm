@@ -1,7 +1,7 @@
 package com.immutable.sdk.extensions
 
-import com.immutable.sdk.model.Token
-import com.immutable.sdk.model.TokenData
+import com.immutable.sdk.api.model.Token
+import com.immutable.sdk.api.model.TokenData
 import com.immutable.sdk.utils.TokenType
 
 /**

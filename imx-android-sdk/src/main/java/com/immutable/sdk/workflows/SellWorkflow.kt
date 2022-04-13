@@ -5,7 +5,9 @@ import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.model.*
+import com.immutable.sdk.api.model.*
+import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.TokenType
 import java.math.BigDecimal

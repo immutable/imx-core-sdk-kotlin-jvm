@@ -8,7 +8,7 @@ import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.extensions.sanitizeBytes
 import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.model.RegisterUserRequestVerifyEth
+import com.immutable.sdk.api.model.RegisterUserRequestVerifyEth
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.stark.StarkKey
 import com.immutable.sdk.utils.Constants

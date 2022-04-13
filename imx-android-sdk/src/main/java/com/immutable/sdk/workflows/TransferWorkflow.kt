@@ -3,7 +3,11 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.TransfersApi
-import com.immutable.sdk.model.*
+import com.immutable.sdk.api.model.CreateTransferRequest
+import com.immutable.sdk.api.model.CreateTransferResponse
+import com.immutable.sdk.api.model.GetSignableTransferRequest
+import com.immutable.sdk.api.model.GetSignableTransferResponse
+import com.immutable.sdk.model.AssetModel
 import java.util.concurrent.CompletableFuture
 
 internal fun transfer(

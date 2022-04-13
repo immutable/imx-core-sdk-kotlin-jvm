@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
     id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
+    id 'jacoco'
 }
 
 def getArtifactId = { ->
@@ -31,6 +32,15 @@ android {
         consumerProguardFiles "consumer-rules.pro"
     }
 
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+        unitTests.returnDefaultValues = true
+    }
+
     buildTypes {
         debug {
             debuggable true
@@ -55,7 +65,7 @@ android {
         outputDir = "$buildDir/generated".toString()
         apiPackage = "com.immutable.sdk.api"
         invokerPackage = "com.immutable.sdk.invoker"
-        modelPackage = "com.immutable.sdk.model"
+        modelPackage = "com.immutable.sdk.api.model"
         configOptions = [
                 dateLibrary: "java8"
         ]
@@ -144,3 +154,109 @@ detekt {
     allRules = false // activate all available (even unstable) rules.
     config = files("../.github/detekt/config/detekt.yml") // point to your custom config defining rules to run, overwriting default behavior
 }
+
+// Start code coverage
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+// Without this block the build will fail
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+// Creates a task for generating the jacoco coverage report
+project.afterEvaluate {
+    (android.hasProperty('applicationVariants')
+            ? android.'applicationVariants'
+            : android.'libraryVariants')
+            .all { variant ->
+                def variantName = variant.name
+                def unitTestTask = "test${variantName.capitalize()}UnitTest"
+
+                tasks.create(name: "${unitTestTask}Coverage", type: JacocoReport, dependsOn: [
+                        "$unitTestTask",
+                ]) {
+                    group = "Reporting"
+                    description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
+
+                    reports {
+                        html.required = true
+                        xml.required = true
+                    }
+
+                    def excludes = [
+                            // data binding
+                            'android/databinding/**/*.class',
+                            '**/android/databinding/*Binding.class',
+                            '**/android/databinding/*',
+                            '**/androidx/databinding/*',
+                            '**/BR.*',
+                            // android
+                            '**/R.class',
+                            '**/R$*.class',
+                            '**/BuildConfig.*',
+                            '**/Manifest*.*',
+                            '**/*Test*.*',
+                            'android/**/*.*',
+                            // kotlin
+                            '**/*MapperImpl*.*',
+                            '**/*$ViewInjector*.*',
+                            '**/*$ViewBinder*.*',
+                            '**/BuildConfig.*',
+                            '**/*Component*.*',
+                            '**/*BR*.*',
+                            '**/Manifest*.*',
+                            '**/*$Lambda$*.*',
+                            '**/*Companion*.*',
+                            '**/*Module*.*',
+                            '**/*Dagger*.*',
+                            '**/*Hilt*.*',
+                            '**/*MembersInjector*.*',
+                            '**/*_MembersInjector.class',
+                            '**/*_Factory*.*',
+                            '**/*_Provide*Factory*.*',
+                            '**/*Extensions*.*',
+                            // sealed and data classes
+                            '**/*$Result.*',
+                            '**/*$Result$*.*',
+                            '/com/immutable/sdk/api/**',
+                            '/org/openapitools/**',
+                    ]
+
+                    def javaClasses = fileTree(dir: variant.javaCompileProvider.get().destinationDir,
+                            excludes: excludes)
+                    def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}",
+                            excludes: excludes)
+
+                    classDirectories.setFrom(files([
+                            javaClasses,
+                            kotlinClasses
+                    ]))
+
+                    def variantSourceSets = variant.sourceSets.java.srcDirs.collect { it.path }.flatten()
+                    sourceDirectories.setFrom(project.files(variantSourceSets))
+
+                    def androidTestsData = fileTree(dir: "${buildDir}/outputs/code_coverage/${variantName}AndroidTest/connected/", includes: ["**/*.ec"])
+
+                    executionData(files([
+                            "$project.buildDir/jacoco/${unitTestTask}.exec",
+                            androidTestsData
+                    ]))
+                }
+
+            }
+}
+
+// Kotlin 1.5+ only works with version 0.8.7
+configurations.all{
+    resolutionStrategy {
+        eachDependency { details ->
+            if ('org.jacoco' == details.requested.group) {
+                details.useVersion "0.8.7"
+            }
+        }
+    }
+}
+// End code coverage

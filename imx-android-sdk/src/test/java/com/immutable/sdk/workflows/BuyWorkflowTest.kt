@@ -3,7 +3,7 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
-import com.immutable.sdk.model.*
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.utils.TokenType
 import io.mockk.MockKAnnotations
 import io.mockk.every

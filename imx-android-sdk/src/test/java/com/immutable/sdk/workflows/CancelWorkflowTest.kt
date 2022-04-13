@@ -4,7 +4,7 @@ import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.TestException
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.model.CancelOrderResponse
+import com.immutable.sdk.api.model.CancelOrderResponse
 import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every

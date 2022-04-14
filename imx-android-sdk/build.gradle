@@ -87,6 +87,7 @@ android {
 
     preBuild.dependsOn(tasks.ktlintCheck)
     preBuild.dependsOn(tasks.detekt)
+    preBuild.finalizedBy(tasks.dokkaHtml)
 }
 
 dependencies {
@@ -157,6 +158,8 @@ detekt {
 }
 
 dokkaHtml.configure {
+    outputDirectory.set(file("../docs"))
+
     dokkaSourceSets {
         configureEach {
             perPackageOption {

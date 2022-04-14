@@ -50,7 +50,7 @@ private const val HEADER_CONTENT_TYPE = "Content-Type"
  * @throws Exception if anything error occurs
  */
 @Suppress("TooGenericExceptionCaught", "LongParameterList")
-fun buyCrypto(
+internal fun buyCrypto(
     base: ImmutableXBase,
     context: Context,
     signer: Signer,

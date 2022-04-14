@@ -10,10 +10,19 @@ import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
+/**
+ * An enum for defining the environment the SDK will communicate with
+ */
 enum class ImmutableXBase {
     Production, Ropsten
 }
 
+/**
+ * This is the entry point for the Immutable X SDK.
+ *
+ * You can configure the environment or use any of the provided utility workflows which chain
+ * the necessary calls to perform standard actions (e.g. buy, sell etc).
+ */
 object ImmutableXSdk {
 
     private var base: ImmutableXBase = ImmutableXBase.Ropsten
@@ -23,7 +32,7 @@ object ImmutableXSdk {
     }
 
     /**
-     * Sets the base property used by all Immutable X API classes.
+     * Sets the environment the SDK will communicate with
      */
     fun setBase(base: ImmutableXBase) {
         this.base = base
@@ -124,6 +133,8 @@ object ImmutableXSdk {
     /**
      * Launches a Chrome Custom Tab to buy cryptocurrencies via Moonpay
      *
+     * @param context the context for launching the Custom Tabs activity
+     * @param signer represents the users L1 wallet to get the address
      * @param colourInt (optional) the colour of the Chrome Custom Tab address bar. The default
      * value is [DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR]
      * @param colourCodeHex The color code in hex (e.g. #00818e) for the Moon pay widget main color. It is used for buttons,

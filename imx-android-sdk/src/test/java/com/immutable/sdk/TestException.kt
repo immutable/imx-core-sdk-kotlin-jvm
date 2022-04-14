@@ -48,7 +48,7 @@ fun <T> testFuture(
         if (expectedError is ImmutableException)
             assert(expectedError.type == (rootCause as ImmutableException).type)
         else
-            assert(rootCause!!.javaClass.isInstance(expectedError))
+            assert(rootCause?.javaClass?.isInstance(expectedError) == true)
     }
 }
 

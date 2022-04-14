@@ -3,6 +3,10 @@ package com.immutable.sdk
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
+/**
+ * This represents an Ethereum Externally Owned Account (EOA). Any wallet provider can be wrapped
+ * with this interface so they can be used with this SDK.
+ */
 interface Signer {
     /**
      * Returns a CompletableFuture that resolves to the account address.
@@ -13,7 +17,7 @@ interface Signer {
     fun getAddress(): CompletableFuture<String>
 
     /**
-     * A signed message is prefixd with "\x19Ethereum Signed Message:\n" and the length of the
+     * A signed message is prefixed with "\x19Ethereum Signed Message:\n" and the length of the
      * message, using the hashMessage method, so that it is EIP-191 compliant. If recovering the
      * address in Solidity, this prefix will be required to create a matching hash.
      *
@@ -23,6 +27,10 @@ interface Signer {
     fun signMessage(message: String): CompletableFuture<String>
 }
 
+/**
+ * This represents the Immutable X Wallet on Layer 2. Any implementation should have access to
+ * the Stark KeyPair so it can be used to sign messages using [ImmutableXSdk.starkSign].
+ */
 interface StarkSigner {
     /**
      * Returns a CompletableFuture that resolves to the user's L2 Stark keys.

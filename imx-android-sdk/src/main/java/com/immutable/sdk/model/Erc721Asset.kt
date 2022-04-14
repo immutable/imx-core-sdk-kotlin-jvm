@@ -5,14 +5,14 @@ import com.immutable.sdk.api.model.TokenData
 import com.immutable.sdk.utils.Constants.ERC721_AMOUNT
 import com.immutable.sdk.utils.TokenType
 
+/**
+ * This is an ERC721 wrapper for the [Token] API model
+ *
+ * @property tokenAddress The address of this ERC721 contract
+ * @property tokenId The token id of this ERC721 asset
+ */
 class Erc721Asset(
-    /**
-     * The address of this ERC721 contract
-     */
     val tokenAddress: String,
-    /**
-     * The token id of this ERC721 asset
-     */
     val tokenId: String
 ) : AssetModel(ERC721_AMOUNT) {
     override fun toToken(): Token = Token(

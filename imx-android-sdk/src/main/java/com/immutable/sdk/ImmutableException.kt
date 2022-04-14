@@ -3,7 +3,10 @@ package com.immutable.sdk
 /**
  * Exception thrown during SDK operations
  *
- * @param type categorises the type of exception
+ * @property cause the exception being wrapped. If it came from a [CompletableFuture] you will need
+ * to get the cause again to find the root exception as it will be wrapped by a [CompletionException]
+ * @property message categorises the type of exception
+ * @property type categorises the type of exception
  */
 class ImmutableException private constructor(
     val type: ImmutableExceptionType,
@@ -51,6 +54,27 @@ class ImmutableException private constructor(
     }
 }
 
+/**
+ * Category of exception to provide more information and allow specific handling of each type
+ */
 enum class ImmutableExceptionType {
-    InvalidRequest, InvalidResponse, ApiError, ClientError
+    /**
+     * Exception for when a request has been invalidated before sending
+     */
+    InvalidRequest,
+
+    /**
+     * Exception for when a request has been invalidated before sending
+     */
+    InvalidResponse,
+
+    /**
+     * Exception for when a workflow fails due to an api call failing.
+     */
+    ApiError,
+
+    /**
+     * Exception for when the issue is due to SDK logic
+     */
+    ClientError
 }

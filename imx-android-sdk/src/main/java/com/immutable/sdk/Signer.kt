@@ -1,5 +1,6 @@
 package com.immutable.sdk
 
+import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 interface Signer {
@@ -24,8 +25,7 @@ interface Signer {
 
 interface StarkSigner {
     /**
-     * Sign a message with the users L2 Stark keys. This is needed to perform transactions on
-     * Immutable.
+     * Returns a CompletableFuture that resolves to the user's L2 Stark keys.
      */
-    fun starkSign(message: String): CompletableFuture<String>
+    fun getStarkKeys(): CompletableFuture<ECKeyPair>
 }

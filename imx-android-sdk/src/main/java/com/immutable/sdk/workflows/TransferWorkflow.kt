@@ -8,6 +8,7 @@ import com.immutable.sdk.api.model.CreateTransferResponse
 import com.immutable.sdk.api.model.GetSignableTransferRequest
 import com.immutable.sdk.api.model.GetSignableTransferResponse
 import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
 
 internal fun transfer(
@@ -71,25 +72,30 @@ private fun getTransferRequest(
 
     CompletableFuture.runAsync {
         try {
-            signer.starkSign(response.payloadHash!!).whenComplete { signature, error ->
-                if (error != null)
-                    future.completeExceptionally(error)
-                else {
-                    future.complete(
-                        CreateTransferRequest(
-                            amount = response.amount!!,
-                            assetId = response.assetId!!,
-                            expirationTimestamp = response.expirationTimestamp!!,
-                            nonce = response.nonce!!,
-                            receiverStarkKey = response.receiverStarkKey!!,
-                            receiverVaultId = response.receiverVaultId!!,
-                            senderStarkKey = response.senderStarkKey!!,
-                            senderVaultId = response.senderVaultId!!,
-                            starkSignature = signature!!
-                        )
-                    )
+            signer.getStarkKeys()
+                .thenCompose { starkKeys ->
+                    val signature = StarkCurve.sign(starkKeys, response.payloadHash!!)
+                    CompletableFuture.completedFuture(signature)
                 }
-            }
+                .whenComplete { signature, error ->
+                    if (error != null)
+                        future.completeExceptionally(error)
+                    else {
+                        future.complete(
+                            CreateTransferRequest(
+                                amount = response.amount!!,
+                                assetId = response.assetId!!,
+                                expirationTimestamp = response.expirationTimestamp!!,
+                                nonce = response.nonce!!,
+                                receiverStarkKey = response.receiverStarkKey!!,
+                                receiverVaultId = response.receiverVaultId!!,
+                                senderStarkKey = response.senderStarkKey!!,
+                                senderVaultId = response.senderVaultId!!,
+                                starkSignature = signature!!
+                            )
+                        )
+                    }
+                }
         } catch (e: Exception) {
             future.completeExceptionally(e)
         }

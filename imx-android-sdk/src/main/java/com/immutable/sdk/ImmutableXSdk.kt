@@ -5,16 +5,24 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
+/**
+ * An enum for defining the environment the SDK will communicate with
+ */
 enum class ImmutableXBase {
     Production, Ropsten
 }
 
+/**
+ * This is the entry point for the Immutable X SDK.
+ *
+ * You can configure the environment or use any of the provided utility workflows which chain
+ * the necessary calls to perform standard actions (e.g. buy, sell etc).
+ */
 object ImmutableXSdk {
 
     private var base: ImmutableXBase = ImmutableXBase.Ropsten
@@ -24,7 +32,7 @@ object ImmutableXSdk {
     }
 
     /**
-     * Sets the base property used by all Immutable X API classes.
+     * Sets the environment the SDK will communicate with
      */
     fun setBase(base: ImmutableXBase) {
         this.base = base
@@ -68,8 +76,7 @@ object ImmutableXSdk {
      * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
      *
      * @param asset the ERC721 asset to sell
-     * @param sellAmount the amount to sell the ERC721 asset
-     * @param sellToken the type of token to be used for the [sellAmount]. See [SellToken].
+     * @param sellToken the type of token and how much of it to sell the ERC721 asset for
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
@@ -77,14 +84,12 @@ object ImmutableXSdk {
      */
     fun sell(
         asset: Erc721Asset,
-        sellAmount: String,
-        sellToken: SellToken,
+        sellToken: AssetModel,
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<Int> {
         return com.immutable.sdk.workflows.sell(
             asset,
-            sellAmount,
             sellToken,
             signer,
             starkSigner
@@ -128,6 +133,8 @@ object ImmutableXSdk {
     /**
      * Launches a Chrome Custom Tab to buy cryptocurrencies via Moonpay
      *
+     * @param context the context for launching the Custom Tabs activity
+     * @param signer represents the users L1 wallet to get the address
      * @param colourInt (optional) the colour of the Chrome Custom Tab address bar. The default
      * value is [DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR]
      * @param colourCodeHex The color code in hex (e.g. #00818e) for the Moon pay widget main color. It is used for buttons,

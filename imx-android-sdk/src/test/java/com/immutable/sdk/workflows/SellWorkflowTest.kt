@@ -3,10 +3,11 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CreateOrderResponse
-import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.api.model.GetSignableOrderResponse
-import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.stark.StarkCurve
+import com.immutable.sdk.model.Erc20Asset
+import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.EthAsset
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -74,8 +75,7 @@ class SellWorkflowTest {
 
     private fun createSellFuture() = sell(
         asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
-        sellAmount = SELL_AMOUNT,
-        sellToken = SellToken.ETH,
+        sellToken = EthAsset(SELL_AMOUNT),
         signer = signer,
         starkSigner = starkSigner,
         ordersApi = ordersApi
@@ -105,8 +105,7 @@ class SellWorkflowTest {
         testFuture(
             future = sell(
                 asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
-                sellAmount = SELL_AMOUNT,
-                sellToken = SellToken.ERC20(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS),
+                sellToken = Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, SELL_AMOUNT),
                 signer = signer,
                 starkSigner = starkSigner,
                 ordersApi = ordersApi
@@ -180,11 +179,10 @@ class SellWorkflowTest {
 
     @Test
     fun testConvertAmount() {
-        assertEquals(convertAmount("0.081", SellToken.ETH), "81000000000000000")
+        assertEquals(convertAmount(EthAsset("0.081")), "81000000000000000")
         assertEquals(
             convertAmount(
-                "55",
-                SellToken.ERC20(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS)
+                Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, "55")
             ),
             "55000000"
         )

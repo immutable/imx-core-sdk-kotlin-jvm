@@ -6,8 +6,7 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.SellToken
+import com.immutable.sdk.model.*
 import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.TokenType
 import java.math.BigDecimal
@@ -19,8 +18,7 @@ private const val SIGNABLE_ORDER = "Signable order"
 @Suppress("LongParameterList")
 internal fun sell(
     asset: Erc721Asset,
-    sellAmount: String,
-    sellToken: SellToken,
+    sellToken: AssetModel,
     signer: Signer,
     starkSigner: StarkSigner,
     ordersApi: OrdersApi = OrdersApi()
@@ -31,7 +29,6 @@ internal fun sell(
         .thenCompose { address ->
             getSignableOrder(
                 asset,
-                sellAmount,
                 sellToken,
                 address,
                 ordersApi
@@ -62,8 +59,7 @@ internal fun sell(
 )
 private fun getSignableOrder(
     asset: Erc721Asset,
-    sellAmount: String,
-    sellToken: SellToken,
+    sellToken: AssetModel,
     address: String,
     api: OrdersApi
 ): CompletableFuture<GetSignableOrderResponse> {
@@ -71,9 +67,9 @@ private fun getSignableOrder(
     CompletableFuture.runAsync {
         try {
             val request = GetSignableOrderRequest(
-                amountBuy = convertAmount(sellAmount, sellToken),
+                amountBuy = convertAmount(sellToken),
                 amountSell = asset.quantity,
-                tokenBuy = createTokenBuy(sellToken),
+                tokenBuy = sellToken.toToken(),
                 tokenSell = createTokenSell(asset),
                 user = address,
                 fees = listOf(), // add support for maker/taker fees
@@ -87,29 +83,19 @@ private fun getSignableOrder(
     return future
 }
 
-private fun createTokenBuy(sellToken: SellToken) = when (sellToken) {
-    SellToken.ETH -> Token(
-        data = TokenData(decimals = Constants.ETH_DECIMALS),
-        type = TokenType.ETH.name
-    )
-    is SellToken.ERC20 -> Token(
-        data = TokenData(tokenAddress = sellToken.tokenAddress, decimals = sellToken.decimals),
-        type = TokenType.ERC20.name
-    )
-}
-
 private fun createTokenSell(asset: Erc721Asset) = Token(
     data = TokenData(tokenId = asset.tokenId, tokenAddress = asset.tokenAddress),
     type = TokenType.ERC721.name
 )
 
 @VisibleForTesting
-internal fun convertAmount(value: String, sellToken: SellToken): String {
+internal fun convertAmount(sellToken: AssetModel): String {
     val decimals = when (sellToken) {
-        is SellToken.ERC20 -> sellToken.decimals
-        SellToken.ETH -> Constants.ETH_DECIMALS
+        is Erc20Asset -> sellToken.decimals
+        is EthAsset -> Constants.ETH_DECIMALS
+        is Erc721Asset -> return sellToken.quantity
     }
-    return (BigDecimal.TEN.pow(decimals) * BigDecimal(value)).toBigInteger()
+    return (BigDecimal.TEN.pow(decimals) * BigDecimal(sellToken.quantity)).toBigInteger()
         .toString()
 }
 

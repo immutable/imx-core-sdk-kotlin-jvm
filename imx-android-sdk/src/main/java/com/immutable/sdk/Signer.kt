@@ -28,8 +28,8 @@ interface Signer {
 }
 
 /**
- * This represents the Immutable X Wallet on Layer 2. Any implementation should have access to
- * the Stark KeyPair so it can be used to sign messages using [ImmutableXSdk.starkSign].
+ * This represents the Immutable X Wallet on Layer 2 and will provide the users Stark key pair to be
+ * used for signing L2 transactions.
  */
 interface StarkSigner {
     /**

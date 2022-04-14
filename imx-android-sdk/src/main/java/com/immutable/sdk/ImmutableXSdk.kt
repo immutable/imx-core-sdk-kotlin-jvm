@@ -5,7 +5,6 @@ import android.graphics.Color
 import androidx.annotation.ColorInt
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.SellToken
 import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
@@ -68,8 +67,7 @@ object ImmutableXSdk {
      * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
      *
      * @param asset the ERC721 asset to sell
-     * @param sellAmount the amount to sell the ERC721 asset
-     * @param sellToken the type of token to be used for the [sellAmount]. See [SellToken].
+     * @param sellToken the type of token and how much of it to sell the ERC721 asset for
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
@@ -77,14 +75,12 @@ object ImmutableXSdk {
      */
     fun sell(
         asset: Erc721Asset,
-        sellAmount: String,
-        sellToken: SellToken,
+        sellToken: AssetModel,
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<Int> {
         return com.immutable.sdk.workflows.sell(
             asset,
-            sellAmount,
             sellToken,
             signer,
             starkSigner

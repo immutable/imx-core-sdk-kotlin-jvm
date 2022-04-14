@@ -6,7 +6,6 @@ import androidx.annotation.ColorInt
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.SellToken
-import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
@@ -35,17 +34,6 @@ object ImmutableXSdk {
     private fun setBaseUrl() {
         System.getProperties()
             .setProperty("org.openapitools.client.baseUrl", ImmutableConfig.getPublicApiUrl(base))
-    }
-
-    /**
-     * This function is for signing L2 transactions with the Stark key pair returned from the
-     * [register] function.
-     *
-     * @param keyPair keys used for the users L2 wallet
-     * @param message to be signed by the key pair
-     */
-    fun starkSign(keyPair: ECKeyPair, message: String): String {
-        return StarkCurve.sign(keyPair, message)
     }
 
     /**

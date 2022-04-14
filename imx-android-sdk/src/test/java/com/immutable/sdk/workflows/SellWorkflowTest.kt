@@ -6,13 +6,16 @@ import com.immutable.sdk.api.model.CreateOrderResponse
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.api.model.GetSignableOrderResponse
 import com.immutable.sdk.model.SellToken
+import com.immutable.sdk.stark.StarkCurve
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.mockkObject
 import junit.framework.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
+import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
@@ -37,8 +40,11 @@ class SellWorkflowTest {
     @MockK
     private lateinit var starkSigner: StarkSigner
 
+    @MockK
+    private lateinit var ecKeyPair: ECKeyPair
+
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var starkSignatureFuture: CompletableFuture<String>
+    private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
 
     @Before
     fun setUp() {
@@ -47,8 +53,8 @@ class SellWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        starkSignatureFuture = CompletableFuture<String>()
-        every { starkSigner.starkSign(any()) } returns starkSignatureFuture
+        starkKeysFuture = CompletableFuture<ECKeyPair>()
+        every { starkSigner.getStarkKeys() } returns starkKeysFuture
 
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse(
             assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
@@ -61,6 +67,9 @@ class SellWorkflowTest {
             expirationTimestamp = 1_325_907,
             starkKey = STARK_KEY
         )
+
+        mockkObject(StarkCurve)
+        every { StarkCurve.sign(any(), any()) } returns SIGNATURE
     }
 
     private fun createSellFuture() = sell(
@@ -75,7 +84,7 @@ class SellWorkflowTest {
     @Test
     fun testSellInEthSuccess() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.complete(SIGNATURE)
+        starkKeysFuture.complete(ecKeyPair)
 
         every { ordersApi.createOrder(any()) } returns CreateOrderResponse(orderId = ORDER_ID)
 
@@ -89,7 +98,7 @@ class SellWorkflowTest {
     @Test
     fun testSellInErc20Success() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.complete(SIGNATURE)
+        starkKeysFuture.complete(ecKeyPair)
 
         every { ordersApi.createOrder(any()) } returns CreateOrderResponse(orderId = ORDER_ID)
 
@@ -110,10 +119,7 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnAddress() {
         addressFuture.completeExceptionally(TestException())
-
-        val starkSignatureFuture = CompletableFuture<String>()
-        every { starkSigner.starkSign(any()) } returns starkSignatureFuture
-        starkSignatureFuture.complete(SIGNATURE)
+        starkKeysFuture.complete(ecKeyPair)
 
         testFuture(
             future = createSellFuture(),
@@ -137,7 +143,7 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(TestException())
+        starkKeysFuture.completeExceptionally(TestException())
 
         testFuture(
             future = createSellFuture(),
@@ -149,7 +155,7 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnStarkSignatureInvalidSignableResponse() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.completeExceptionally(TestException())
+        starkKeysFuture.completeExceptionally(TestException())
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
 
         testFuture(
@@ -162,7 +168,7 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnCreateOrder() {
         addressFuture.complete(ADDRESS)
-        starkSignatureFuture.complete(SIGNATURE)
+        starkKeysFuture.complete(ecKeyPair)
         every { ordersApi.createOrder(any()) } throws ClientException()
 
         testFuture(

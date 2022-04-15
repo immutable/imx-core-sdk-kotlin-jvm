@@ -3,12 +3,12 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.api.UsersApi
+import com.immutable.sdk.api.model.RegisterUserRequestVerifyEth
 import com.immutable.sdk.crypto.Crypto
 import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.extensions.sanitizeBytes
 import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.api.model.RegisterUserRequestVerifyEth
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.stark.StarkKey
 import com.immutable.sdk.utils.Constants
@@ -117,34 +117,26 @@ private fun getRegisterMessage(
 private fun registerUser(
     keyPairAndData: Pair<ECKeyPair, LoginData>,
     api: UsersApi
-): CompletableFuture<ECKeyPair> {
-    val registerFuture = CompletableFuture<ECKeyPair>()
-    if (keyPairAndData.second.isRegistered)
-        registerFuture.complete(keyPairAndData.first)
-    else {
-        CompletableFuture.runAsync {
-            try {
-                val starkPublicKey = keyPairAndData.first.getStarkPublicKey()
-                val body = RegisterUserRequestVerifyEth(
-                    ethSignature = keyPairAndData.second.ethSignature,
-                    etherKey = keyPairAndData.second.address,
-                    starkKey = starkPublicKey,
-                    starkSignature = StarkCurve.sign(
-                        keyPairAndData.first,
-                        CryptoUtil.getRegisterUserMsgVerifyEth(
-                            keyPairAndData.second.address,
-                            starkPublicKey
-                        )
-                    )
+): CompletableFuture<ECKeyPair> = if (keyPairAndData.second.isRegistered)
+    CompletableFuture.completedFuture(keyPairAndData.first)
+else {
+    call(REGISTER_USER) {
+        val starkPublicKey = keyPairAndData.first.getStarkPublicKey()
+        val body = RegisterUserRequestVerifyEth(
+            ethSignature = keyPairAndData.second.ethSignature,
+            etherKey = keyPairAndData.second.address,
+            starkKey = starkPublicKey,
+            starkSignature = StarkCurve.sign(
+                keyPairAndData.first,
+                CryptoUtil.getRegisterUserMsgVerifyEth(
+                    keyPairAndData.second.address,
+                    starkPublicKey
                 )
-                api.registerUser(body)
-                registerFuture.complete(keyPairAndData.first)
-            } catch (e: Exception) {
-                registerFuture.completeExceptionally(ImmutableException.apiError(REGISTER_USER, e))
-            }
-        }
+            )
+        )
+        api.registerUser(body)
+        keyPairAndData.first
     }
-    return registerFuture
 }
 
 internal fun ECKeyPair.getStarkPublicKey() =

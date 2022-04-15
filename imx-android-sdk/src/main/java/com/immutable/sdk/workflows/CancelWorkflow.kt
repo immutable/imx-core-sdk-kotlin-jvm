@@ -1,6 +1,5 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CancelOrderRequest
@@ -37,24 +36,13 @@ internal fun cancel(
     return future
 }
 
-@Suppress("TooGenericExceptionCaught")
 private fun cancelOrder(
     orderId: String,
     signature: String,
     api: OrdersApi
-): CompletableFuture<Int> {
-    val future = CompletableFuture<Int>()
-    CompletableFuture.runAsync {
-        try {
-            future.complete(
-                api.cancelOrder(
-                    orderId,
-                    CancelOrderRequest(signature)
-                ).orderId
-            )
-        } catch (e: Exception) {
-            future.completeExceptionally(ImmutableException.apiError(CANCEL_ORDER, e))
-        }
-    }
-    return future
+): CompletableFuture<Int> = call(CANCEL_ORDER) {
+    api.cancelOrder(
+        orderId,
+        CancelOrderRequest(signature)
+    ).orderId!!
 }

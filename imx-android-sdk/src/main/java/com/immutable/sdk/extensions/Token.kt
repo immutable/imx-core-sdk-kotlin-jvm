@@ -9,29 +9,20 @@ import com.immutable.sdk.utils.TokenType
  */
 internal fun Token.clean(): Token? = data?.let {
     when (type) {
-        TokenType.ETH.name -> {
-            if (it.decimals != null)
-                Token(data = TokenData(decimals = it.decimals), type = TokenType.ETH.name)
-            else
-                null
+        TokenType.ETH.name -> it.decimals?.let { decimals ->
+            Token(data = TokenData(decimals = decimals), type = TokenType.ETH.name)
         }
-        TokenType.ERC20.name -> {
-            if (it.tokenAddress != null && it.decimals != null)
-                Token(
-                    data = TokenData(decimals = it.decimals, tokenAddress = it.tokenAddress),
-                    type = TokenType.ERC20.name
-                )
-            else
-                null
+        TokenType.ERC20.name -> ifNotNull(it.tokenAddress, it.decimals) { tokenAddress, decimals ->
+            Token(
+                data = TokenData(decimals = decimals, tokenAddress = tokenAddress),
+                type = TokenType.ERC20.name
+            )
         }
-        TokenType.ERC721.name -> {
-            if (it.tokenAddress != null && it.tokenId != null)
-                Token(
-                    data = TokenData(tokenId = it.tokenId, tokenAddress = it.tokenAddress),
-                    type = TokenType.ERC721.name
-                )
-            else
-                null
+        TokenType.ERC721.name -> ifNotNull(it.tokenAddress, it.tokenId) { tokenAddress, tokenId ->
+            Token(
+                data = TokenData(tokenId = tokenId, tokenAddress = tokenAddress),
+                type = TokenType.ERC721.name
+            )
         }
         else -> null
     }

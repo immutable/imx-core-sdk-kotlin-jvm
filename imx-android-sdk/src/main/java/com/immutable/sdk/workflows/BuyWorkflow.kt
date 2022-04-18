@@ -5,10 +5,11 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
-import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.api.model.CreateTradeRequest
 import com.immutable.sdk.api.model.GetSignableOrderRequest
 import com.immutable.sdk.api.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.Order
+import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
 
@@ -26,7 +27,8 @@ internal fun buy(
     val future = CompletableFuture<Int>()
 
     signer.getAddress()
-        .thenCompose { address -> getSignableTrade(orderId, address, ordersApi) }
+        .thenCompose { address -> getOrderDetails(orderId, ordersApi).thenApply { address to it } }
+        .thenCompose { (address, order) -> getSignableTrade(order, address, ordersApi) }
         .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
         .thenCompose { responseToSignature ->
             createTrade(
@@ -46,62 +48,41 @@ internal fun buy(
     return future
 }
 
-@Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
-private fun getSignableTrade(
+private fun getOrderDetails(
     orderId: String,
+    api: OrdersApi
+): CompletableFuture<Order> =
+    call(ORDER_DETAILS) {
+        api.getOrder(
+            id = orderId,
+            includeFees = true,
+            auxiliaryFeePercentages = null,
+            auxiliaryFeeRecipients = null
+        )
+    }
+
+private fun getSignableTrade(
+    order: Order,
     address: String,
     api: OrdersApi
-): CompletableFuture<GetSignableOrderResponse> {
-    val future = CompletableFuture<GetSignableOrderResponse>()
-    CompletableFuture.runAsync {
-        try {
-            val order = api.getOrder(
-                id = orderId,
-                includeFees = true,
-                auxiliaryFeePercentages = null,
-                auxiliaryFeeRecipients = null
+): CompletableFuture<GetSignableOrderResponse> = when {
+    order.user == address ->
+        completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
+    order.status != OrderStatus.Active.value ->
+        completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
+    else -> call(SIGNABLE_ORDER) {
+        api.getSignableOrder(
+            GetSignableOrderRequest(
+                amountBuy = order.sell!!.data!!.quantity!!,
+                amountSell = order.buy!!.data!!.quantity!!,
+                tokenBuy = order.sell.clean()!!,
+                tokenSell = order.buy.clean()!!,
+                user = address,
+                fees = listOf(), // add support for maker/taker fees
+                includeFees = true
             )
-            when {
-                order.user == address ->
-                    future.completeExceptionally(
-                        ImmutableException.invalidRequest("Cannot purchase own order")
-                    )
-                order.status != OrderStatus.Active.value ->
-                    future.completeExceptionally(
-                        ImmutableException.invalidRequest("Order not available for purchase")
-                    )
-                else -> {
-                    try {
-                        future.complete(
-                            api.getSignableOrder(
-                                GetSignableOrderRequest(
-                                    amountBuy = order.sell!!.data!!.quantity!!,
-                                    amountSell = order.buy!!.data!!.quantity!!,
-                                    tokenBuy = order.sell.clean()!!,
-                                    tokenSell = order.buy.clean()!!,
-                                    user = address,
-                                    fees = listOf(), // add support for maker/taker fees
-                                    includeFees = true
-                                )
-                            )
-                        )
-                    } catch (e: Exception) {
-                        if (e is NullPointerException)
-                            future.completeExceptionally(
-                                ImmutableException.invalidResponse(SIGNABLE_ORDER, e)
-                            )
-                        else
-                            future.completeExceptionally(
-                                ImmutableException.apiError(SIGNABLE_ORDER, e)
-                            )
-                    }
-                }
-            }
-        } catch (e: Exception) {
-            future.completeExceptionally(ImmutableException.apiError(ORDER_DETAILS, e))
-        }
+        )
     }
-    return future
 }
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
@@ -110,37 +91,24 @@ private fun createTrade(
     response: GetSignableOrderResponse,
     starkSignature: String,
     api: TradesApi
-): CompletableFuture<Int> {
-    val future = CompletableFuture<Int>()
-    CompletableFuture.runAsync {
-        try {
-            future.complete(
-                api.createTrade(
-                    // If the forced unwrapping below fails it will be forwarded on as an error
-                    CreateTradeRequest(
-                        amountBuy = response.amountBuy!!,
-                        amountSell = response.amountSell!!,
-                        assetIdBuy = response.assetIdBuy!!,
-                        assetIdSell = response.assetIdSell!!,
-                        expirationTimestamp = response.expirationTimestamp!!,
-                        nonce = response.nonce!!,
-                        orderId = orderId,
-                        starkKey = response.starkKey!!,
-                        starkSignature = starkSignature,
-                        vaultIdBuy = response.vaultIdBuy!!,
-                        vaultIdSell = response.vaultIdSell!!,
-                        feeInfo = response.feeInfo,
-                        fees = listOf(),
-                        includeFees = true
-                    )
-                ).tradeId
-            )
-        } catch (e: Exception) {
-            if (e is NullPointerException)
-                future.completeExceptionally(ImmutableException.invalidResponse(CREATE_TRADE, e))
-            else
-                future.completeExceptionally(ImmutableException.apiError(CREATE_TRADE, e))
-        }
-    }
-    return future
+): CompletableFuture<Int> = call(CREATE_TRADE) {
+    api.createTrade(
+        // If the forced unwrapping below fails it will be forwarded on as an error
+        CreateTradeRequest(
+            amountBuy = response.amountBuy!!,
+            amountSell = response.amountSell!!,
+            assetIdBuy = response.assetIdBuy!!,
+            assetIdSell = response.assetIdSell!!,
+            expirationTimestamp = response.expirationTimestamp!!,
+            nonce = response.nonce!!,
+            orderId = orderId,
+            starkKey = response.starkKey!!,
+            starkSignature = starkSignature,
+            vaultIdBuy = response.vaultIdBuy!!,
+            vaultIdSell = response.vaultIdSell!!,
+            feeInfo = response.feeInfo,
+            fees = listOf(),
+            includeFees = true
+        )
+    ).tradeId!!
 }

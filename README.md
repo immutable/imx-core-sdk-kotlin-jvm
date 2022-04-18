@@ -42,7 +42,7 @@ Utility functions that will chain necessary API calls to complete a process or p
 * Transfer ERC20/ERC721/ETH
 
 ### Wallet Connection
-In order to use any workflow functions, you will need to pass in the connected wallet provider. This means you will need to implement your own Wallet L1 [Signer](https://github.com/immutable/imx-android-sdk/blob/184be52a85a4415cbce1b8edfd60b52a4b7062fd/imx-android-sdk/src/main/java/com/immutable/sdk/Signer.kt#L5) and L2 [StarkSigner](https://github.com/immutable/imx-android-sdk/blob/184be52a85a4415cbce1b8edfd60b52a4b7062fd/imx-android-sdk/src/main/java/com/immutable/sdk/Signer.kt#L25) (see [sample](https://github.com/immutable/imx-android-sdk/tree/main/sample) app for an example on how to implement these two interfaces).
+In order to use any workflow functions, you will need to pass in the connected wallet provider. This means you will need to implement your own Wallet L1 [Signer](https://github.com/immutable/imx-android-sdk/blob/184be52a85a4415cbce1b8edfd60b52a4b7062fd/imx-android-sdk/src/main/java/com/immutable/sdk/Signer.kt#L5) and L2 [StarkSigner](https://github.com/immutable/imx-android-sdk/blob/184be52a85a4415cbce1b8edfd60b52a4b7062fd/imx-android-sdk/src/main/java/com/immutable/sdk/Signer.kt#L25).
 
 Alternatively, you could use our [ImmutableX Wallet Android SDK](https://github.com/immutable/imx-wallet-android-sdk) which already supports a list of wallet providers and works seamlessly with this ImmutableX Android SDK.
 

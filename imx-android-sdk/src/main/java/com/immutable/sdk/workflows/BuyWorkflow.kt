@@ -10,7 +10,6 @@ import com.immutable.sdk.api.model.GetSignableOrderRequest
 import com.immutable.sdk.api.model.GetSignableOrderResponse
 import com.immutable.sdk.api.model.Order
 import com.immutable.sdk.extensions.clean
-import com.immutable.sdk.extensions.combine
 import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
 
@@ -28,9 +27,8 @@ internal fun buy(
     val future = CompletableFuture<Int>()
 
     signer.getAddress()
-        .combine(getOrderDetails(orderId, ordersApi)) { address, order ->
-            getSignableTrade(order, address, ordersApi)
-        }
+        .thenCompose { address -> getOrderDetails(orderId, ordersApi).thenApply { address to it } }
+        .thenCompose { (address, order) -> getSignableTrade(order, address, ordersApi) }
         .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
         .thenCompose { responseToSignature ->
             createTrade(

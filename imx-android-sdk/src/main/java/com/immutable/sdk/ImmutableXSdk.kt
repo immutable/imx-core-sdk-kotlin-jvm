@@ -3,6 +3,7 @@ package com.immutable.sdk
 import android.content.Context
 import android.graphics.Color
 import androidx.annotation.ColorInt
+import androidx.annotation.VisibleForTesting
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
@@ -16,6 +17,8 @@ import java.util.concurrent.CompletableFuture
 enum class ImmutableXBase {
     Production, Ropsten
 }
+
+@VisibleForTesting internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
 
 /**
  * This is the entry point for the Immutable X SDK.
@@ -41,7 +44,7 @@ object ImmutableXSdk {
 
     private fun setBaseUrl() {
         System.getProperties()
-            .setProperty("org.openapitools.client.baseUrl", ImmutableConfig.getPublicApiUrl(base))
+            .setProperty(KEY_BASE_URL, ImmutableConfig.getPublicApiUrl(base))
     }
 
     /**

@@ -78,23 +78,8 @@ private fun getTransferRequest(
                     CompletableFuture.completedFuture(signature)
                 }
                 .whenComplete { signature, error ->
-                    if (error != null)
-                        future.completeExceptionally(error)
-                    else {
-                        future.complete(
-                            CreateTransferRequest(
-                                amount = response.amount!!,
-                                assetId = response.assetId!!,
-                                expirationTimestamp = response.expirationTimestamp!!,
-                                nonce = response.nonce!!,
-                                receiverStarkKey = response.receiverStarkKey!!,
-                                receiverVaultId = response.receiverVaultId!!,
-                                senderStarkKey = response.senderStarkKey!!,
-                                senderVaultId = response.senderVaultId!!,
-                                starkSignature = signature!!
-                            )
-                        )
-                    }
+                    if (error != null) future.completeExceptionally(error)
+                    else future.complete(getCreateTransferRequest(response, signature))
                 }
         } catch (e: Exception) {
             future.completeExceptionally(e)
@@ -103,6 +88,19 @@ private fun getTransferRequest(
 
     return future
 }
+
+private fun getCreateTransferRequest(response: GetSignableTransferResponse, signature: String?) =
+    CreateTransferRequest(
+        amount = response.amount!!,
+        assetId = response.assetId!!,
+        expirationTimestamp = response.expirationTimestamp!!,
+        nonce = response.nonce!!,
+        receiverStarkKey = response.receiverStarkKey!!,
+        receiverVaultId = response.receiverVaultId!!,
+        senderStarkKey = response.senderStarkKey!!,
+        senderVaultId = response.senderVaultId!!,
+        starkSignature = signature!!
+    )
 
 @Suppress("TooGenericExceptionCaught")
 private fun createTransfer(

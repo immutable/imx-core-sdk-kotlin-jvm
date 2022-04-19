@@ -2,6 +2,7 @@ package com.immutable.sdk
 
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import java.util.*
@@ -27,6 +28,11 @@ class ImmutableXSdkTest {
         every { properties.setProperty(any(), any()) } returns mockk()
 
         sdk = spyk(ImmutableXSdk)
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     @Test

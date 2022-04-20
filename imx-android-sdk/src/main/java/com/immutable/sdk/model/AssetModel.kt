@@ -1,5 +1,6 @@
 package com.immutable.sdk.model
 
+import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 
 /**
@@ -14,4 +15,6 @@ sealed class AssetModel(val quantity: String) {
      * client calls.
      */
     abstract fun toToken(): Token
+
+    abstract fun toSignableToken(): SignableToken
 }

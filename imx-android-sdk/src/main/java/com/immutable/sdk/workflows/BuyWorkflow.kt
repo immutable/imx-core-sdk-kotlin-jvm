@@ -5,10 +5,7 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
-import com.immutable.sdk.api.model.CreateTradeRequest
-import com.immutable.sdk.api.model.GetSignableOrderRequest
-import com.immutable.sdk.api.model.GetSignableOrderResponse
-import com.immutable.sdk.api.model.Order
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
@@ -16,9 +13,12 @@ import java.util.concurrent.CompletableFuture
 private const val SIGNABLE_ORDER = "Signable order"
 private const val ORDER_DETAILS = "Order details"
 private const val CREATE_TRADE = "Create trade"
+private const val COMMA = ","
 
+@Suppress("LongParameterList")
 internal fun buy(
     orderId: String,
+    fees: List<FeeEntry>,
     signer: Signer,
     starkSigner: StarkSigner,
     ordersApi: OrdersApi = OrdersApi(),
@@ -27,14 +27,17 @@ internal fun buy(
     val future = CompletableFuture<Int>()
 
     signer.getAddress()
-        .thenCompose { address -> getOrderDetails(orderId, ordersApi).thenApply { address to it } }
-        .thenCompose { (address, order) -> getSignableTrade(order, address, ordersApi) }
+        .thenCompose { address ->
+            getOrderDetails(orderId, fees, ordersApi).thenApply { address to it }
+        }
+        .thenCompose { (address, order) -> getSignableTrade(order, address, fees, ordersApi) }
         .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
-        .thenCompose { responseToSignature ->
+        .thenCompose { (response, signature) ->
             createTrade(
                 orderId.toInt(),
-                responseToSignature.first,
-                responseToSignature.second,
+                response,
+                fees,
+                signature,
                 tradesApi
             )
         }.whenComplete { tradeId, error ->
@@ -50,35 +53,38 @@ internal fun buy(
 
 private fun getOrderDetails(
     orderId: String,
+    fees: List<FeeEntry>,
     api: OrdersApi
 ): CompletableFuture<Order> =
     call(ORDER_DETAILS) {
         api.getOrder(
             id = orderId,
             includeFees = true,
-            auxiliaryFeePercentages = null,
-            auxiliaryFeeRecipients = null
+            auxiliaryFeePercentages = fees.joinToString(separator = COMMA) { it.feePercentage?.toString()!! },
+            auxiliaryFeeRecipients = fees.joinToString(separator = COMMA) { it.address!! },
         )
     }
 
 private fun getSignableTrade(
     order: Order,
     address: String,
+    fees: List<FeeEntry>,
     api: OrdersApi
-): CompletableFuture<GetSignableOrderResponse> = when {
+): CompletableFuture<GetSignableOrderResponseV1> = when {
     order.user == address ->
         completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
     order.status != OrderStatus.Active.value ->
         completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
     else -> call(SIGNABLE_ORDER) {
-        api.getSignableOrder(
-            GetSignableOrderRequest(
+        api.getSignableOrderV1(
+            GetSignableOrderRequestV1(
                 amountBuy = order.sell!!.data!!.quantity!!,
                 amountSell = order.buy!!.data!!.quantity!!,
                 tokenBuy = order.sell.clean()!!,
                 tokenSell = order.buy.clean()!!,
                 user = address,
-                fees = listOf(), // add support for maker/taker fees
+                fees = fees,
+                // Always include fees, the 'fees' field will contain fees details or nothing at all
                 includeFees = true
             )
         )
@@ -88,13 +94,14 @@ private fun getSignableTrade(
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 private fun createTrade(
     orderId: Int,
-    response: GetSignableOrderResponse,
+    response: GetSignableOrderResponseV1,
+    fees: List<FeeEntry>,
     starkSignature: String,
     api: TradesApi
 ): CompletableFuture<Int> = call(CREATE_TRADE) {
     api.createTrade(
         // If the forced unwrapping below fails it will be forwarded on as an error
-        CreateTradeRequest(
+        CreateTradeRequestV1(
             amountBuy = response.amountBuy!!,
             amountSell = response.amountSell!!,
             assetIdBuy = response.assetIdBuy!!,
@@ -107,8 +114,11 @@ private fun createTrade(
             vaultIdBuy = response.vaultIdBuy!!,
             vaultIdSell = response.vaultIdSell!!,
             feeInfo = response.feeInfo,
-            fees = listOf(),
+            fees = fees,
+            // Always include fees, the 'fees' field will contain fees details or nothing at all
             includeFees = true
-        )
+        ),
+        xImxEthAddress = null,
+        xImxEthSignature = null
     ).tradeId!!
 }

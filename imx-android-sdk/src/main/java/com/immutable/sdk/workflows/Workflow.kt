@@ -2,7 +2,7 @@ package com.immutable.sdk.workflows
 
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.StarkSigner
-import com.immutable.sdk.api.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.GetSignableOrderResponseV1
 import com.immutable.sdk.crypto.CryptoUtil
 import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
@@ -11,10 +11,10 @@ private const val SIGNABLE_ORDER = "Signable order"
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 internal fun getOrderStarkSignature(
-    response: GetSignableOrderResponse,
+    response: GetSignableOrderResponseV1,
     signer: StarkSigner
-): CompletableFuture<Pair<GetSignableOrderResponse, String>> {
-    val future = CompletableFuture<Pair<GetSignableOrderResponse, String>>()
+): CompletableFuture<Pair<GetSignableOrderResponseV1, String>> {
+    val future = CompletableFuture<Pair<GetSignableOrderResponseV1, String>>()
 
     // Temporary until API returns message to sign
     CompletableFuture.runAsync {

@@ -43,6 +43,8 @@ private fun cancelOrder(
 ): CompletableFuture<Int> = call(CANCEL_ORDER) {
     api.cancelOrder(
         orderId,
-        CancelOrderRequest(signature)
+        CancelOrderRequest(orderId.toInt(), signature),
+        xImxEthAddress = null,
+        xImxEthSignature = null
     ).orderId!!
 }

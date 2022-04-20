@@ -70,6 +70,10 @@ android {
         configOptions = [
                 dateLibrary: "java8"
         ]
+        languageSpecificPrimitives = ["Double"]
+        typeMappings = [
+            number : "Double"
+        ]
     }
 
     sourceSets {

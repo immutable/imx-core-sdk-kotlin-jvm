@@ -51,7 +51,7 @@ class LoginWorkflowTest {
 
     @Test
     fun testPreRegisteredUserLoginSuccess() {
-        every { api.getUser(ADDRESS) } returns GetUsersApiResponse(listOf("account"))
+        every { api.getUsers(ADDRESS) } returns GetUsersApiResponse(listOf("account"))
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.complete(SIGNATURE)
 
@@ -65,7 +65,7 @@ class LoginWorkflowTest {
 
     @Test
     fun testUnregisteredUserLoginSuccess() {
-        every { api.getUser(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
         every { api.registerUser(any()) } returns RegisterUserResponse("txHash")
 
         addressFuture.complete(ADDRESS)
@@ -124,7 +124,7 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnIsRegistered() {
-        every { api.getUser(any()) } throws ClientException()
+        every { api.getUsers(any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.complete(SIGNATURE)
 
@@ -137,7 +137,7 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnGetRegisterMessage() {
-        every { api.getUser(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.complete(SIGNATURE)
         registerStarkSignatureFuture.completeExceptionally(TestException())
@@ -151,7 +151,7 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnRegister() {
-        every { api.getUser(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
         every { api.registerUser(any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.complete(SIGNATURE)

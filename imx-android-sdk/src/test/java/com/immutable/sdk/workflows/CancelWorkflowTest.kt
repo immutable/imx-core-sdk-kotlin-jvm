@@ -57,7 +57,7 @@ class CancelWorkflowTest {
     @Test
     fun testCancelSuccess() {
         starkKeysFuture.complete(ecKeyPair)
-        every { ordersApi.cancelOrder(any(), any()) } returns cancelOrderResponse
+        every { ordersApi.cancelOrder(any(), any(), any(), any()) } returns cancelOrderResponse
         every { cancelOrderResponse.orderId } returns ORDER_ID
 
         testFuture(
@@ -81,7 +81,7 @@ class CancelWorkflowTest {
     @Test
     fun testCancelFailedOnCancelOrder() {
         starkKeysFuture.complete(ecKeyPair)
-        every { ordersApi.cancelOrder(any(), any()) } throws ClientException()
+        every { ordersApi.cancelOrder(any(), any(), any(), any()) } throws ClientException()
 
         testFuture(
             future = createCancelFuture(),

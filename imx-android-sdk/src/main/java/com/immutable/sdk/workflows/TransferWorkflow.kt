@@ -3,10 +3,7 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.TransfersApi
-import com.immutable.sdk.api.model.CreateTransferRequest
-import com.immutable.sdk.api.model.CreateTransferResponse
-import com.immutable.sdk.api.model.GetSignableTransferRequest
-import com.immutable.sdk.api.model.GetSignableTransferResponse
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
@@ -29,7 +26,7 @@ internal fun transfer(
             if (error != null)
                 future.completeExceptionally(error)
             else
-                future.complete(response.transferId)
+                future.complete(response.transferIds?.first())
         }
 
     return future
@@ -46,16 +43,18 @@ private fun getSignableTransfer(
 
     CompletableFuture.runAsync {
         try {
-            future.complete(
-                api.getSignableTransfer(
-                    GetSignableTransferRequest(
-                        amount = token.quantity,
-                        receiver = recipientAddress,
-                        sender = address,
-                        token = token.toToken()
-                    )
+            val transferDetails = arrayListOf(
+                SignableTransferDetails(
+                    amount = token.quantity,
+                    receiver = recipientAddress,
+                    token = token.toSignableToken()
                 )
             )
+            val request = GetSignableTransferRequest(
+                senderEtherKey = address,
+                signableRequests = transferDetails
+            )
+            future.complete(api.getSignableTransfer(request))
         } catch (e: Exception) {
             future.completeExceptionally(e)
         }
@@ -74,7 +73,10 @@ private fun getTransferRequest(
         try {
             signer.getStarkKeys()
                 .thenCompose { starkKeys ->
-                    val signature = StarkCurve.sign(starkKeys, response.payloadHash!!)
+                    val signature = StarkCurve.sign(
+                        keyPair = starkKeys,
+                        msg = response.signableResponses?.first()?.payloadHash!!
+                    )
                     CompletableFuture.completedFuture(signature)
                 }
                 .whenComplete { signature, error ->
@@ -89,18 +91,26 @@ private fun getTransferRequest(
     return future
 }
 
-private fun getCreateTransferRequest(response: GetSignableTransferResponse, signature: String?) =
-    CreateTransferRequest(
-        amount = response.amount!!,
-        assetId = response.assetId!!,
-        expirationTimestamp = response.expirationTimestamp!!,
-        nonce = response.nonce!!,
-        receiverStarkKey = response.receiverStarkKey!!,
-        receiverVaultId = response.receiverVaultId!!,
-        senderStarkKey = response.senderStarkKey!!,
-        senderVaultId = response.senderVaultId!!,
-        starkSignature = signature!!
+private fun getCreateTransferRequest(
+    response: GetSignableTransferResponse,
+    signature: String?
+): CreateTransferRequest {
+    val signableResponse = response.signableResponses?.first()!!
+    val transferRequest = TransferRequest(
+        amount = signableResponse.amount!!,
+        assetId = signableResponse.assetId!!,
+        expirationTimestamp = signableResponse.expirationTimestamp!!,
+        nonce = signableResponse.nonce!!,
+        receiverStarkKey = signableResponse.receiverStarkKey!!,
+        receiverVaultId = signableResponse.receiverVaultId!!,
+        senderVaultId = signableResponse.senderVaultId!!,
+        starkSignature = signature!!,
     )
+    return CreateTransferRequest(
+        senderStarkKey = response.senderStarkKey,
+        requests = arrayListOf(transferRequest)
+    )
+}
 
 @Suppress("TooGenericExceptionCaught")
 private fun createTransfer(
@@ -111,7 +121,12 @@ private fun createTransfer(
 
     CompletableFuture.runAsync {
         try {
-            future.complete(api.createTransfer(request))
+            val response = api.createTransfer(
+                request,
+                xImxEthAddress = null,
+                xImxEthSignature = null
+            )
+            future.complete(response)
         } catch (e: Exception) {
             future.completeExceptionally(e)
         }

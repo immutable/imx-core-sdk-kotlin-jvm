@@ -43,10 +43,7 @@ class TransferWorkflowTest {
     private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
 
     private val transferResponse = CreateTransferResponse(
-        sentSignature = "sentSignature",
-        status = "complete",
-        time = 1_325_907,
-        transferId = 5
+        transferIds = arrayListOf(5)
     )
 
     @Before
@@ -63,31 +60,43 @@ class TransferWorkflowTest {
         every { StarkCurve.sign(any(), any()) } returns SIGNATURE
 
         every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
-            amount = "1",
-            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
-            expirationTimestamp = 1_325_907,
-            nonce = 596_252_354,
-            payloadHash = "hash",
-            receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
-            receiverVaultId = 1_502_450_104,
             senderStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
-            senderVaultId = 1_502_450_105
-        )
-        every {
-            api.createTransfer(
-                CreateTransferRequest(
+            signableResponses = arrayListOf(
+                SignableTransferResponseDetails(
                     amount = "1",
                     assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
                     expirationTimestamp = 1_325_907,
                     nonce = 596_252_354,
-                    starkSignature = SIGNATURE,
-                    receiverStarkKey =
-                    "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                    payloadHash = "hash",
+                    receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
+                        "e971a23485",
                     receiverVaultId = 1_502_450_104,
-                    senderStarkKey =
-                    "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
                     senderVaultId = 1_502_450_105
                 )
+            )
+        )
+        every {
+            api.createTransfer(
+                CreateTransferRequest(
+                    senderStarkKey =
+                    "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
+                    requests = arrayListOf(
+                        TransferRequest(
+                            amount = "1",
+                            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552" +
+                                "471a7abfcb02",
+                            expirationTimestamp = 1_325_907,
+                            nonce = 596_252_354,
+                            starkSignature = SIGNATURE,
+                            receiverStarkKey =
+                            "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                            receiverVaultId = 1_502_450_104,
+                            senderVaultId = 1_502_450_105
+                        )
+                    )
+                ),
+                xImxEthAddress = null,
+                xImxEthSignature = null
             )
         } returns transferResponse
     }
@@ -201,7 +210,7 @@ class TransferWorkflowTest {
 
     @Test
     fun testTransferFailOnInvalidSignableResponse() {
-        every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse()
+        every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(ADDRESS)
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
 
@@ -222,7 +231,7 @@ class TransferWorkflowTest {
     fun testTransferFailOnCreateTransfer() {
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
-        every { api.createTransfer(any()) } throws ClientException()
+        every { api.createTransfer(any(), any(), any()) } throws ClientException()
 
         testFuture(
             transfer(

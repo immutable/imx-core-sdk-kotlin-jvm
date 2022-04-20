@@ -29,6 +29,7 @@ fun <T> testFuture(
     future.whenComplete { result, throwable ->
         data = result
         error = throwable
+        throwable.printStackTrace()
         latch.countDown()
     }
 

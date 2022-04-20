@@ -78,7 +78,7 @@ private fun isUserRegistered(
     CompletableFuture.runAsync {
         try {
             val isRegistered =
-                api.getUser(keyPairAndData.second.address).accounts?.isNotEmpty() == true
+                api.getUsers(keyPairAndData.second.address).accounts?.isNotEmpty() == true
             isRegisteredFuture.complete(
                 keyPairAndData.first to keyPairAndData.second.copy(
                     isRegistered = isRegistered

@@ -57,10 +57,8 @@ class BuyWorkflowTest {
 
         every {
             ordersApi.getOrder(
-                ORDER_ID,
-                true,
-                null,
-                null
+                any(),
+                any(), any(), any()
             )
         } returns Order(
             buy = Token(TokenData(quantity = "200000000000000", decimals = 18), TokenType.ETH.name),
@@ -76,7 +74,7 @@ class BuyWorkflowTest {
             user = "0xb76e3eeb2f7143165618ab8feaabcd395b6fac7f"
         )
 
-        every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse(
+        every { ordersApi.getSignableOrderV1(any()) } returns GetSignableOrderResponseV1(
             assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
             assetIdBuy = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb01",
             vaultIdSell = 1_502_450_104,
@@ -91,12 +89,18 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuySuccess() {
-        every { tradesApi.createTrade(any()) } returns CreateTradeResponse(tradeId = TRADE_ID)
+        every {
+            tradesApi.createTrade(
+                any(),
+                any(),
+                any()
+            )
+        } returns CreateTradeResponse(tradeId = TRADE_ID)
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = TRADE_ID,
             expectedError = null
         )
@@ -107,7 +111,7 @@ class BuyWorkflowTest {
         addressFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -115,18 +119,11 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuyFailedOnGetOrder() {
-        every {
-            ordersApi.getOrder(
-                ORDER_ID,
-                true,
-                null,
-                null
-            )
-        } throws ClientException()
+        every { ordersApi.getOrder(any(), any(), any(), any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
@@ -135,11 +132,11 @@ class BuyWorkflowTest {
     @Suppress("UnderscoresInNumericLiterals")
     @Test
     fun testBuyFailedOnGetSignableOrder() {
-        every { ordersApi.getSignableOrder(any()) } throws ClientException()
+        every { ordersApi.getSignableOrderV1(any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
@@ -151,7 +148,7 @@ class BuyWorkflowTest {
         starkKeysFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -159,13 +156,13 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuyFailedOnStarkSignatureInvalidSignableResponse() {
-        every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
+        every { ordersApi.getSignableOrderV1(any()) } returns GetSignableOrderResponseV1()
 
         addressFuture.complete(ADDRESS)
         starkKeysFuture.completeExceptionally(ImmutableException.invalidResponse(""))
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.invalidResponse("")
         )
@@ -173,13 +170,13 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuyFailedOnCreateTrade() {
-        every { tradesApi.createTrade(any()) } throws ClientException()
+        every { tradesApi.createTrade(any(), any(), any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
 
         testFuture(
-            future = buy(ORDER_ID, signer, starkSigner, ordersApi, tradesApi),
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )

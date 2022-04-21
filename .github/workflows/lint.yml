@@ -24,4 +24,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: ktlint-results
-          path: build/reports/ktlint
+          path: imx-android-sdk/build/reports/ktlint

@@ -1,18 +1,21 @@
 package com.immutable.sdk.workflows
 
 import com.immutable.sdk.*
+import com.immutable.sdk.api.AssetsApi
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.api.model.CreateOrderResponse
-import com.immutable.sdk.api.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.stark.StarkCurve
+import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.utils.TokenType
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockkObject
-import junit.framework.Assert.assertEquals
+import io.mockk.verify
+import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
@@ -38,6 +41,9 @@ class SellWorkflowTest {
     private lateinit var ordersApi: OrdersApi
 
     @MockK
+    private lateinit var assetsApi: AssetsApi
+
+    @MockK
     private lateinit var signer: Signer
 
     @MockK
@@ -45,6 +51,9 @@ class SellWorkflowTest {
 
     @MockK
     private lateinit var ecKeyPair: ECKeyPair
+
+    @MockK
+    private lateinit var asset: Asset
 
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
@@ -72,6 +81,9 @@ class SellWorkflowTest {
             payloadHash = PAYLOAD_HASH
         )
 
+        every { assetsApi.getAsset(any(), any(), any()) } returns asset
+        every { asset.fees } returns arrayListOf()
+
         mockkObject(StarkCurve)
         every { StarkCurve.sign(any(), any()) } returns SIGNATURE
     }
@@ -82,7 +94,8 @@ class SellWorkflowTest {
         fees = emptyList(),
         signer = signer,
         starkSigner = starkSigner,
-        ordersApi = ordersApi
+        ordersApi = ordersApi,
+        assetsApi = assetsApi
     )
 
     @Test
@@ -102,6 +115,44 @@ class SellWorkflowTest {
     }
 
     @Test
+    fun testSellInEthSuccess_withRoyaltyFee() {
+        addressFuture.complete(ADDRESS)
+        starkKeysFuture.complete(ecKeyPair)
+
+        every {
+            ordersApi.createOrder(any(), any(), any())
+        } returns CreateOrderResponse(orderId = ORDER_ID)
+        every { asset.fees } returns arrayListOf(
+            Fee(address = ADDRESS, percentage = 2.0, type = FEE_TYPE_ROYALTY)
+        )
+
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = ORDER_ID,
+            expectedError = null
+        )
+
+        verify {
+            ordersApi.getSignableOrder(
+                GetSignableOrderRequest(
+                    amountBuy = "10302000000000000",
+                    amountSell = "1",
+                    tokenBuy = SignableToken(
+                        type = TokenType.ETH.name,
+                        data = TokenData(decimals = Constants.ETH_DECIMALS)
+                    ),
+                    tokenSell = SignableToken(
+                        data = TokenData(tokenId = TOKEN_ID, tokenAddress = TOKEN_ADDRESS),
+                        type = TokenType.ERC721.name
+                    ),
+                    user = ADDRESS,
+                    fees = emptyList()
+                )
+            )
+        }
+    }
+
+    @Test
     fun testSellInErc20Success() {
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
@@ -117,11 +168,83 @@ class SellWorkflowTest {
                 fees = emptyList(),
                 signer = signer,
                 starkSigner = starkSigner,
-                ordersApi = ordersApi
+                ordersApi = ordersApi,
+                assetsApi = assetsApi
             ),
             expectedResult = ORDER_ID,
             expectedError = null
         )
+
+        verify {
+            ordersApi.getSignableOrder(
+                GetSignableOrderRequest(
+                    amountBuy = "10100",
+                    amountSell = "1",
+                    tokenBuy = SignableToken(
+                        type = TokenType.ERC20.name,
+                        data = TokenData(
+                            tokenAddress = SELL_TOKEN_ADDRESS,
+                            decimals = SELL_TOKEN_DECIMALS
+                        )
+                    ),
+                    tokenSell = SignableToken(
+                        data = TokenData(tokenId = TOKEN_ID, tokenAddress = TOKEN_ADDRESS),
+                        type = TokenType.ERC721.name
+                    ),
+                    user = ADDRESS,
+                    fees = emptyList()
+                )
+            )
+        }
+    }
+
+    @Test
+    fun testSellInErc20Success_withRoyaltyAndMakerFee() {
+        addressFuture.complete(ADDRESS)
+        starkKeysFuture.complete(ecKeyPair)
+
+        every {
+            ordersApi.createOrder(any(), any(), any())
+        } returns CreateOrderResponse(orderId = ORDER_ID)
+        every { asset.fees } returns arrayListOf(
+            Fee(address = ADDRESS, percentage = 3.5, type = FEE_TYPE_ROYALTY)
+        )
+
+        testFuture(
+            future = sell(
+                asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
+                sellToken = Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, SELL_AMOUNT),
+                fees = arrayListOf(FeeEntry(address = ADDRESS, feePercentage = 1.0)),
+                signer = signer,
+                starkSigner = starkSigner,
+                ordersApi = ordersApi,
+                assetsApi = assetsApi
+            ),
+            expectedResult = ORDER_ID,
+            expectedError = null
+        )
+
+        verify {
+            ordersApi.getSignableOrder(
+                GetSignableOrderRequest(
+                    amountBuy = "10554",
+                    amountSell = "1",
+                    tokenBuy = SignableToken(
+                        type = TokenType.ERC20.name,
+                        data = TokenData(
+                            tokenAddress = SELL_TOKEN_ADDRESS,
+                            decimals = SELL_TOKEN_DECIMALS
+                        )
+                    ),
+                    tokenSell = SignableToken(
+                        data = TokenData(tokenId = TOKEN_ID, tokenAddress = TOKEN_ADDRESS),
+                        type = TokenType.ERC721.name
+                    ),
+                    user = ADDRESS,
+                    fees = arrayListOf(FeeEntry(address = ADDRESS, feePercentage = 1.0))
+                )
+            )
+        }
     }
 
     @Test
@@ -133,6 +256,18 @@ class SellWorkflowTest {
             future = createSellFuture(),
             expectedResult = null,
             expectedError = TestException()
+        )
+    }
+
+    @Test
+    fun testSellFailedOnGetAssets() {
+        addressFuture.complete(ADDRESS)
+        every { assetsApi.getAsset(any(), any(), any()) } throws RuntimeException()
+
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
         )
     }
 

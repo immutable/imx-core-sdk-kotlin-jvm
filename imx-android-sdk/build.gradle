@@ -22,6 +22,14 @@ task addHeader(type:Exec) {
     commandLine 'python', 'addHeaderScript.py', getVersionName()
 }
 
+task cleanGeneratedClient() {
+    delete "$project.projectDir/generated"
+}
+
+task cleanDocs() {
+    delete "$rootDir/docs"
+}
+
 android {
     compileSdk 32
 
@@ -62,7 +70,7 @@ android {
     openApiGenerate {
         generatorName = "kotlin"
         inputSpec = "$rootDir/swagger.json".toString()
-        outputDir = "$buildDir/generated".toString()
+        outputDir = "$project.projectDir/generated".toString()
         apiPackage = "com.immutable.sdk.api"
         invokerPackage = "com.immutable.sdk.invoker"
         modelPackage = "com.immutable.sdk.api.model"
@@ -77,7 +85,7 @@ android {
 
     sourceSets {
         main {
-            java.srcDirs = ["$buildDir/generated/src/main/kotlin"]
+            java.srcDirs = ["$project.projectDir/generated/src/main/kotlin"]
         }
     }
 
@@ -91,6 +99,8 @@ android {
     preBuild.dependsOn(tasks.ktlintCheck)
     preBuild.dependsOn(tasks.detekt)
     preBuild.finalizedBy(tasks.dokkaHtml)
+    tasks.dokkaHtml.dependsOn(tasks.cleanDocs)
+    tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
 }
 
 dependencies {
@@ -151,6 +161,7 @@ ktlint {
     disabledRules = ["no-wildcard-imports", "import-ordering"]
     filter {
         exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated/") }
+        exclude { "generated/**" }
     }
 }
 
@@ -161,12 +172,22 @@ detekt {
 }
 
 dokkaHtml.configure {
-    outputDirectory.set(file("../docs"))
+    outputDirectory.set(file("$rootDir/docs"))
 
     dokkaSourceSets {
         configureEach {
             perPackageOption {
                 matchingRegex.set("org.openapitools.*")
+                suppress.set(true)
+            }
+
+            perPackageOption {
+                matchingRegex.set("com.immutable.sdk.api.*")
+                suppress.set(true)
+            }
+
+            perPackageOption {
+                matchingRegex.set("com.immutable.sdk.api")
                 suppress.set(true)
             }
 

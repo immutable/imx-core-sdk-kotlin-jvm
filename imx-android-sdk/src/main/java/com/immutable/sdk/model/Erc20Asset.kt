@@ -18,11 +18,6 @@ class Erc20Asset(
     val decimals: Int,
     quantity: String
 ) : AssetModel(quantity) {
-    override fun toToken(): Token = Token(
-        type = TokenType.ERC20.name,
-        data = TokenData(tokenAddress = tokenAddress, decimals = decimals)
-    )
-
     override fun toSignableToken(): SignableToken = SignableToken(
         type = TokenType.ERC20.name,
         data = TokenData(tokenAddress = tokenAddress, decimals = decimals)

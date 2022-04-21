@@ -160,8 +160,7 @@ ktlint {
     enableExperimentalRules = false
     disabledRules = ["no-wildcard-imports", "import-ordering"]
     filter {
-        exclude { projectDir.toURI().relativize(it.file.toURI()).path.contains("/generated/") }
-        exclude { "generated/**" }
+        exclude { element -> element.file.path.contains("generated/") }
     }
 }
 

@@ -3065,10 +3065,7 @@
                 },
                 "metadata": {
                     "description": "Metadata of this asset",
-                    "type": "array",
-                    "items": {
-                        "type": "integer"
-                    }
+                    "type": "object"
                 },
                 "name": {
                     "description": "Name of this asset",

@@ -1,5 +1,6 @@
 package com.immutable.sdk.model
 
+import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
 import com.immutable.sdk.utils.TokenType
@@ -17,7 +18,7 @@ class Erc20Asset(
     val decimals: Int,
     quantity: String
 ) : AssetModel(quantity) {
-    override fun toToken(): Token = Token(
+    override fun toSignableToken(): SignableToken = SignableToken(
         type = TokenType.ERC20.name,
         data = TokenData(tokenAddress = tokenAddress, decimals = decimals)
     )

@@ -44,7 +44,6 @@ android {
 
     buildTypes {
         debug {
-            debuggable true
             minifyEnabled false
         }
         release {
@@ -69,6 +68,10 @@ android {
         modelPackage = "com.immutable.sdk.api.model"
         configOptions = [
                 dateLibrary: "java8"
+        ]
+        languageSpecificPrimitives = ["Double"]
+        typeMappings = [
+            number : "Double"
         ]
     }
 

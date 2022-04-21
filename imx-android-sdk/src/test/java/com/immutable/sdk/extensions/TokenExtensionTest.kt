@@ -1,5 +1,6 @@
 package com.immutable.sdk.extensions
 
+import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
 import com.immutable.sdk.utils.TokenType
@@ -25,7 +26,7 @@ class TokenExtensionTest {
     @Test
     fun testCleanEth() {
         assertEquals(
-            Token(
+            SignableToken(
                 data = TokenData(decimals = DECIMAL),
                 type = TokenType.ETH.name
             ),
@@ -42,7 +43,7 @@ class TokenExtensionTest {
     @Test
     fun testCleanErc20() {
         assertEquals(
-            Token(
+            SignableToken(
                 data = TokenData(decimals = DECIMAL, tokenAddress = TOKEN_ADDRESS),
                 type = TokenType.ERC20.name
             ),
@@ -65,7 +66,7 @@ class TokenExtensionTest {
     @Test
     fun testCleanErc721() {
         assertEquals(
-            Token(
+            SignableToken(
                 data = TokenData(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
                 type = TokenType.ERC721.name
             ),

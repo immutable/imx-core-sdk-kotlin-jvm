@@ -4,10 +4,10 @@ import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CreateOrderResponse
 import com.immutable.sdk.api.model.GetSignableOrderResponse
-import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
+import com.immutable.sdk.stark.StarkCurve
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -17,6 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
 import org.web3j.crypto.ECKeyPair
+import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
@@ -30,6 +31,7 @@ private const val SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
 private const val ORDER_ID = 8426
+private const val PAYLOAD_HASH = "payloadHash"
 
 class SellWorkflowTest {
     @MockK
@@ -66,7 +68,8 @@ class SellWorkflowTest {
             amountBuy = "10100000000000000",
             nonce = 596_252_354,
             expirationTimestamp = 1_325_907,
-            starkKey = STARK_KEY
+            starkKey = STARK_KEY,
+            payloadHash = PAYLOAD_HASH
         )
 
         mockkObject(StarkCurve)
@@ -76,6 +79,7 @@ class SellWorkflowTest {
     private fun createSellFuture() = sell(
         asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
         sellToken = EthAsset(SELL_AMOUNT),
+        fees = emptyList(),
         signer = signer,
         starkSigner = starkSigner,
         ordersApi = ordersApi
@@ -86,7 +90,9 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
 
-        every { ordersApi.createOrder(any()) } returns CreateOrderResponse(orderId = ORDER_ID)
+        every {
+            ordersApi.createOrder(any(), any(), any())
+        } returns CreateOrderResponse(orderId = ORDER_ID)
 
         testFuture(
             future = createSellFuture(),
@@ -100,12 +106,15 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
 
-        every { ordersApi.createOrder(any()) } returns CreateOrderResponse(orderId = ORDER_ID)
+        every {
+            ordersApi.createOrder(any(), any(), any())
+        } returns CreateOrderResponse(orderId = ORDER_ID)
 
         testFuture(
             future = sell(
                 asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
                 sellToken = Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, SELL_AMOUNT),
+                fees = emptyList(),
                 signer = signer,
                 starkSigner = starkSigner,
                 ordersApi = ordersApi
@@ -160,7 +169,7 @@ class SellWorkflowTest {
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = ImmutableException.invalidResponse("")
+            expectedError = TestException()
         )
     }
 
@@ -168,7 +177,7 @@ class SellWorkflowTest {
     fun testSellFailedOnCreateOrder() {
         addressFuture.complete(ADDRESS)
         starkKeysFuture.complete(ecKeyPair)
-        every { ordersApi.createOrder(any()) } throws ClientException()
+        every { ordersApi.createOrder(any(), any(), any()) } throws ClientException()
 
         testFuture(
             future = createSellFuture(),
@@ -178,13 +187,21 @@ class SellWorkflowTest {
     }
 
     @Test
-    fun testConvertAmount() {
-        assertEquals(convertAmount(EthAsset("0.081")), "81000000000000000")
+    fun testFormatAmount() {
+        assertEquals("81000000000000000", formatAmount(EthAsset("0.081"), BigDecimal.ZERO))
         assertEquals(
-            convertAmount(
-                Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, "55")
-            ),
-            "55000000"
+            "55000000",
+            formatAmount(
+                Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, "55"),
+                BigDecimal.ZERO
+            )
+        )
+        assertEquals(
+            "2000000",
+            formatAmount(
+                Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, "1"),
+                BigDecimal.ONE
+            )
         )
     }
 }

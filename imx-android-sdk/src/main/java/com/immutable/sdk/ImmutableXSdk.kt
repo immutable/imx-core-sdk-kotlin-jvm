@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
+import com.immutable.sdk.api.model.FeeEntry
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
@@ -18,7 +19,8 @@ enum class ImmutableXBase {
     Production, Ropsten
 }
 
-@VisibleForTesting internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
+@VisibleForTesting
+internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
 
 /**
  * This is the entry point for the Immutable X SDK.
@@ -56,13 +58,14 @@ object ImmutableXSdk {
      * @return a [CompletableFuture] that will provide the Stark key pair if successful. This
      * key pair needs to be securely stored as exposing this risks the users assets and wallet.
      */
-    fun register(signer: Signer): CompletableFuture<ECKeyPair> =
+    fun login(signer: Signer): CompletableFuture<ECKeyPair> =
         com.immutable.sdk.workflows.login(signer)
 
     /**
      * This is a utility function that will chain the necessary calls to buy an existing order.
      *
      * @param orderId the id of an existing order to be bought
+     * @param fees taker fees information to be used in the buy order.
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
@@ -70,30 +73,35 @@ object ImmutableXSdk {
      */
     fun buy(
         orderId: String,
+        fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<Int> =
-        com.immutable.sdk.workflows.buy(orderId, signer, starkSigner)
+        com.immutable.sdk.workflows.buy(orderId, fees, signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
      *
      * @param asset the ERC721 asset to sell
      * @param sellToken the type of token and how much of it to sell the ERC721 asset for
+     * @param fees maker fees information to be used in the sell order.
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
      * @return a [CompletableFuture] that will provide the cancelled Order id if successful.
      */
+    @Suppress("LongParameterList")
     fun sell(
         asset: Erc721Asset,
         sellToken: AssetModel,
+        fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<Int> {
         return com.immutable.sdk.workflows.sell(
             asset,
             sellToken,
+            fees,
             signer,
             starkSigner
         )

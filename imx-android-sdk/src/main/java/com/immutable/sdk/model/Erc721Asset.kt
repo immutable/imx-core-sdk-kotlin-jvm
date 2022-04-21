@@ -16,11 +16,6 @@ class Erc721Asset(
     val tokenAddress: String,
     val tokenId: String
 ) : AssetModel(ERC721_AMOUNT) {
-    override fun toToken(): Token = Token(
-        type = TokenType.ERC721.name,
-        data = TokenData(tokenAddress = tokenAddress, tokenId = tokenId)
-    )
-
     override fun toSignableToken(): SignableToken = SignableToken(
         type = TokenType.ERC721.name,
         data = TokenData(tokenAddress = tokenAddress, tokenId = tokenId)

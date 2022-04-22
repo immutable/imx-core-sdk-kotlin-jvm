@@ -6,6 +6,7 @@ import androidx.annotation.VisibleForTesting
 import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
+import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.extensions.getJson
 import com.immutable.sdk.extensions.getJsonArray
 import com.immutable.sdk.extensions.toURLEncodedString
@@ -18,6 +19,10 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
+import org.openapitools.client.infrastructure.ClientException
+
+@VisibleForTesting
+internal const val HTTP_STATUS_CODE_NOT_FOUND = 404
 
 @VisibleForTesting
 internal const val ID = "id"
@@ -56,11 +61,15 @@ internal fun buyCrypto(
     signer: Signer,
     client: OkHttpClient = OkHttpClient.Builder().build(),
     @ColorInt colourInt: Int,
-    colourCodeHex: String
+    colourCodeHex: String,
+    usersApi: UsersApi = UsersApi()
 ) {
     try {
         // Get connected wallet address
         val address = signer.getAddress().get()
+        // Check that the wallet is registered
+        val isRegistered = isWalletRegistered(address, usersApi)
+        check(isRegistered) { "Wallet is not registered. Call ImmutableXSdk.login() to register your wallet." }
         // Get transaction ID
         val transactionId = getTransactionId(walletAddress = address, base = base, client = client)
         // Get supported fiat to crypto currencies
@@ -83,6 +92,16 @@ internal fun buyCrypto(
         )
     } catch (e: Exception) {
         e.cause?.let { throw it } ?: throw e
+    }
+}
+
+@Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
+private fun isWalletRegistered(address: String, userApi: UsersApi): Boolean {
+    return try {
+        userApi.getUsers(address).accounts?.isNotEmpty() == true
+    } catch (e: Exception) {
+        if (e is ClientException && e.statusCode == HTTP_STATUS_CODE_NOT_FOUND) false
+        else throw e
     }
 }
 

@@ -18,6 +18,7 @@ import okhttp3.Response
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
@@ -111,6 +112,11 @@ class BuyCryptoWorkflowTest {
         every { ImmutableConfig.getPublicApiUrl(base) } returns BASE_URL
         every { ImmutableConfig.getMoonpayApiKey(base) } returns API_KEY
         every { ImmutableConfig.getBuyCryptoUrl(base) } returns BUY_CRYPTO_URL
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     private fun buyCrypto() {

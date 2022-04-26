@@ -10,7 +10,7 @@ Name | Type | Description | Notes
 **fees** | [**kotlin.collections.List&lt;Fee&gt;**](Fee.md) | Royalties to pay on this asset operations |  [optional]
 **id** | **kotlin.String** | [DEPRECATED] Internal Immutable X Token ID |  [optional]
 **imageUrl** | **kotlin.String** | URL of the image which should be used for this asset |  [optional]
-**metadata** | **kotlin.collections.List&lt;kotlin.Int&gt;** | Metadata of this asset |  [optional]
+**metadata** | [**kotlin.Any**](.md) | Metadata of this asset |  [optional]
 **name** | **kotlin.String** | Name of this asset |  [optional]
 **orders** | [**OrderDetails**](OrderDetails.md) |  |  [optional]
 **status** | **kotlin.String** | Status of this asset (where it is in the system) |  [optional]

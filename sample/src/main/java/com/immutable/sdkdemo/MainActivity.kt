@@ -1,12 +1,13 @@
-package com.immutable.sdk
+package com.immutable.sdkdemo
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import com.immutable.sdk.ImmutableXBase
+import com.immutable.sdk.ImmutableXSdk
 import com.immutable.sdk.api.CollectionsApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import java.util.*
 
 class MainActivity : AppCompatActivity() {
 

@@ -11,7 +11,9 @@ import com.immutable.sdk.utils.Constants
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
+import io.mockk.unmockkAll
 import io.mockk.verify
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
@@ -47,6 +49,11 @@ class LoginWorkflowTest {
         every {
             signer.signMessage(Constants.REGISTER_SIGN_MESSAGE)
         } returns registerStarkSignatureFuture
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     @Test

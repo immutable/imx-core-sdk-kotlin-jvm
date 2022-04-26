@@ -73,7 +73,7 @@ data class Asset (
 
     /* Metadata of this asset */
     @Json(name = "metadata")
-    val metadata: kotlin.collections.List<kotlin.Int>? = null,
+    val metadata: kotlin.Any? = null,
 
     /* Name of this asset */
     @Json(name = "name")

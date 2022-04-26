@@ -7,7 +7,7 @@ android {
     compileSdk 32
 
     defaultConfig {
-        applicationId "com.immutable.sdk"
+        applicationId "com.immutable.sdkdemo"
         minSdk 27
         targetSdk 32
         versionCode 1

@@ -10,6 +10,8 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
@@ -17,11 +19,13 @@ import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
+private const val ASSET_OWNER = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7d"
 private const val SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
 private const val ORDER_ID = "5"
 private const val TRADE_ID = 6
+private const val STATUS = "active"
 
 class BuyWorkflowTest {
     @MockK
@@ -38,6 +42,9 @@ class BuyWorkflowTest {
 
     @MockK
     private lateinit var ecKeyPair: ECKeyPair
+
+    @MockK
+    private lateinit var order: Order
 
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
@@ -56,22 +63,21 @@ class BuyWorkflowTest {
         every { StarkCurve.sign(any(), any()) } returns SIGNATURE
 
         every {
-            ordersApi.getOrder(
-                any(),
-                any(), any(), any()
-            )
-        } returns Order(
-            buy = Token(TokenData(quantity = "200000000000000", decimals = 18), TokenType.ETH.name),
-            sell = Token(
-                TokenData(
-                    quantity = "1",
-                    tokenId = "11",
-                    tokenAddress = "0x6ee5c0836ba5523c9f0eee40da69befa30b3d97e"
-                ),
-                TokenType.ERC721.name
+            ordersApi.getOrder(ORDER_ID, true, "", "")
+        } returns order
+        every { order.user } returns ASSET_OWNER
+        every { order.status } returns STATUS
+        every { order.buy } returns Token(
+            TokenData(quantity = "200000000000000", decimals = 18),
+            TokenType.ETH.name
+        )
+        every { order.sell } returns Token(
+            TokenData(
+                quantity = "1",
+                tokenId = "11",
+                tokenAddress = "0x6ee5c0836ba5523c9f0eee40da69befa30b3d97e"
             ),
-            status = "active",
-            user = "0xb76e3eeb2f7143165618ab8feaabcd395b6fac7f"
+            TokenType.ERC721.name
         )
 
         every { ordersApi.getSignableOrderV1(any()) } returns GetSignableOrderResponseV1(
@@ -85,6 +91,11 @@ class BuyWorkflowTest {
             expirationTimestamp = 1_325_765,
             starkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485"
         )
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     @Test
@@ -129,7 +140,6 @@ class BuyWorkflowTest {
         )
     }
 
-    @Suppress("UnderscoresInNumericLiterals")
     @Test
     fun testBuyFailedOnGetSignableOrder() {
         every { ordersApi.getSignableOrderV1(any()) } throws ClientException()

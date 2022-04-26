@@ -11,6 +11,8 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import io.mockk.mockkObject
+import io.mockk.unmockkAll
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
@@ -46,6 +48,11 @@ class CancelWorkflowTest {
 
         mockkObject(StarkCurve)
         every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     private fun createCancelFuture() = cancel(

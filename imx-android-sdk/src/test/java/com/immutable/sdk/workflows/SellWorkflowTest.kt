@@ -10,11 +10,9 @@ import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.TokenType
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockkObject
-import io.mockk.verify
+import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -86,6 +84,11 @@ class SellWorkflowTest {
 
         mockkObject(StarkCurve)
         every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+    }
+
+    @After
+    fun tearDown() {
+        unmockkAll()
     }
 
     private fun createSellFuture() = sell(

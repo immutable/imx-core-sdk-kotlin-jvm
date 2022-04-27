@@ -236,6 +236,7 @@ Class | Method | HTTP request | Description
  - [com.immutable.sdk.api.model.RegisterUserRequestVerifyEth](docs/RegisterUserRequestVerifyEth.md)
  - [com.immutable.sdk.api.model.RegisterUserResponse](docs/RegisterUserResponse.md)
  - [com.immutable.sdk.api.model.Reward](docs/Reward.md)
+ - [com.immutable.sdk.api.model.SellOrders](docs/SellOrders.md)
  - [com.immutable.sdk.api.model.SignableToken](docs/SignableToken.md)
  - [com.immutable.sdk.api.model.SignableTransferDetails](docs/SignableTransferDetails.md)
  - [com.immutable.sdk.api.model.SignableTransferResponseDetails](docs/SignableTransferResponseDetails.md)

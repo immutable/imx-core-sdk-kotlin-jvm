@@ -5,22 +5,10 @@ import com.immutable.sdk.utils.Constants.HEX_RADIX
 import java.math.BigInteger
 
 private const val REGISTER_USER = "1000"
-private const val CANCEL_ORDER = "1003"
 
 // Can be removed once API returns encoded and serialised message ready to be signed with the Stark keys
 @Suppress("TooManyFunctions")
 object CryptoUtil {
-    fun getCancelOrderMsg(orderId: String): String {
-        return Crypto.pedersenHash(arrayOf(packCancelOrderMsg(orderId)))
-    }
-
-    @Suppress("MagicNumber")
-    private fun packCancelOrderMsg(orderId: String): String {
-        var serialized = BigInteger(CANCEL_ORDER)
-        serialized = serialized.shl(64).add(BigInteger(orderId))
-        return sanitizeHex(serialized.toString(HEX_RADIX))
-    }
-
     internal fun getRegisterUserMsgVerifyEth(
         etherKey: String,
         starkPublicKey: String,

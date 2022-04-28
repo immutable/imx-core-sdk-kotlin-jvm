@@ -11,7 +11,7 @@ import com.immutable.sdk.model.OrderStatus
 import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
 
-private const val SIGNABLE_ORDER = "Signable order"
+private const val SIGNABLE_TRADE = "Signable trade"
 private const val ORDER_DETAILS = "Order details"
 private const val CREATE_TRADE = "Create trade"
 private const val COMMA = ","
@@ -73,7 +73,7 @@ private fun getSignableTrade(
         completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
     order.status != OrderStatus.Active.value ->
         completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
-    else -> call(SIGNABLE_ORDER) {
+    else -> call(SIGNABLE_TRADE) {
         api.getSignableTrade(
             GetSignableTradeRequest(
                 amountBuy = order.sell!!.data!!.quantity!!,

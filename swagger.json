@@ -8,6 +8,7 @@
         },
         "version": "0.1"
     },
+    "schemes": ["https"],
     "host": "api.ropsten.x.immutable.com",
     "basePath": "/",
     "paths": {
@@ -4168,6 +4169,10 @@
                 "expiration_timestamp": {
                     "description": "Expiration timestamp for this order",
                     "type": "integer"
+                },
+                "fee_info": {
+                    "description": "Fee information",
+                    "$ref": "#/definitions/FeeInfo"
                 },
                 "nonce": {
                     "description": "Nonce of the order",

@@ -4,6 +4,7 @@ import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
+import com.immutable.sdk.model.OrderStatus
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.TokenType
 import io.mockk.MockKAnnotations
@@ -25,7 +26,7 @@ private const val SIGNATURE =
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
 private const val ORDER_ID = "5"
 private const val TRADE_ID = 6
-private const val STATUS = "active"
+private const val PAYLOAD_HASH = "tradePayloadHash"
 
 class BuyWorkflowTest {
     @MockK
@@ -66,7 +67,7 @@ class BuyWorkflowTest {
             ordersApi.getOrder(ORDER_ID, true, "", "")
         } returns order
         every { order.user } returns ASSET_OWNER
-        every { order.status } returns STATUS
+        every { order.status } returns OrderStatus.Active.value
         every { order.buy } returns Token(
             TokenData(quantity = "200000000000000", decimals = 18),
             TokenType.ETH.name
@@ -80,7 +81,7 @@ class BuyWorkflowTest {
             TokenType.ERC721.name
         )
 
-        every { ordersApi.getSignableOrderV1(any()) } returns GetSignableOrderResponseV1(
+        every { tradesApi.getSignableTrade(any()) } returns GetSignableTradeResponse(
             assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
             assetIdBuy = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb01",
             vaultIdSell = 1_502_450_104,
@@ -89,7 +90,8 @@ class BuyWorkflowTest {
             amountBuy = "1",
             nonce = 639_749_977,
             expirationTimestamp = 1_325_765,
-            starkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485"
+            starkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+            payloadHash = PAYLOAD_HASH
         )
     }
 
@@ -141,14 +143,37 @@ class BuyWorkflowTest {
     }
 
     @Test
-    fun testBuyFailedOnGetSignableOrder() {
-        every { ordersApi.getSignableOrderV1(any()) } throws ClientException()
+    fun testBuyFailedOnGetSignableTrade() {
+        every { tradesApi.getSignableTrade(any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
+        )
+    }
+
+    @Test
+    fun testBuyFailedOnGetSignableTrade_purchaseOwnOrder() {
+        addressFuture.complete(ASSET_OWNER)
+
+        testFuture(
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            expectedResult = null,
+            expectedError = ImmutableException.invalidRequest("")
+        )
+    }
+
+    @Test
+    fun testBuyFailedOnGetSignableTrade_notActive() {
+        every { order.status } returns OrderStatus.Filled.value
+        addressFuture.complete(ADDRESS)
+
+        testFuture(
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            expectedResult = null,
+            expectedError = ImmutableException.invalidRequest("")
         )
     }
 
@@ -166,7 +191,7 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuyFailedOnStarkSignatureInvalidSignableResponse() {
-        every { ordersApi.getSignableOrderV1(any()) } returns GetSignableOrderResponseV1()
+        every { tradesApi.getSignableTrade(any()) } returns GetSignableTradeResponse()
 
         addressFuture.complete(ADDRESS)
         starkKeysFuture.completeExceptionally(ImmutableException.invalidResponse(""))

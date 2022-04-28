@@ -9,6 +9,7 @@ Name | Type | Description | Notes
 **assetIdBuy** | **kotlin.String** | ID of the asset to buy |  [optional]
 **assetIdSell** | **kotlin.String** | ID of the asset to sell |  [optional]
 **expirationTimestamp** | **kotlin.Int** | Expiration timestamp for this order |  [optional]
+**feeInfo** | [**FeeInfo**](FeeInfo.md) |  |  [optional]
 **nonce** | **kotlin.Int** | Nonce of the order |  [optional]
 **payloadHash** | **kotlin.String** | Payload Hash |  [optional]
 **starkKey** | **kotlin.String** | Public stark key of the created user |  [optional]

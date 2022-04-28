@@ -3,8 +3,9 @@ package com.immutable.sdk
 /**
  * Exception thrown during SDK operations
  *
- * @property cause the exception being wrapped. If it came from a [CompletableFuture] you will need
- * to get the cause again to find the root exception as it will be wrapped by a [CompletionException]
+ * @property cause the exception being wrapped. If it came from a [java.util.concurrent.CompletableFuture]
+ * you will need to get the cause again to find the root exception as it will be wrapped by a
+ * [java.util.concurrent.CompletionException]
  * @property message categorises the type of exception
  * @property type categorises the type of exception
  */

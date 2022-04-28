@@ -20,6 +20,7 @@
 
 package com.immutable.sdk.api.model
 
+import com.immutable.sdk.api.model.FeeInfo
 
 import com.squareup.moshi.Json
 
@@ -31,6 +32,7 @@ import com.squareup.moshi.Json
  * @param assetIdBuy ID of the asset to buy
  * @param assetIdSell ID of the asset to sell
  * @param expirationTimestamp Expiration timestamp for this order
+ * @param feeInfo 
  * @param nonce Nonce of the order
  * @param payloadHash Payload Hash
  * @param starkKey Public stark key of the created user
@@ -59,6 +61,9 @@ data class GetSignableTradeResponse (
     /* Expiration timestamp for this order */
     @Json(name = "expiration_timestamp")
     val expirationTimestamp: kotlin.Int? = null,
+
+    @Json(name = "fee_info")
+    val feeInfo: FeeInfo? = null,
 
     /* Nonce of the order */
     @Json(name = "nonce")

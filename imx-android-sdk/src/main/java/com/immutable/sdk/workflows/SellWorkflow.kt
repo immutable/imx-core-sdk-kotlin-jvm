@@ -9,7 +9,6 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.TokenType
@@ -19,6 +18,7 @@ import java.util.concurrent.CompletableFuture
 private const val CREATE_ORDER = "Create order"
 private const val SIGNABLE_ORDER = "Signable order"
 private const val GET_ASSETS = "Get assets"
+
 @VisibleForTesting
 internal const val FEE_TYPE_ROYALTY = "royalty"
 
@@ -118,8 +118,8 @@ private fun createTokenSell(asset: Erc721Asset) = SignableToken(
 internal fun formatAmount(sellToken: AssetModel, totalFees: BigDecimal): String {
     val decimals = when (sellToken) {
         is Erc20Asset -> sellToken.decimals
-        is EthAsset -> Constants.ETH_DECIMALS
         is Erc721Asset -> return sellToken.quantity
+        else -> Constants.ETH_DECIMALS
     }
     val sellTokenAmount = BigDecimal(sellToken.quantity) + totalFees
     return (BigDecimal.TEN.pow(decimals) * sellTokenAmount).toBigInteger()
@@ -151,7 +151,7 @@ private fun createOrder(
             starkSignature = starkSignature,
             vaultIdBuy = response.vaultIdBuy!!,
             vaultIdSell = response.vaultIdSell!!,
-            fees = fees.map { FeeEntry(address = it.address, feePercentage = it.feePercentage) },
+            fees = fees,
             // Always include fees in order, the 'fees' field will either have fees details or nothing at all
             includeFees = true
         ),

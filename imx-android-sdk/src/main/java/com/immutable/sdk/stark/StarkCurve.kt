@@ -63,7 +63,7 @@ internal object StarkCurve {
     /**
      * @return ECPrivateKeyParameters with respect to G point
      */
-    private fun createPrivateKeyParams(privateKey: BigInteger?): ECPrivateKeyParameters? {
+    private fun createPrivateKeyParams(privateKey: BigInteger?): ECPrivateKeyParameters {
         return ECPrivateKeyParameters(
             privateKey,
             ECDomainParameters(

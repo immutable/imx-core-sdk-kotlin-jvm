@@ -15,7 +15,6 @@ class TestException : Exception()
  * @param future that is to be tested
  * @param expectedResult from the future, null if errored
  * @param expectedError from the future, null if completed successfully
- * @param block to be executed that will trigger the completion and result of the future
  */
 fun <T> testFuture(
     future: CompletableFuture<T>,

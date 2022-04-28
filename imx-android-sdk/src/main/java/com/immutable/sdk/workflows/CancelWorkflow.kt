@@ -3,10 +3,11 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CancelOrderRequest
-import com.immutable.sdk.crypto.CryptoUtil
+import com.immutable.sdk.api.model.GetSignableCancelOrderRequest
 import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
 
+private const val SIGNABLE_CANCEL_ORDER = "Signable cancel order"
 private const val CANCEL_ORDER = "Cancel order"
 
 internal fun cancel(
@@ -18,8 +19,10 @@ internal fun cancel(
 
     starkSigner.getStarkKeys()
         .thenCompose { starkKeys ->
-            val message = CryptoUtil.getCancelOrderMsg(orderId)
-            val signature = StarkCurve.sign(starkKeys, message)
+            getSignableCancelOrder(orderId, ordersApi).thenApply { starkKeys to it }
+        }
+        .thenCompose { (starkKeys, payloadHash) ->
+            val signature = StarkCurve.sign(starkKeys, payloadHash)
             CompletableFuture.completedFuture(signature)
         }
         .thenCompose { signature ->
@@ -34,6 +37,10 @@ internal fun cancel(
         }
 
     return future
+}
+
+private fun getSignableCancelOrder(orderId: String, api: OrdersApi) = call(SIGNABLE_CANCEL_ORDER) {
+    api.getSignableCancelOrder(GetSignableCancelOrderRequest(orderId = orderId.toInt())).payloadHash!!
 }
 
 private fun cancelOrder(

@@ -5,6 +5,7 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.TestException
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CancelOrderResponse
+import com.immutable.sdk.api.model.GetSignableCancelOrderResponse
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
@@ -23,6 +24,7 @@ private const val SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
 private const val ORDER_ID = 4511
+private const val PAYLOAD_HASH = "cancelPayloadHash"
 
 class CancelWorkflowTest {
     @MockK
@@ -30,6 +32,9 @@ class CancelWorkflowTest {
 
     @MockK
     private lateinit var starkSigner: StarkSigner
+
+    @MockK
+    private lateinit var signableCancelOrderResponse: GetSignableCancelOrderResponse
 
     @MockK
     private lateinit var cancelOrderResponse: CancelOrderResponse
@@ -48,6 +53,9 @@ class CancelWorkflowTest {
 
         mockkObject(StarkCurve)
         every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+
+        every { ordersApi.getSignableCancelOrder(any()) } returns signableCancelOrderResponse
+        every { signableCancelOrderResponse.payloadHash } returns PAYLOAD_HASH
     }
 
     @After
@@ -82,6 +90,30 @@ class CancelWorkflowTest {
             future = createCancelFuture(),
             expectedResult = null,
             expectedError = TestException()
+        )
+    }
+
+    @Test
+    fun testCancelFailedOnGetSignableCancelOrder() {
+        starkKeysFuture.complete(ecKeyPair)
+        every { ordersApi.getSignableCancelOrder(any()) } throws ClientException()
+
+        testFuture(
+            future = createCancelFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
+    }
+
+    @Test
+    fun testCancelFailedOnGetSignableCancelOrder_nullPayloadHash() {
+        starkKeysFuture.complete(ecKeyPair)
+        every { signableCancelOrderResponse.payloadHash } returns null
+
+        testFuture(
+            future = createCancelFuture(),
+            expectedResult = null,
+            expectedError = ImmutableException.invalidResponse("")
         )
     }
 

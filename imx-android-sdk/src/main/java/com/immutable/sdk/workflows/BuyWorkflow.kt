@@ -8,6 +8,7 @@ import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.OrderStatus
+import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
 
 private const val SIGNABLE_ORDER = "Signable order"
@@ -30,16 +31,13 @@ internal fun buy(
         .thenCompose { address ->
             getOrderDetails(orderId, fees, ordersApi).thenApply { address to it }
         }
-        .thenCompose { (address, order) -> getSignableTrade(order, address, fees, ordersApi) }
-        .thenCompose { response -> getOrderStarkSignature(response, starkSigner) }
+        .thenCompose { (address, order) -> getSignableTrade(order, address, fees, tradesApi) }
+        .thenCompose { response -> starkSigner.getStarkKeys().thenApply { response to it } }
+        .thenApply { (response, starkKeys) ->
+            response to StarkCurve.sign(starkKeys, response.payloadHash!!)
+        }
         .thenCompose { (response, signature) ->
-            createTrade(
-                orderId.toInt(),
-                response,
-                fees,
-                signature,
-                tradesApi
-            )
+            createTrade(orderId.toInt(), response, fees, signature, tradesApi)
         }.whenComplete { tradeId, error ->
             // Forward any exceptions from the compose chain
             if (error != null)
@@ -69,23 +67,21 @@ private fun getSignableTrade(
     order: Order,
     address: String,
     fees: List<FeeEntry>,
-    api: OrdersApi
-): CompletableFuture<GetSignableOrderResponseV1> = when {
+    api: TradesApi
+): CompletableFuture<GetSignableTradeResponse> = when {
     order.user == address ->
         completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
     order.status != OrderStatus.Active.value ->
         completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
     else -> call(SIGNABLE_ORDER) {
-        api.getSignableOrderV1(
-            GetSignableOrderRequestV1(
+        api.getSignableTrade(
+            GetSignableTradeRequest(
                 amountBuy = order.sell!!.data!!.quantity!!,
                 amountSell = order.buy!!.data!!.quantity!!,
                 tokenBuy = order.sell.clean()!!,
                 tokenSell = order.buy.clean()!!,
                 user = address,
-                fees = fees,
-                // Always include fees, the 'fees' field will contain fees details or nothing at all
-                includeFees = true
+                fees = fees
             )
         )
     }
@@ -94,7 +90,7 @@ private fun getSignableTrade(
 @Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
 private fun createTrade(
     orderId: Int,
-    response: GetSignableOrderResponseV1,
+    response: GetSignableTradeResponse,
     fees: List<FeeEntry>,
     starkSignature: String,
     api: TradesApi

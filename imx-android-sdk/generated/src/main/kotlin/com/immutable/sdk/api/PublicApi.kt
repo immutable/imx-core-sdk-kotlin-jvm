@@ -181,7 +181,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun cancelOrder(id: kotlin.String, cancelOrderRequest: CancelOrderRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CancelOrderResponse {
+    fun cancelOrder(id: kotlin.String, cancelOrderRequest: CancelOrderRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CancelOrderResponse {
         val localVariableConfig = cancelOrderRequestConfig(id = id, cancelOrderRequest = cancelOrderRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CancelOrderRequest, CancelOrderResponse>(
@@ -300,7 +300,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createOrder(createOrderRequest: CreateOrderRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateOrderResponse {
+    fun createOrder(createOrderRequest: CreateOrderRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateOrderResponse {
         val localVariableConfig = createOrderRequestConfig(createOrderRequest = createOrderRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateOrderRequest, CreateOrderResponse>(
@@ -418,7 +418,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createTrade(createTradeRequest: CreateTradeRequestV1, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateTradeResponse {
+    fun createTrade(createTradeRequest: CreateTradeRequestV1, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateTradeResponse {
         val localVariableConfig = createTradeRequestConfig(createTradeRequest = createTradeRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateTradeRequestV1, CreateTradeResponse>(
@@ -477,7 +477,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createTransfer(createTransferRequestV2: CreateTransferRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateTransferResponse {
+    fun createTransfer(createTransferRequestV2: CreateTransferRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateTransferResponse {
         val localVariableConfig = createTransferRequestConfig(createTransferRequestV2 = createTransferRequestV2, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateTransferRequest, CreateTransferResponse>(
@@ -536,7 +536,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createTransferV1(createTransferRequest: CreateTransferRequestV1, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateTransferResponseV1 {
+    fun createTransferV1(createTransferRequest: CreateTransferRequestV1, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateTransferResponseV1 {
         val localVariableConfig = createTransferV1RequestConfig(createTransferRequest = createTransferRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateTransferRequestV1, CreateTransferResponseV1>(
@@ -595,7 +595,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createWithdrawal(createWithdrawalRequest: CreateWithdrawalRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateWithdrawalResponse {
+    fun createWithdrawal(createWithdrawalRequest: CreateWithdrawalRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateWithdrawalResponse {
         val localVariableConfig = createWithdrawalRequestConfig(createWithdrawalRequest = createWithdrawalRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateWithdrawalRequest, CreateWithdrawalResponse>(
@@ -654,7 +654,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getAsset(tokenAddress: kotlin.String, tokenId: kotlin.String, includeFees: kotlin.Boolean?) : Asset {
+    fun getAsset(tokenAddress: kotlin.String, tokenId: kotlin.String, includeFees: kotlin.Boolean? = null) : Asset {
         val localVariableConfig = getAssetRequestConfig(tokenAddress = tokenAddress, tokenId = tokenId, includeFees = includeFees)
 
         val localVarResponse = request<Unit, Asset>(
@@ -1039,7 +1039,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getOrder(id: kotlin.String, includeFees: kotlin.Boolean?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : Order {
+    fun getOrder(id: kotlin.String, includeFees: kotlin.Boolean? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : Order {
         val localVariableConfig = getOrderRequestConfig(id = id, includeFees = includeFees, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
 
         val localVarResponse = request<Unit, Order>(
@@ -1170,7 +1170,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProjects(imXSignature: kotlin.String, imXTimestamp: kotlin.String, pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?) : GetProjectsResponse {
+    fun getProjects(imXSignature: kotlin.String, imXTimestamp: kotlin.String, pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null) : GetProjectsResponse {
         val localVariableConfig = getProjectsRequestConfig(imXSignature = imXSignature, imXTimestamp = imXTimestamp, pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction)
 
         val localVarResponse = request<Unit, GetProjectsResponse>(
@@ -1948,7 +1948,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listAssets(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, name: kotlin.String?, metadata: kotlin.String?, sellOrders: kotlin.Boolean?, buyOrders: kotlin.Boolean?, includeFees: kotlin.Boolean?, collection: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : ListAssetsResponse {
+    fun listAssets(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, name: kotlin.String? = null, metadata: kotlin.String? = null, sellOrders: kotlin.Boolean? = null, buyOrders: kotlin.Boolean? = null, includeFees: kotlin.Boolean? = null, collection: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : ListAssetsResponse {
         val localVariableConfig = listAssetsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, name = name, metadata = metadata, sellOrders = sellOrders, buyOrders = buyOrders, includeFees = includeFees, collection = collection, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
 
         val localVarResponse = request<Unit, ListAssetsResponse>(
@@ -2121,7 +2121,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listCollectionFilters(address: kotlin.String, pageSize: kotlin.Int?, nextPageToken: kotlin.String?) : CollectionFilter {
+    fun listCollectionFilters(address: kotlin.String, pageSize: kotlin.Int? = null, nextPageToken: kotlin.String? = null) : CollectionFilter {
         val localVariableConfig = listCollectionFiltersRequestConfig(address = address, pageSize = pageSize, nextPageToken = nextPageToken)
 
         val localVarResponse = request<Unit, CollectionFilter>(
@@ -2188,7 +2188,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listCollections(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, blacklist: kotlin.String?) : ListCollectionsResponse {
+    fun listCollections(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, blacklist: kotlin.String? = null) : ListCollectionsResponse {
         val localVariableConfig = listCollectionsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, blacklist = blacklist)
 
         val localVarResponse = request<Unit, ListCollectionsResponse>(
@@ -2277,7 +2277,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listDeposits(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenAddress: kotlin.String?, tokenName: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : ListDepositsResponse {
+    fun listDeposits(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenAddress: kotlin.String? = null, tokenName: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListDepositsResponse {
         val localVariableConfig = listDepositsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenAddress = tokenAddress, tokenName = tokenName, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
 
         val localVarResponse = request<Unit, ListDepositsResponse>(
@@ -2410,7 +2410,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listMints(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenName: kotlin.String?, tokenAddress: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : ListMintsResponse {
+    fun listMints(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenName: kotlin.String? = null, tokenAddress: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListMintsResponse {
         val localVariableConfig = listMintsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenName = tokenName, tokenAddress = tokenAddress, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
 
         val localVarResponse = request<Unit, ListMintsResponse>(
@@ -2555,7 +2555,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listOrders(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, buyTokenType: kotlin.String?, buyTokenId: kotlin.String?, buyAssetId: kotlin.String?, buyTokenAddress: kotlin.String?, buyTokenName: kotlin.String?, buyMinQuantity: kotlin.String?, buyMaxQuantity: kotlin.String?, buyMetadata: kotlin.String?, sellTokenType: kotlin.String?, sellTokenId: kotlin.String?, sellAssetId: kotlin.String?, sellTokenAddress: kotlin.String?, sellTokenName: kotlin.String?, sellMinQuantity: kotlin.String?, sellMaxQuantity: kotlin.String?, sellMetadata: kotlin.String?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : ListOrdersResponse {
+    fun listOrders(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, buyTokenType: kotlin.String? = null, buyTokenId: kotlin.String? = null, buyAssetId: kotlin.String? = null, buyTokenAddress: kotlin.String? = null, buyTokenName: kotlin.String? = null, buyMinQuantity: kotlin.String? = null, buyMaxQuantity: kotlin.String? = null, buyMetadata: kotlin.String? = null, sellTokenType: kotlin.String? = null, sellTokenId: kotlin.String? = null, sellAssetId: kotlin.String? = null, sellTokenAddress: kotlin.String? = null, sellTokenName: kotlin.String? = null, sellMinQuantity: kotlin.String? = null, sellMaxQuantity: kotlin.String? = null, sellMetadata: kotlin.String? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : ListOrdersResponse {
         val localVariableConfig = listOrdersRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, buyTokenType = buyTokenType, buyTokenId = buyTokenId, buyAssetId = buyAssetId, buyTokenAddress = buyTokenAddress, buyTokenName = buyTokenName, buyMinQuantity = buyMinQuantity, buyMaxQuantity = buyMaxQuantity, buyMetadata = buyMetadata, sellTokenType = sellTokenType, sellTokenId = sellTokenId, sellAssetId = sellAssetId, sellTokenAddress = sellTokenAddress, sellTokenName = sellTokenName, sellMinQuantity = sellMinQuantity, sellMaxQuantity = sellMaxQuantity, sellMetadata = sellMetadata, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
 
         val localVarResponse = request<Unit, ListOrdersResponse>(
@@ -2722,7 +2722,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listTokens(address: kotlin.String?, symbols: kotlin.String?) : ListTokensResponse {
+    fun listTokens(address: kotlin.String? = null, symbols: kotlin.String? = null) : ListTokensResponse {
         val localVariableConfig = listTokensRequestConfig(address = address, symbols = symbols)
 
         val localVarResponse = request<Unit, ListTokensResponse>(
@@ -2795,7 +2795,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listTrades(partyATokenType: kotlin.String?, partyATokenAddress: kotlin.String?, partyATokenId: kotlin.String?, partyBTokenType: kotlin.String?, partyBTokenAddress: kotlin.String?, partyBTokenId: kotlin.String?, pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?) : ListTradesResponse {
+    fun listTrades(partyATokenType: kotlin.String? = null, partyATokenAddress: kotlin.String? = null, partyATokenId: kotlin.String? = null, partyBTokenType: kotlin.String? = null, partyBTokenAddress: kotlin.String? = null, partyBTokenId: kotlin.String? = null, pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null) : ListTradesResponse {
         val localVariableConfig = listTradesRequestConfig(partyATokenType = partyATokenType, partyATokenAddress = partyATokenAddress, partyATokenId = partyATokenId, partyBTokenType = partyBTokenType, partyBTokenAddress = partyBTokenAddress, partyBTokenId = partyBTokenId, pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp)
 
         val localVarResponse = request<Unit, ListTradesResponse>(
@@ -2912,7 +2912,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listTransfers(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenAddress: kotlin.String?, tokenName: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : ListTransfersResponse {
+    fun listTransfers(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenAddress: kotlin.String? = null, tokenName: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListTransfersResponse {
         val localVariableConfig = listTransfersRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenAddress = tokenAddress, tokenName = tokenName, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
 
         val localVarResponse = request<Unit, ListTransfersResponse>(
@@ -3047,7 +3047,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listWithdrawals(withdrawnToWallet: kotlin.Boolean?, rollupStatus: kotlin.String?, pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenAddress: kotlin.String?, tokenName: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : ListWithdrawalsResponse {
+    fun listWithdrawals(withdrawnToWallet: kotlin.Boolean? = null, rollupStatus: kotlin.String? = null, pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenAddress: kotlin.String? = null, tokenName: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListWithdrawalsResponse {
         val localVariableConfig = listWithdrawalsRequestConfig(withdrawnToWallet = withdrawnToWallet, rollupStatus = rollupStatus, pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenAddress = tokenAddress, tokenName = tokenName, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
 
         val localVarResponse = request<Unit, ListWithdrawalsResponse>(

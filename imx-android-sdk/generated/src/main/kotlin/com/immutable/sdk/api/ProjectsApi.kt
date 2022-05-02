@@ -179,7 +179,7 @@ class ProjectsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePat
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getProjects(imXSignature: kotlin.String, imXTimestamp: kotlin.String, pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?) : GetProjectsResponse {
+    fun getProjects(imXSignature: kotlin.String, imXTimestamp: kotlin.String, pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null) : GetProjectsResponse {
         val localVariableConfig = getProjectsRequestConfig(imXSignature = imXSignature, imXTimestamp = imXTimestamp, pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction)
 
         val localVarResponse = request<Unit, GetProjectsResponse>(

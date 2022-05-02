@@ -110,7 +110,7 @@ class ApplicationsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(bas
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listApplications(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?) : ListApplicationsResponse {
+    fun listApplications(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null) : ListApplicationsResponse {
         val localVariableConfig = listApplicationsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction)
 
         val localVarResponse = request<Unit, ListApplicationsResponse>(

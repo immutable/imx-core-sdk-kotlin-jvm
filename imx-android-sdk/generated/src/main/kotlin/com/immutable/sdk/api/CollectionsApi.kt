@@ -171,7 +171,7 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listCollectionFilters(address: kotlin.String, pageSize: kotlin.Int?, nextPageToken: kotlin.String?) : CollectionFilter {
+    fun listCollectionFilters(address: kotlin.String, pageSize: kotlin.Int? = null, nextPageToken: kotlin.String? = null) : CollectionFilter {
         val localVariableConfig = listCollectionFiltersRequestConfig(address = address, pageSize = pageSize, nextPageToken = nextPageToken)
 
         val localVarResponse = request<Unit, CollectionFilter>(
@@ -238,7 +238,7 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listCollections(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, blacklist: kotlin.String?) : ListCollectionsResponse {
+    fun listCollections(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, blacklist: kotlin.String? = null) : ListCollectionsResponse {
         val localVariableConfig = listCollectionsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, blacklist = blacklist)
 
         val localVarResponse = request<Unit, ListCollectionsResponse>(

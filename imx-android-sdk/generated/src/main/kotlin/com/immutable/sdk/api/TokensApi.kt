@@ -108,7 +108,7 @@ class TokensApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listTokens(address: kotlin.String?, symbols: kotlin.String?) : ListTokensResponse {
+    fun listTokens(address: kotlin.String? = null, symbols: kotlin.String? = null) : ListTokensResponse {
         val localVariableConfig = listTokensRequestConfig(address = address, symbols = symbols)
 
         val localVarResponse = request<Unit, ListTokensResponse>(

@@ -60,7 +60,7 @@ class TradesApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createTrade(createTradeRequest: CreateTradeRequestV1, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateTradeResponse {
+    fun createTrade(createTradeRequest: CreateTradeRequestV1, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateTradeResponse {
         val localVariableConfig = createTradeRequestConfig(createTradeRequest = createTradeRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateTradeRequestV1, CreateTradeResponse>(
@@ -234,7 +234,7 @@ class TradesApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listTrades(partyATokenType: kotlin.String?, partyATokenAddress: kotlin.String?, partyATokenId: kotlin.String?, partyBTokenType: kotlin.String?, partyBTokenAddress: kotlin.String?, partyBTokenId: kotlin.String?, pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?) : ListTradesResponse {
+    fun listTrades(partyATokenType: kotlin.String? = null, partyATokenAddress: kotlin.String? = null, partyATokenId: kotlin.String? = null, partyBTokenType: kotlin.String? = null, partyBTokenAddress: kotlin.String? = null, partyBTokenId: kotlin.String? = null, pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null) : ListTradesResponse {
         val localVariableConfig = listTradesRequestConfig(partyATokenType = partyATokenType, partyATokenAddress = partyATokenAddress, partyATokenId = partyATokenId, partyBTokenType = partyBTokenType, partyBTokenAddress = partyBTokenAddress, partyBTokenId = partyBTokenId, pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp)
 
         val localVarResponse = request<Unit, ListTradesResponse>(

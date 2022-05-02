@@ -64,7 +64,7 @@ class TransfersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePa
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createTransfer(createTransferRequestV2: CreateTransferRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateTransferResponse {
+    fun createTransfer(createTransferRequestV2: CreateTransferRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateTransferResponse {
         val localVariableConfig = createTransferRequestConfig(createTransferRequestV2 = createTransferRequestV2, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateTransferRequest, CreateTransferResponse>(
@@ -123,7 +123,7 @@ class TransfersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePa
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createTransferV1(createTransferRequest: CreateTransferRequestV1, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateTransferResponseV1 {
+    fun createTransferV1(createTransferRequest: CreateTransferRequestV1, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateTransferResponseV1 {
         val localVariableConfig = createTransferV1RequestConfig(createTransferRequest = createTransferRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateTransferRequestV1, CreateTransferResponseV1>(
@@ -354,7 +354,7 @@ class TransfersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePa
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listTransfers(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenAddress: kotlin.String?, tokenName: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : ListTransfersResponse {
+    fun listTransfers(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenAddress: kotlin.String? = null, tokenName: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListTransfersResponse {
         val localVariableConfig = listTransfersRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenAddress = tokenAddress, tokenName = tokenName, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
 
         val localVarResponse = request<Unit, ListTransfersResponse>(

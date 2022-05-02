@@ -9,3 +9,7 @@
 .cxx
 local.properties
 github.properties
+
+# jvm-okhttp/api.mustache is the only file we want to keep
+.openapi-generator/templates/kotlin-client/*
+!.openapi-generator/templates/kotlin-client/libraries

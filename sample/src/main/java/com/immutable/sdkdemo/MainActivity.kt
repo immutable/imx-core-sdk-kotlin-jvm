@@ -19,13 +19,7 @@ class MainActivity : AppCompatActivity() {
         ImmutableXSdk.setBase(ImmutableXBase.Ropsten)
 
         GlobalScope.launch(Dispatchers.Default) {
-            val response = CollectionsApi().listCollections(
-                pageSize = 20,
-                cursor = null,
-                orderBy = null,
-                direction = null,
-                blacklist = null
-            )
+            val response = CollectionsApi().listCollections(pageSize = 20)
             println("COLLECTIONS: " + response.result?.joinToString { it.name ?: "no name" })
         }
     }

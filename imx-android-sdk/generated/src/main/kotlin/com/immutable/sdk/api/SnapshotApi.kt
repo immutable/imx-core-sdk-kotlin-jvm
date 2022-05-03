@@ -57,7 +57,7 @@ class SnapshotApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePat
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listSnapshotBalances(tokenAddress: kotlin.String, getSnapshotRequest: GetSnapshotRequest, pageSize: kotlin.Int?, cursor: kotlin.String?) : ListSnapshotBalancesResponse {
+    fun listSnapshotBalances(tokenAddress: kotlin.String, getSnapshotRequest: GetSnapshotRequest, pageSize: kotlin.Int? = null, cursor: kotlin.String? = null) : ListSnapshotBalancesResponse {
         val localVariableConfig = listSnapshotBalancesRequestConfig(tokenAddress = tokenAddress, getSnapshotRequest = getSnapshotRequest, pageSize = pageSize, cursor = cursor)
 
         val localVarResponse = request<GetSnapshotRequest, ListSnapshotBalancesResponse>(

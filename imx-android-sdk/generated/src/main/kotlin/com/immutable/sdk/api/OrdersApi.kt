@@ -67,7 +67,7 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun cancelOrder(id: kotlin.String, cancelOrderRequest: CancelOrderRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CancelOrderResponse {
+    fun cancelOrder(id: kotlin.String, cancelOrderRequest: CancelOrderRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CancelOrderResponse {
         val localVariableConfig = cancelOrderRequestConfig(id = id, cancelOrderRequest = cancelOrderRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CancelOrderRequest, CancelOrderResponse>(
@@ -127,7 +127,7 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun createOrder(createOrderRequest: CreateOrderRequest, xImxEthAddress: kotlin.String?, xImxEthSignature: kotlin.String?) : CreateOrderResponse {
+    fun createOrder(createOrderRequest: CreateOrderRequest, xImxEthAddress: kotlin.String? = null, xImxEthSignature: kotlin.String? = null) : CreateOrderResponse {
         val localVariableConfig = createOrderRequestConfig(createOrderRequest = createOrderRequest, xImxEthAddress = xImxEthAddress, xImxEthSignature = xImxEthSignature)
 
         val localVarResponse = request<CreateOrderRequest, CreateOrderResponse>(
@@ -187,7 +187,7 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getOrder(id: kotlin.String, includeFees: kotlin.Boolean?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : Order {
+    fun getOrder(id: kotlin.String, includeFees: kotlin.Boolean? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : Order {
         val localVariableConfig = getOrderRequestConfig(id = id, includeFees = includeFees, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
 
         val localVarResponse = request<Unit, Order>(
@@ -440,7 +440,7 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listOrders(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, buyTokenType: kotlin.String?, buyTokenId: kotlin.String?, buyAssetId: kotlin.String?, buyTokenAddress: kotlin.String?, buyTokenName: kotlin.String?, buyMinQuantity: kotlin.String?, buyMaxQuantity: kotlin.String?, buyMetadata: kotlin.String?, sellTokenType: kotlin.String?, sellTokenId: kotlin.String?, sellAssetId: kotlin.String?, sellTokenAddress: kotlin.String?, sellTokenName: kotlin.String?, sellMinQuantity: kotlin.String?, sellMaxQuantity: kotlin.String?, sellMetadata: kotlin.String?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : ListOrdersResponse {
+    fun listOrders(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, buyTokenType: kotlin.String? = null, buyTokenId: kotlin.String? = null, buyAssetId: kotlin.String? = null, buyTokenAddress: kotlin.String? = null, buyTokenName: kotlin.String? = null, buyMinQuantity: kotlin.String? = null, buyMaxQuantity: kotlin.String? = null, buyMetadata: kotlin.String? = null, sellTokenType: kotlin.String? = null, sellTokenId: kotlin.String? = null, sellAssetId: kotlin.String? = null, sellTokenAddress: kotlin.String? = null, sellTokenName: kotlin.String? = null, sellMinQuantity: kotlin.String? = null, sellMaxQuantity: kotlin.String? = null, sellMetadata: kotlin.String? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : ListOrdersResponse {
         val localVariableConfig = listOrdersRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, buyTokenType = buyTokenType, buyTokenId = buyTokenId, buyAssetId = buyAssetId, buyTokenAddress = buyTokenAddress, buyTokenName = buyTokenName, buyMinQuantity = buyMinQuantity, buyMaxQuantity = buyMaxQuantity, buyMetadata = buyMetadata, sellTokenType = sellTokenType, sellTokenId = sellTokenId, sellAssetId = sellAssetId, sellTokenAddress = sellTokenAddress, sellTokenName = sellTokenName, sellMinQuantity = sellMinQuantity, sellMaxQuantity = sellMaxQuantity, sellMetadata = sellMetadata, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
 
         val localVarResponse = request<Unit, ListOrdersResponse>(

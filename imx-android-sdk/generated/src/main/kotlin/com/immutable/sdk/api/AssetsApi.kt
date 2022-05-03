@@ -56,7 +56,7 @@ class AssetsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getAsset(tokenAddress: kotlin.String, tokenId: kotlin.String, includeFees: kotlin.Boolean?) : Asset {
+    fun getAsset(tokenAddress: kotlin.String, tokenId: kotlin.String, includeFees: kotlin.Boolean? = null) : Asset {
         val localVariableConfig = getAssetRequestConfig(tokenAddress = tokenAddress, tokenId = tokenId, includeFees = includeFees)
 
         val localVarResponse = request<Unit, Asset>(
@@ -131,7 +131,7 @@ class AssetsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listAssets(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, name: kotlin.String?, metadata: kotlin.String?, sellOrders: kotlin.Boolean?, buyOrders: kotlin.Boolean?, includeFees: kotlin.Boolean?, collection: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : ListAssetsResponse {
+    fun listAssets(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, name: kotlin.String? = null, metadata: kotlin.String? = null, sellOrders: kotlin.Boolean? = null, buyOrders: kotlin.Boolean? = null, includeFees: kotlin.Boolean? = null, collection: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : ListAssetsResponse {
         val localVariableConfig = listAssetsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, name = name, metadata = metadata, sellOrders = sellOrders, buyOrders = buyOrders, includeFees = includeFees, collection = collection, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
 
         val localVarResponse = request<Unit, ListAssetsResponse>(

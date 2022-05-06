@@ -48,6 +48,7 @@ import com.immutable.sdk.api.model.GetSignableDepositRequest
 import com.immutable.sdk.api.model.GetSignableDepositResponse
 import com.immutable.sdk.api.model.GetSignableOrderRequest
 import com.immutable.sdk.api.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.GetSignableRegistrationOffchainResponse
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
 import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.api.model.GetSignableTradeRequest
@@ -77,7 +78,7 @@ import com.immutable.sdk.api.model.MintTokensResponse
 import com.immutable.sdk.api.model.MintableTokenDetails
 import com.immutable.sdk.api.model.Order
 import com.immutable.sdk.api.model.Project
-import com.immutable.sdk.api.model.RegisterUserRequestVerifyEth
+import com.immutable.sdk.api.model.RegisterUserRequest
 import com.immutable.sdk.api.model.RegisterUserResponse
 import com.immutable.sdk.api.model.SuccessResponse
 import com.immutable.sdk.api.model.TokenDetails
@@ -1439,6 +1440,59 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/v1/signable-registration",
+            query = localVariableQuery,
+            headers = localVariableHeaders,
+            body = localVariableBody
+        )
+    }
+
+    /**
+    * Get encoded details to allow clients to register the user offchain
+    * Get encoded details to allow clients to register the user offchain
+    * @param getSignableRegistrationRequest Register User Offchain 
+    * @return GetSignableRegistrationOffchainResponse
+    * @throws UnsupportedOperationException If the API returns an informational or redirection response
+    * @throws ClientException If the API returns a client error response
+    * @throws ServerException If the API returns a server error response
+    */
+    @Suppress("UNCHECKED_CAST")
+    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
+    fun getSignableRegistrationOffchain(getSignableRegistrationRequest: GetSignableRegistrationRequest) : GetSignableRegistrationOffchainResponse {
+        val localVariableConfig = getSignableRegistrationOffchainRequestConfig(getSignableRegistrationRequest = getSignableRegistrationRequest)
+
+        val localVarResponse = request<GetSignableRegistrationRequest, GetSignableRegistrationOffchainResponse>(
+            localVariableConfig
+        )
+
+        return when (localVarResponse.responseType) {
+            ResponseType.Success -> (localVarResponse as Success<*>).data as GetSignableRegistrationOffchainResponse
+            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
+            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
+            ResponseType.ClientError -> {
+                val localVarError = localVarResponse as ClientError<*>
+                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+            ResponseType.ServerError -> {
+                val localVarError = localVarResponse as ServerError<*>
+                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+            }
+        }
+    }
+
+    /**
+    * To obtain the request config of the operation getSignableRegistrationOffchain
+    *
+    * @param getSignableRegistrationRequest Register User Offchain 
+    * @return RequestConfig
+    */
+    fun getSignableRegistrationOffchainRequestConfig(getSignableRegistrationRequest: GetSignableRegistrationRequest) : RequestConfig<GetSignableRegistrationRequest> {
+        val localVariableBody = getSignableRegistrationRequest
+        val localVariableQuery: MultiValueMap = mutableMapOf()
+        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
+
+        return RequestConfig(
+            method = RequestMethod.POST,
+            path = "/v1/signable-registration-offchain",
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody
@@ -3218,7 +3272,7 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     /**
     * Registers a user
     * Registers a user
-    * @param registerUserRequestVerifyEth Register User 
+    * @param registerUserRequest Register User 
     * @return RegisterUserResponse
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
@@ -3226,10 +3280,10 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun registerUser(registerUserRequestVerifyEth: RegisterUserRequestVerifyEth) : RegisterUserResponse {
-        val localVariableConfig = registerUserRequestConfig(registerUserRequestVerifyEth = registerUserRequestVerifyEth)
+    fun registerUser(registerUserRequest: RegisterUserRequest) : RegisterUserResponse {
+        val localVariableConfig = registerUserRequestConfig(registerUserRequest = registerUserRequest)
 
-        val localVarResponse = request<RegisterUserRequestVerifyEth, RegisterUserResponse>(
+        val localVarResponse = request<RegisterUserRequest, RegisterUserResponse>(
             localVariableConfig
         )
 
@@ -3251,11 +3305,11 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     /**
     * To obtain the request config of the operation registerUser
     *
-    * @param registerUserRequestVerifyEth Register User 
+    * @param registerUserRequest Register User 
     * @return RequestConfig
     */
-    fun registerUserRequestConfig(registerUserRequestVerifyEth: RegisterUserRequestVerifyEth) : RequestConfig<RegisterUserRequestVerifyEth> {
-        val localVariableBody = registerUserRequestVerifyEth
+    fun registerUserRequestConfig(registerUserRequest: RegisterUserRequest) : RequestConfig<RegisterUserRequest> {
+        val localVariableBody = registerUserRequest
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
 

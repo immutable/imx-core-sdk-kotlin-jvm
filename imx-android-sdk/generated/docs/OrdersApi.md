@@ -372,7 +372,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **pageSize** | **kotlin.Int**| Page size of the result | [optional]
  **cursor** | **kotlin.String**| Cursor | [optional]
- **orderBy** | **kotlin.String**| Property to sort by | [optional] [enum: created_at, expired_at, sell_quantity, buy_quantity, updated_at]
+ **orderBy** | **kotlin.String**| Property to sort by | [optional] [enum: created_at, expired_at, sell_quantity, buy_quantity, buy_quantity_with_fees, updated_at]
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
  **user** | **kotlin.String**| Ethereum address of the user who submitted this order | [optional]
  **status** | **kotlin.String**| Status of this order | [optional] [enum: active, filled, cancelled, expired, inactive]

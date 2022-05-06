@@ -34,6 +34,7 @@ import com.squareup.moshi.Json
  * @param expirationTimestamp Expiration timestamp for this order
  * @param feeInfo 
  * @param nonce Nonce of the order
+ * @param signableMessage Message to sign with L1 wallet to confirm order request
  * @param starkKey Public stark key of the created user
  * @param vaultIdBuy ID of the vault into which the bought asset will be placed
  * @param vaultIdSell ID of the vault to sell from
@@ -67,6 +68,10 @@ data class GetSignableOrderResponseV1 (
     /* Nonce of the order */
     @Json(name = "nonce")
     val nonce: kotlin.Int? = null,
+
+    /* Message to sign with L1 wallet to confirm order request */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null,
 
     /* Public stark key of the created user */
     @Json(name = "stark_key")

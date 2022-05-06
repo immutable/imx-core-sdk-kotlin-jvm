@@ -27,6 +27,7 @@ Method | HTTP request | Description
 [**getSignableDeposit**](PublicApi.md#getSignableDeposit) | **POST** /v1/signable-deposit-details | Gets details of a signable deposit
 [**getSignableOrder**](PublicApi.md#getSignableOrder) | **POST** /v3/signable-order-details | Get details a signable order V3
 [**getSignableRegistration**](PublicApi.md#getSignableRegistration) | **POST** /v1/signable-registration | Get operator signature to allow clients to register the user
+[**getSignableRegistrationOffchain**](PublicApi.md#getSignableRegistrationOffchain) | **POST** /v1/signable-registration-offchain | Get encoded details to allow clients to register the user offchain
 [**getSignableTrade**](PublicApi.md#getSignableTrade) | **POST** /v3/signable-trade-details | Get details a signable trade V3
 [**getSignableTransfer**](PublicApi.md#getSignableTransfer) | **POST** /v2/signable-transfer-details | Gets bulk details of a signable transfer
 [**getSignableTransferV1**](PublicApi.md#getSignableTransferV1) | **POST** /v1/signable-transfer-details | Gets details of a signable transfer
@@ -1202,6 +1203,53 @@ No authorization required
  - **Content-Type**: application/json
  - **Accept**: application/json
 
+<a name="getSignableRegistrationOffchain"></a>
+# **getSignableRegistrationOffchain**
+> GetSignableRegistrationOffchainResponse getSignableRegistrationOffchain(getSignableRegistrationRequest)
+
+Get encoded details to allow clients to register the user offchain
+
+Get encoded details to allow clients to register the user offchain
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.infrastructure.*
+//import com.immutable.sdk.api.model.*
+
+val apiInstance = PublicApi()
+val getSignableRegistrationRequest : GetSignableRegistrationRequest =  // GetSignableRegistrationRequest | Register User Offchain
+try {
+    val result : GetSignableRegistrationOffchainResponse = apiInstance.getSignableRegistrationOffchain(getSignableRegistrationRequest)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling PublicApi#getSignableRegistrationOffchain")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling PublicApi#getSignableRegistrationOffchain")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **getSignableRegistrationRequest** | [**GetSignableRegistrationRequest**](GetSignableRegistrationRequest.md)| Register User Offchain |
+
+### Return type
+
+[**GetSignableRegistrationOffchainResponse**](GetSignableRegistrationOffchainResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
 <a name="getSignableTrade"></a>
 # **getSignableTrade**
 > GetSignableTradeResponse getSignableTrade(getSignableTradeRequest)
@@ -2070,7 +2118,7 @@ Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
  **pageSize** | **kotlin.Int**| Page size of the result | [optional]
  **cursor** | **kotlin.String**| Cursor | [optional]
- **orderBy** | **kotlin.String**| Property to sort by | [optional] [enum: created_at, expired_at, sell_quantity, buy_quantity, updated_at]
+ **orderBy** | **kotlin.String**| Property to sort by | [optional] [enum: created_at, expired_at, sell_quantity, buy_quantity, buy_quantity_with_fees, updated_at]
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
  **user** | **kotlin.String**| Ethereum address of the user who submitted this order | [optional]
  **status** | **kotlin.String**| Status of this order | [optional] [enum: active, filled, cancelled, expired, inactive]
@@ -2435,7 +2483,7 @@ No authorization required
 
 <a name="registerUser"></a>
 # **registerUser**
-> RegisterUserResponse registerUser(registerUserRequestVerifyEth)
+> RegisterUserResponse registerUser(registerUserRequest)
 
 Registers a user
 
@@ -2448,9 +2496,9 @@ Registers a user
 //import com.immutable.sdk.api.model.*
 
 val apiInstance = PublicApi()
-val registerUserRequestVerifyEth : RegisterUserRequestVerifyEth =  // RegisterUserRequestVerifyEth | Register User
+val registerUserRequest : RegisterUserRequest =  // RegisterUserRequest | Register User
 try {
-    val result : RegisterUserResponse = apiInstance.registerUser(registerUserRequestVerifyEth)
+    val result : RegisterUserResponse = apiInstance.registerUser(registerUserRequest)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling PublicApi#registerUser")
@@ -2465,7 +2513,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **registerUserRequestVerifyEth** | [**RegisterUserRequestVerifyEth**](RegisterUserRequestVerifyEth.md)| Register User |
+ **registerUserRequest** | [**RegisterUserRequest**](RegisterUserRequest.md)| Register User |
 
 ### Return type
 

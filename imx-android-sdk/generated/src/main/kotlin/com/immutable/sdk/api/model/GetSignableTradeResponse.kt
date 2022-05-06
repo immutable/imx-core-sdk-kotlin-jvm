@@ -35,6 +35,7 @@ import com.squareup.moshi.Json
  * @param feeInfo 
  * @param nonce Nonce of the order
  * @param payloadHash Payload Hash
+ * @param signableMessage Message to sign with L1 wallet to confirm trade request
  * @param starkKey Public stark key of the created user
  * @param vaultIdBuy ID of the vault into which the bought asset will be placed
  * @param vaultIdSell ID of the vault to sell from
@@ -72,6 +73,10 @@ data class GetSignableTradeResponse (
     /* Payload Hash */
     @Json(name = "payload_hash")
     val payloadHash: kotlin.String? = null,
+
+    /* Message to sign with L1 wallet to confirm trade request */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null,
 
     /* Public stark key of the created user */
     @Json(name = "stark_key")

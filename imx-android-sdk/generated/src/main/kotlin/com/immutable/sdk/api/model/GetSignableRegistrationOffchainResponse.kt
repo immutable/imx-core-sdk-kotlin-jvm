@@ -20,28 +20,25 @@
 
 package com.immutable.sdk.api.model
 
-import com.immutable.sdk.api.model.Reward
 
 import com.squareup.moshi.Json
 
 /**
  * 
  *
- * @param code 
- * @param message 
- * @param result 
+ * @param payloadHash Hash of the payload to be signed for user registration offchain
+ * @param signableMessage Message to sign with L1 wallet to register user offchain
  */
 
-data class ListRewardsResponse (
+data class GetSignableRegistrationOffchainResponse (
 
-    @Json(name = "code")
-    val code: kotlin.Int? = null,
+    /* Hash of the payload to be signed for user registration offchain */
+    @Json(name = "payload_hash")
+    val payloadHash: kotlin.String? = null,
 
-    @Json(name = "message")
-    val message: kotlin.String? = null,
-
-    @Json(name = "result")
-    val result: Reward? = null
+    /* Message to sign with L1 wallet to register user offchain */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null
 
 )
 

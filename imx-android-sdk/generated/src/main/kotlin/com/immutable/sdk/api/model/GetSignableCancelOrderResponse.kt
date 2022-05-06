@@ -28,6 +28,7 @@ import com.squareup.moshi.Json
  *
  * @param orderId ID of the order to be cancelled
  * @param payloadHash Hash of the payload to be signed for cancel order
+ * @param signableMessage Message to sign from wallet to confirm cancel order
  */
 
 data class GetSignableCancelOrderResponse (
@@ -38,7 +39,11 @@ data class GetSignableCancelOrderResponse (
 
     /* Hash of the payload to be signed for cancel order */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null
+    val payloadHash: kotlin.String? = null,
+
+    /* Message to sign from wallet to confirm cancel order */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null
 
 )
 

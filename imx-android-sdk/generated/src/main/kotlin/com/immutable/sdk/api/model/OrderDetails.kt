@@ -20,7 +20,6 @@
 
 package com.immutable.sdk.api.model
 
-import com.immutable.sdk.api.model.SellOrders
 
 import com.squareup.moshi.Json
 
@@ -39,7 +38,7 @@ data class OrderDetails (
 
     /* Sell orders for this asset */
     @Json(name = "sell_orders")
-    val sellOrders: kotlin.collections.List<SellOrders>? = null
+    val sellOrders: kotlin.collections.List<kotlin.collections.List<kotlin.Int>>? = null
 
 )
 

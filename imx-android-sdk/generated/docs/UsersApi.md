@@ -5,6 +5,7 @@ All URIs are relative to *https://api.ropsten.x.immutable.com*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getSignableRegistration**](UsersApi.md#getSignableRegistration) | **POST** /v1/signable-registration | Get operator signature to allow clients to register the user
+[**getSignableRegistrationOffchain**](UsersApi.md#getSignableRegistrationOffchain) | **POST** /v1/signable-registration-offchain | Get encoded details to allow clients to register the user offchain
 [**getUsers**](UsersApi.md#getUsers) | **GET** /v1/users/{user} | Get stark keys for a registered user
 [**registerUser**](UsersApi.md#registerUser) | **POST** /v1/users | Registers a user
 
@@ -46,6 +47,53 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**GetSignableRegistrationResponse**](GetSignableRegistrationResponse.md)
+
+### Authorization
+
+No authorization required
+
+### HTTP request headers
+
+ - **Content-Type**: application/json
+ - **Accept**: application/json
+
+<a name="getSignableRegistrationOffchain"></a>
+# **getSignableRegistrationOffchain**
+> GetSignableRegistrationOffchainResponse getSignableRegistrationOffchain(getSignableRegistrationRequest)
+
+Get encoded details to allow clients to register the user offchain
+
+Get encoded details to allow clients to register the user offchain
+
+### Example
+```kotlin
+// Import classes:
+//import org.openapitools.client.infrastructure.*
+//import com.immutable.sdk.api.model.*
+
+val apiInstance = UsersApi()
+val getSignableRegistrationRequest : GetSignableRegistrationRequest =  // GetSignableRegistrationRequest | Register User Offchain
+try {
+    val result : GetSignableRegistrationOffchainResponse = apiInstance.getSignableRegistrationOffchain(getSignableRegistrationRequest)
+    println(result)
+} catch (e: ClientException) {
+    println("4xx response calling UsersApi#getSignableRegistrationOffchain")
+    e.printStackTrace()
+} catch (e: ServerException) {
+    println("5xx response calling UsersApi#getSignableRegistrationOffchain")
+    e.printStackTrace()
+}
+```
+
+### Parameters
+
+Name | Type | Description  | Notes
+------------- | ------------- | ------------- | -------------
+ **getSignableRegistrationRequest** | [**GetSignableRegistrationRequest**](GetSignableRegistrationRequest.md)| Register User Offchain |
+
+### Return type
+
+[**GetSignableRegistrationOffchainResponse**](GetSignableRegistrationOffchainResponse.md)
 
 ### Authorization
 
@@ -105,7 +153,7 @@ No authorization required
 
 <a name="registerUser"></a>
 # **registerUser**
-> RegisterUserResponse registerUser(registerUserRequestVerifyEth)
+> RegisterUserResponse registerUser(registerUserRequest)
 
 Registers a user
 
@@ -118,9 +166,9 @@ Registers a user
 //import com.immutable.sdk.api.model.*
 
 val apiInstance = UsersApi()
-val registerUserRequestVerifyEth : RegisterUserRequestVerifyEth =  // RegisterUserRequestVerifyEth | Register User
+val registerUserRequest : RegisterUserRequest =  // RegisterUserRequest | Register User
 try {
-    val result : RegisterUserResponse = apiInstance.registerUser(registerUserRequestVerifyEth)
+    val result : RegisterUserResponse = apiInstance.registerUser(registerUserRequest)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling UsersApi#registerUser")
@@ -135,7 +183,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **registerUserRequestVerifyEth** | [**RegisterUserRequestVerifyEth**](RegisterUserRequestVerifyEth.md)| Register User |
+ **registerUserRequest** | [**RegisterUserRequest**](RegisterUserRequest.md)| Register User |
 
 ### Return type
 

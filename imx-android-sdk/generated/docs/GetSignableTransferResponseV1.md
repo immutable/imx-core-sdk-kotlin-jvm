@@ -13,6 +13,7 @@ Name | Type | Description | Notes
 **receiverVaultId** | **kotlin.Int** | ID of the vault being transferred to |  [optional]
 **senderStarkKey** | **kotlin.String** | Sender of the transfer |  [optional]
 **senderVaultId** | **kotlin.Int** | ID of the vault being transferred from |  [optional]
+**signableMessage** | **kotlin.String** | Message to sign with L1 wallet to confirm transfer request |  [optional]
 
 
 

@@ -100,6 +100,7 @@ docs/PublicApi.md
 docs/Range.md
 docs/RegisterUserRequest.md
 docs/RegisterUserResponse.md
+docs/SellOrders.md
 docs/SignableToken.md
 docs/SignableTransferDetails.md
 docs/SignableTransferResponseDetails.md
@@ -232,6 +233,7 @@ src/main/kotlin/com/immutable/sdk/api/model/Project.kt
 src/main/kotlin/com/immutable/sdk/api/model/Range.kt
 src/main/kotlin/com/immutable/sdk/api/model/RegisterUserRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/RegisterUserResponse.kt
+src/main/kotlin/com/immutable/sdk/api/model/SellOrders.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableToken.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableTransferDetails.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableTransferResponseDetails.kt

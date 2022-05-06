@@ -1,5 +1,5 @@
 
-# RegisterUserRequestVerifyEth
+# RegisterUserRequest
 
 ## Properties
 Name | Type | Description | Notes

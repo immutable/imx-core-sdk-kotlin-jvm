@@ -35,6 +35,7 @@ import com.squareup.moshi.Json
  * @param receiverVaultId ID of the vault being transferred to
  * @param senderStarkKey Sender of the transfer
  * @param senderVaultId ID of the vault being transferred from
+ * @param signableMessage Message to sign with L1 wallet to confirm transfer request
  */
 
 data class GetSignableTransferResponseV1 (
@@ -73,7 +74,11 @@ data class GetSignableTransferResponseV1 (
 
     /* ID of the vault being transferred from */
     @Json(name = "sender_vault_id")
-    val senderVaultId: kotlin.Int? = null
+    val senderVaultId: kotlin.Int? = null,
+
+    /* Message to sign with L1 wallet to confirm transfer request */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null
 
 )
 

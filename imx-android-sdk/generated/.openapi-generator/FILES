@@ -11,9 +11,6 @@ docs/Balance.md
 docs/BalancesApi.md
 docs/CancelOrderRequest.md
 docs/CancelOrderResponse.md
-docs/ClaimRewardRequest.md
-docs/ClaimRewardResponse.md
-docs/ClaimsApi.md
 docs/Collection.md
 docs/CollectionDetails.md
 docs/CollectionFilter.md
@@ -48,6 +45,7 @@ docs/GetSignableOrderRequest.md
 docs/GetSignableOrderRequestV1.md
 docs/GetSignableOrderResponse.md
 docs/GetSignableOrderResponseV1.md
+docs/GetSignableRegistrationOffchainResponse.md
 docs/GetSignableRegistrationRequest.md
 docs/GetSignableRegistrationResponse.md
 docs/GetSignableTradeRequest.md
@@ -69,7 +67,6 @@ docs/ListCollectionsResponse.md
 docs/ListDepositsResponse.md
 docs/ListMintsResponse.md
 docs/ListOrdersResponse.md
-docs/ListRewardsResponse.md
 docs/ListSnapshotBalancesResponse.md
 docs/ListTokensResponse.md
 docs/ListTradesResponse.md
@@ -101,10 +98,8 @@ docs/Project.md
 docs/ProjectsApi.md
 docs/PublicApi.md
 docs/Range.md
-docs/RegisterUserRequestVerifyEth.md
+docs/RegisterUserRequest.md
 docs/RegisterUserResponse.md
-docs/Reward.md
-docs/SellOrders.md
 docs/SignableToken.md
 docs/SignableTransferDetails.md
 docs/SignableTransferResponseDetails.md
@@ -134,7 +129,6 @@ settings.gradle
 src/main/kotlin/com/immutable/sdk/api/ApplicationsApi.kt
 src/main/kotlin/com/immutable/sdk/api/AssetsApi.kt
 src/main/kotlin/com/immutable/sdk/api/BalancesApi.kt
-src/main/kotlin/com/immutable/sdk/api/ClaimsApi.kt
 src/main/kotlin/com/immutable/sdk/api/CollectionsApi.kt
 src/main/kotlin/com/immutable/sdk/api/DepositsApi.kt
 src/main/kotlin/com/immutable/sdk/api/MetadataApi.kt
@@ -156,8 +150,6 @@ src/main/kotlin/com/immutable/sdk/api/model/AssetProperties.kt
 src/main/kotlin/com/immutable/sdk/api/model/Balance.kt
 src/main/kotlin/com/immutable/sdk/api/model/CancelOrderRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/CancelOrderResponse.kt
-src/main/kotlin/com/immutable/sdk/api/model/ClaimRewardRequest.kt
-src/main/kotlin/com/immutable/sdk/api/model/ClaimRewardResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/Collection.kt
 src/main/kotlin/com/immutable/sdk/api/model/CollectionDetails.kt
 src/main/kotlin/com/immutable/sdk/api/model/CollectionFilter.kt
@@ -190,6 +182,7 @@ src/main/kotlin/com/immutable/sdk/api/model/GetSignableOrderRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableOrderRequestV1.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableOrderResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableOrderResponseV1.kt
+src/main/kotlin/com/immutable/sdk/api/model/GetSignableRegistrationOffchainResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableRegistrationRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableRegistrationResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableTradeRequest.kt
@@ -211,7 +204,6 @@ src/main/kotlin/com/immutable/sdk/api/model/ListCollectionsResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListDepositsResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListMintsResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListOrdersResponse.kt
-src/main/kotlin/com/immutable/sdk/api/model/ListRewardsResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListSnapshotBalancesResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListTokensResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListTradesResponse.kt
@@ -238,10 +230,8 @@ src/main/kotlin/com/immutable/sdk/api/model/OrderDetails.kt
 src/main/kotlin/com/immutable/sdk/api/model/OrderFeeInfo.kt
 src/main/kotlin/com/immutable/sdk/api/model/Project.kt
 src/main/kotlin/com/immutable/sdk/api/model/Range.kt
-src/main/kotlin/com/immutable/sdk/api/model/RegisterUserRequestVerifyEth.kt
+src/main/kotlin/com/immutable/sdk/api/model/RegisterUserRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/RegisterUserResponse.kt
-src/main/kotlin/com/immutable/sdk/api/model/Reward.kt
-src/main/kotlin/com/immutable/sdk/api/model/SellOrders.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableToken.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableTransferDetails.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableTransferResponseDetails.kt

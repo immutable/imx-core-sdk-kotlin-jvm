@@ -28,6 +28,7 @@ import com.squareup.moshi.Json
  * 
  *
  * @param senderStarkKey Sender of the transfer
+ * @param signableMessage Message to sign with L1 wallet to confirm transfer request
  * @param signableResponses List of transfer responses without the sender stark key
  */
 
@@ -36,6 +37,10 @@ data class GetSignableTransferResponse (
     /* Sender of the transfer */
     @Json(name = "sender_stark_key")
     val senderStarkKey: kotlin.String,
+
+    /* Message to sign with L1 wallet to confirm transfer request */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null,
 
     /* List of transfer responses without the sender stark key */
     @Json(name = "signable_responses")

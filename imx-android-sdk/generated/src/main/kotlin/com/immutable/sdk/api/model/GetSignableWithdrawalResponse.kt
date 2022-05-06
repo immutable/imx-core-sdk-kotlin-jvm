@@ -30,6 +30,7 @@ import com.squareup.moshi.Json
  * @param assetId ID of the asset to be withdrawn
  * @param nonce Nonce of this transaction
  * @param payloadHash Encoded payload hash
+ * @param signableMessage Message to sign with L1 wallet to verity withdrawal request
  * @param starkKey Public stark key of this user
  * @param vaultId ID of the vault we are withdrawing from
  */
@@ -51,6 +52,10 @@ data class GetSignableWithdrawalResponse (
     /* Encoded payload hash */
     @Json(name = "payload_hash")
     val payloadHash: kotlin.String? = null,
+
+    /* Message to sign with L1 wallet to verity withdrawal request */
+    @Json(name = "signable_message")
+    val signableMessage: kotlin.String? = null,
 
     /* Public stark key of this user */
     @Json(name = "stark_key")

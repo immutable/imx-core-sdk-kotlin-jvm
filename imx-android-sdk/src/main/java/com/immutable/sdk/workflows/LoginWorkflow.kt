@@ -110,17 +110,19 @@ private fun getSignatures(
         CompletableFuture.completedFuture(keyPairAndData)
     else {
         call(SIGNABLE_REGISTRATION) {
-            api.getSignableRegistrationOffchain(
+            val result = api.getSignableRegistrationOffchain(
                 GetSignableRegistrationRequest(
                     etherKey = keyPairAndData.second.address,
                     starkKey = keyPairAndData.first.getStarkPublicKey()
                 )
             )
-        }.thenCompose { response ->
-            signer.signMessage(response.signableMessage!!).thenApply { ethSignature ->
+            // Force unwrap here so that the NPE gets handled by `call`
+            result.payloadHash!! to result.signableMessage!!
+        }.thenCompose { (payloadHash, signableMessage) ->
+            signer.signMessage(signableMessage).thenApply { ethSignature ->
                 keyPairAndData.first to keyPairAndData.second.copy(
                     ethSignature = Crypto.serializeEthSignature(ethSignature),
-                    starkSignature = StarkCurve.sign(keyPairAndData.first, response.payloadHash!!)
+                    starkSignature = StarkCurve.sign(keyPairAndData.first, payloadHash)
                 )
             }
         }

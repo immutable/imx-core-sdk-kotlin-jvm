@@ -24,4 +24,4 @@ jobs:
         uses: actions/upload-artifact@v1
         with:
           name: detekt-results
-          path: imx-android-sdk/build/reports/detekt
+          path: imx-core-sdk-android/build/reports/detekt

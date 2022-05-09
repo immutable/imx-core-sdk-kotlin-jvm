@@ -1,0 +1,310 @@
+plugins {
+    id 'com.android.library'
+    id 'kotlin-android'
+    id "org.openapi.generator" version "5.3.0"
+    id 'maven-publish'
+    id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
+    id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
+    id 'jacoco'
+    id "org.jetbrains.dokka"
+}
+
+def getArtifactId = { ->
+    return "imx-core-sdk-android"
+}
+
+def getVersionName = { ->
+    return "0.0.19"
+}
+
+task addHeader(type: Exec) {
+    workingDir '..'
+    commandLine 'python', 'addHeaderScript.py', getVersionName()
+}
+
+task cleanGeneratedClient() {
+    delete "$project.projectDir/generated"
+}
+
+task cleanDocs() {
+    delete "$rootDir/docs"
+}
+
+android {
+    compileSdk 32
+
+    defaultConfig {
+        minSdk 27
+        targetSdk 32
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+
+    testOptions {
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
+        unitTests.returnDefaultValues = true
+    }
+
+    buildTypes {
+        debug {
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+
+    openApiGenerate {
+        generatorName = "kotlin"
+        inputSpec = "$rootDir/swagger.json".toString()
+        outputDir = "$project.projectDir/generated".toString()
+        apiPackage = "com.immutable.sdk.api"
+        invokerPackage = "com.immutable.sdk.invoker"
+        modelPackage = "com.immutable.sdk.api.model"
+        // For version 5.3.0 this override is performed to add null as a default for !required parameters
+        templateDir = "$rootDir/.openapi-generator/templates/kotlin-client/libraries/jvm-okhttp"
+        configOptions = [
+                dateLibrary: "java8"
+        ]
+        languageSpecificPrimitives = ["Double"]
+        typeMappings = [
+                number: "Double"
+        ]
+    }
+
+    sourceSets {
+        main {
+            java.srcDirs = ["$project.projectDir/generated/src/main/kotlin"]
+        }
+    }
+
+    // Generate all apis before every build
+    preBuild.dependsOn(tasks.openApiGenerate)
+
+    // Add SDK version header to all API endpoint
+    preBuild.dependsOn(tasks.addHeader)
+    tasks.addHeader.shouldRunAfter(tasks.openApiGenerate)
+
+    preBuild.dependsOn(tasks.ktlintCheck)
+    preBuild.dependsOn(tasks.detekt)
+    preBuild.finalizedBy(tasks.dokkaHtml)
+    tasks.dokkaHtml.dependsOn(tasks.cleanDocs)
+    tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
+}
+
+dependencies {
+    implementation 'androidx.core:core-ktx:1.7.0'
+
+    // Required for the generated SDK code
+    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+
+    // Web3
+    implementation "org.web3j:core:4.8.7-android"
+
+    // Required for Moonpay
+    implementation "androidx.browser:browser:1.4.0"
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "io.mockk:mockk:1.12.3"
+
+    // Detekt
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0-RC1"
+}
+
+def githubProperties = new Properties()
+def githubPropertiesFile = file("github.properties")
+if (githubPropertiesFile.exists()) {
+    githubProperties.load(new FileInputStream(githubPropertiesFile))
+}
+
+publishing {
+    publications {
+        bar(MavenPublication) {
+            groupId 'com.immutable.sdk' // Replace with group ID
+            artifactId getArtifactId()
+            version getVersionName()
+            artifact("$buildDir/outputs/aar/${getArtifactId()}-release.aar")
+        }
+    }
+
+    repositories {
+        maven {
+            name = "imx-core-sdk-android"
+            url = uri("https://maven.pkg.github.com/immutable/imx-core-sdk-android")
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
+    }
+}
+
+ktlint {
+    debug = true
+    verbose = true
+    android = true
+    outputToConsole = true
+    outputColorName = "RED"
+    enableExperimentalRules = false
+    disabledRules = ["no-wildcard-imports", "import-ordering"]
+    filter {
+        exclude { element -> element.file.path.contains("generated/") }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false // activate all available (even unstable) rules.
+    config = files("../.github/detekt/config/detekt.yml")
+    // point to your custom config defining rules to run, overwriting default behavior
+}
+
+dokkaHtml.configure {
+    outputDirectory.set(file("$rootDir/docs"))
+
+    dokkaSourceSets {
+        configureEach {
+            perPackageOption {
+                matchingRegex.set("org.openapitools.*")
+                suppress.set(true)
+            }
+
+            perPackageOption {
+                matchingRegex.set("com.immutable.sdk.api.*")
+                suppress.set(true)
+            }
+
+            perPackageOption {
+                matchingRegex.set("com.immutable.sdk.api")
+                suppress.set(true)
+            }
+
+            perPackageOption {
+                matchingRegex.set("com.immutable.sdk.crypto")
+                suppress.set(true)
+            }
+
+            includes.from("packages.md")
+        }
+    }
+}
+
+// Start code coverage
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+// Without this block the build will fail
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+// Creates a task for generating the jacoco coverage report
+project.afterEvaluate {
+    (android.hasProperty('applicationVariants')
+            ? android.'applicationVariants'
+            : android.'libraryVariants')
+            .all { variant ->
+                def variantName = variant.name
+                def unitTestTask = "test${variantName.capitalize()}UnitTest"
+
+                tasks.create(name: "${unitTestTask}Coverage", type: JacocoReport, dependsOn: [
+                        "$unitTestTask",
+                ]) {
+                    group = "Reporting"
+                    description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
+
+                    reports {
+                        html.required = true
+                        xml.required = true
+                    }
+
+                    def excludes = [
+                            // data binding
+                            'android/databinding/**/*.class',
+                            '**/android/databinding/*Binding.class',
+                            '**/android/databinding/*',
+                            '**/androidx/databinding/*',
+                            '**/BR.*',
+                            // android
+                            '**/R.class',
+                            '**/R$*.class',
+                            '**/BuildConfig.*',
+                            '**/Manifest*.*',
+                            '**/*Test*.*',
+                            'android/**/*.*',
+                            // kotlin
+                            '**/*MapperImpl*.*',
+                            '**/*$ViewInjector*.*',
+                            '**/*$ViewBinder*.*',
+                            '**/BuildConfig.*',
+                            '**/*Component*.*',
+                            '**/*BR*.*',
+                            '**/Manifest*.*',
+                            '**/*$Lambda$*.*',
+                            '**/*Companion*.*',
+                            '**/*Module*.*',
+                            '**/*Dagger*.*',
+                            '**/*Hilt*.*',
+                            '**/*MembersInjector*.*',
+                            '**/*_MembersInjector.class',
+                            '**/*_Factory*.*',
+                            '**/*_Provide*Factory*.*',
+                            '**/*Extensions*.*',
+                            // sealed and data classes
+                            '**/*$Result.*',
+                            '**/*$Result$*.*',
+                            '/com/immutable/sdk/api/**',
+                            '/org/openapitools/**',
+                    ]
+
+                    def javaClasses = fileTree(dir: variant.javaCompileProvider.get().destinationDir,
+                            excludes: excludes)
+                    def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}",
+                            excludes: excludes)
+
+                    classDirectories.setFrom(files([
+                            javaClasses,
+                            kotlinClasses
+                    ]))
+
+                    def variantSourceSets = variant.sourceSets.java.srcDirs.collect { it.path }.flatten()
+                    sourceDirectories.setFrom(project.files(variantSourceSets))
+
+                    def androidTestsData = fileTree(dir: "${buildDir}/outputs/code_coverage/${variantName}AndroidTest/connected/", includes: ["**/*.ec"])
+
+                    executionData(files([
+                            "$project.buildDir/jacoco/${unitTestTask}.exec",
+                            androidTestsData
+                    ]))
+                }
+
+            }
+}
+
+// Kotlin 1.5+ only works with version 0.8.7
+configurations.all {
+    resolutionStrategy {
+        eachDependency { details ->
+            if ('org.jacoco' == details.requested.group) {
+                details.useVersion "0.8.7"
+            }
+        }
+    }
+}
+// End code coverage

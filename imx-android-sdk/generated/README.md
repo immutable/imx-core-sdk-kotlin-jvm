@@ -42,8 +42,6 @@ Class | Method | HTTP request | Description
 *BalancesApi* | [**getBalance**](docs/BalancesApi.md#getbalance) | **GET** /v2/balances/{owner}/{address} | Fetches the token balances of the user
 *BalancesApi* | [**getBalanceOfUser**](docs/BalancesApi.md#getbalanceofuser) | **GET** /v1/balances/{owner} | Fetches the WEI balances of the user
 *BalancesApi* | [**listBalances**](docs/BalancesApi.md#listbalances) | **GET** /v2/balances/{owner} | Get a list of balances for given user
-*ClaimsApi* | [**claims**](docs/ClaimsApi.md#claims) | **POST** /v1/rewards | User claim to redeem campaign rewards
-*ClaimsApi* | [**listClaims**](docs/ClaimsApi.md#listclaims) | **GET** /v1/rewards/{etherKey} | Get list of reward claims for a user
 *CollectionsApi* | [**createCollection**](docs/CollectionsApi.md#createcollection) | **POST** /v1/collections | Create collection
 *CollectionsApi* | [**getCollection**](docs/CollectionsApi.md#getcollection) | **GET** /v1/collections/{address} | Get details of a collection at the given address
 *CollectionsApi* | [**listCollectionFilters**](docs/CollectionsApi.md#listcollectionfilters) | **GET** /v1/collections/{address}/filters | Get a list of collection filters
@@ -94,6 +92,7 @@ Class | Method | HTTP request | Description
 *PublicApi* | [**getSignableDeposit**](docs/PublicApi.md#getsignabledeposit) | **POST** /v1/signable-deposit-details | Gets details of a signable deposit
 *PublicApi* | [**getSignableOrder**](docs/PublicApi.md#getsignableorder) | **POST** /v3/signable-order-details | Get details a signable order V3
 *PublicApi* | [**getSignableRegistration**](docs/PublicApi.md#getsignableregistration) | **POST** /v1/signable-registration | Get operator signature to allow clients to register the user
+*PublicApi* | [**getSignableRegistrationOffchain**](docs/PublicApi.md#getsignableregistrationoffchain) | **POST** /v1/signable-registration-offchain | Get encoded details to allow clients to register the user offchain
 *PublicApi* | [**getSignableTrade**](docs/PublicApi.md#getsignabletrade) | **POST** /v3/signable-trade-details | Get details a signable trade V3
 *PublicApi* | [**getSignableTransfer**](docs/PublicApi.md#getsignabletransfer) | **POST** /v2/signable-transfer-details | Gets bulk details of a signable transfer
 *PublicApi* | [**getSignableTransferV1**](docs/PublicApi.md#getsignabletransferv1) | **POST** /v1/signable-transfer-details | Gets details of a signable transfer
@@ -133,6 +132,7 @@ Class | Method | HTTP request | Description
 *TransfersApi* | [**getTransfer**](docs/TransfersApi.md#gettransfer) | **GET** /v1/transfers/{id} | Get details of a transfer with the given ID
 *TransfersApi* | [**listTransfers**](docs/TransfersApi.md#listtransfers) | **GET** /v1/transfers | Get a list of transfers
 *UsersApi* | [**getSignableRegistration**](docs/UsersApi.md#getsignableregistration) | **POST** /v1/signable-registration | Get operator signature to allow clients to register the user
+*UsersApi* | [**getSignableRegistrationOffchain**](docs/UsersApi.md#getsignableregistrationoffchain) | **POST** /v1/signable-registration-offchain | Get encoded details to allow clients to register the user offchain
 *UsersApi* | [**getUsers**](docs/UsersApi.md#getusers) | **GET** /v1/users/{user} | Get stark keys for a registered user
 *UsersApi* | [**registerUser**](docs/UsersApi.md#registeruser) | **POST** /v1/users | Registers a user
 *WithdrawalsApi* | [**createWithdrawal**](docs/WithdrawalsApi.md#createwithdrawal) | **POST** /v1/withdrawals | Creates a withdrawal of a token
@@ -151,8 +151,6 @@ Class | Method | HTTP request | Description
  - [com.immutable.sdk.api.model.Balance](docs/Balance.md)
  - [com.immutable.sdk.api.model.CancelOrderRequest](docs/CancelOrderRequest.md)
  - [com.immutable.sdk.api.model.CancelOrderResponse](docs/CancelOrderResponse.md)
- - [com.immutable.sdk.api.model.ClaimRewardRequest](docs/ClaimRewardRequest.md)
- - [com.immutable.sdk.api.model.ClaimRewardResponse](docs/ClaimRewardResponse.md)
  - [com.immutable.sdk.api.model.Collection](docs/Collection.md)
  - [com.immutable.sdk.api.model.CollectionDetails](docs/CollectionDetails.md)
  - [com.immutable.sdk.api.model.CollectionFilter](docs/CollectionFilter.md)
@@ -185,6 +183,7 @@ Class | Method | HTTP request | Description
  - [com.immutable.sdk.api.model.GetSignableOrderRequestV1](docs/GetSignableOrderRequestV1.md)
  - [com.immutable.sdk.api.model.GetSignableOrderResponse](docs/GetSignableOrderResponse.md)
  - [com.immutable.sdk.api.model.GetSignableOrderResponseV1](docs/GetSignableOrderResponseV1.md)
+ - [com.immutable.sdk.api.model.GetSignableRegistrationOffchainResponse](docs/GetSignableRegistrationOffchainResponse.md)
  - [com.immutable.sdk.api.model.GetSignableRegistrationRequest](docs/GetSignableRegistrationRequest.md)
  - [com.immutable.sdk.api.model.GetSignableRegistrationResponse](docs/GetSignableRegistrationResponse.md)
  - [com.immutable.sdk.api.model.GetSignableTradeRequest](docs/GetSignableTradeRequest.md)
@@ -206,7 +205,6 @@ Class | Method | HTTP request | Description
  - [com.immutable.sdk.api.model.ListDepositsResponse](docs/ListDepositsResponse.md)
  - [com.immutable.sdk.api.model.ListMintsResponse](docs/ListMintsResponse.md)
  - [com.immutable.sdk.api.model.ListOrdersResponse](docs/ListOrdersResponse.md)
- - [com.immutable.sdk.api.model.ListRewardsResponse](docs/ListRewardsResponse.md)
  - [com.immutable.sdk.api.model.ListSnapshotBalancesResponse](docs/ListSnapshotBalancesResponse.md)
  - [com.immutable.sdk.api.model.ListTokensResponse](docs/ListTokensResponse.md)
  - [com.immutable.sdk.api.model.ListTradesResponse](docs/ListTradesResponse.md)
@@ -233,9 +231,8 @@ Class | Method | HTTP request | Description
  - [com.immutable.sdk.api.model.OrderFeeInfo](docs/OrderFeeInfo.md)
  - [com.immutable.sdk.api.model.Project](docs/Project.md)
  - [com.immutable.sdk.api.model.Range](docs/Range.md)
- - [com.immutable.sdk.api.model.RegisterUserRequestVerifyEth](docs/RegisterUserRequestVerifyEth.md)
+ - [com.immutable.sdk.api.model.RegisterUserRequest](docs/RegisterUserRequest.md)
  - [com.immutable.sdk.api.model.RegisterUserResponse](docs/RegisterUserResponse.md)
- - [com.immutable.sdk.api.model.Reward](docs/Reward.md)
  - [com.immutable.sdk.api.model.SellOrders](docs/SellOrders.md)
  - [com.immutable.sdk.api.model.SignableToken](docs/SignableToken.md)
  - [com.immutable.sdk.api.model.SignableTransferDetails](docs/SignableTransferDetails.md)

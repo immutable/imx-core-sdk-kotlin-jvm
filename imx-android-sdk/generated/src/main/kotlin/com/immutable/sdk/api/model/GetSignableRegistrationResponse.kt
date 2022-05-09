@@ -27,7 +27,7 @@ import com.squareup.moshi.Json
  * 
  *
  * @param operatorSignature Signature from authorised operator
- * @param payloadHash 
+ * @param payloadHash Hash of the payload to be signed for user registration
  */
 
 data class GetSignableRegistrationResponse (
@@ -36,6 +36,7 @@ data class GetSignableRegistrationResponse (
     @Json(name = "operator_signature")
     val operatorSignature: kotlin.String? = null,
 
+    /* Hash of the payload to be signed for user registration */
     @Json(name = "payload_hash")
     val payloadHash: kotlin.String? = null
 

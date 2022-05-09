@@ -31,6 +31,7 @@ import com.squareup.moshi.Json
  * @param id [DEPRECATED] Internal Immutable X Token ID
  * @param properties 
  * @param quantity Quantity of this asset
+ * @param quantityWithFees Quantity of this asset with the sum of all fees applied to the asset
  * @param tokenAddress Address of ERC721/ERC20 contract
  * @param tokenId ERC721 Token ID
  */
@@ -51,6 +52,10 @@ data class TokenData (
     /* Quantity of this asset */
     @Json(name = "quantity")
     val quantity: kotlin.String? = null,
+
+    /* Quantity of this asset with the sum of all fees applied to the asset */
+    @Json(name = "quantity_with_fees")
+    val quantityWithFees: kotlin.String? = null,
 
     /* Address of ERC721/ERC20 contract */
     @Json(name = "token_address")

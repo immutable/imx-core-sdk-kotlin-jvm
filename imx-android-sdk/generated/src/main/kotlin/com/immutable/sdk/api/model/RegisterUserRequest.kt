@@ -26,33 +26,29 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param amount 
- * @param etherKey 
- * @param expirationTime 
- * @param points 
- * @param status 
- * @param tokenAddress 
+ * @param ethSignature Eth signature
+ * @param etherKey The ether key of the user
+ * @param starkKey Public stark key of the user
+ * @param starkSignature Payload signature
  */
 
-data class Reward (
+data class RegisterUserRequest (
 
-    @Json(name = "amount")
-    val amount: kotlin.String? = null,
+    /* Eth signature */
+    @Json(name = "eth_signature")
+    val ethSignature: kotlin.String,
 
+    /* The ether key of the user */
     @Json(name = "ether_key")
-    val etherKey: kotlin.String? = null,
+    val etherKey: kotlin.String,
 
-    @Json(name = "expiration_time")
-    val expirationTime: kotlin.String? = null,
+    /* Public stark key of the user */
+    @Json(name = "stark_key")
+    val starkKey: kotlin.String,
 
-    @Json(name = "points")
-    val points: kotlin.String? = null,
-
-    @Json(name = "status")
-    val status: kotlin.String? = null,
-
-    @Json(name = "token_address")
-    val tokenAddress: kotlin.String? = null
+    /* Payload signature */
+    @Json(name = "stark_signature")
+    val starkSignature: kotlin.String
 
 )
 

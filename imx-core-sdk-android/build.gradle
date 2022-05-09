@@ -14,7 +14,7 @@ def getArtifactId = { ->
 }
 
 def getVersionName = { ->
-    return "0.0.19"
+    return "0.0.3"
 }
 
 task addHeader(type: Exec) {
@@ -33,9 +33,15 @@ task cleanDocs() {
 android {
     compileSdk 32
 
+    namespace = "com.immutable.sdk"
+
     defaultConfig {
         minSdk 27
         targetSdk 32
+
+        aarMetadata {
+            minCompileSdk = 27
+        }
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -91,6 +97,13 @@ android {
         }
     }
 
+    publishing {
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
+    }
+
     // Generate all apis before every build
     preBuild.dependsOn(tasks.openApiGenerate)
 
@@ -126,18 +139,21 @@ dependencies {
 }
 
 def githubProperties = new Properties()
-def githubPropertiesFile = file("github.properties")
+def githubPropertiesFile = file("../github.properties")
 if (githubPropertiesFile.exists()) {
     githubProperties.load(new FileInputStream(githubPropertiesFile))
 }
 
 publishing {
     publications {
-        bar(MavenPublication) {
+        release(MavenPublication) {
             groupId 'com.immutable.sdk' // Replace with group ID
             artifactId getArtifactId()
             version getVersionName()
-            artifact("$buildDir/outputs/aar/${getArtifactId()}-release.aar")
+
+            afterEvaluate {
+                from components.release
+            }
         }
     }
 

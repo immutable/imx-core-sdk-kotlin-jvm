@@ -1,7 +1,6 @@
 package com.immutable.sdk.crypto
 
 import com.immutable.sdk.extensions.*
-import com.immutable.sdk.stark.Points
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
 import com.immutable.sdk.utils.Constants.HEX_RADIX
@@ -82,28 +81,6 @@ object Crypto {
     internal fun hashSha256Update(input: ByteArray) = MessageDigest.getInstance(SHA_256).run {
         update(input)
         digest().toHexString("")
-    }
-
-    // Can be removed once API returns encoded and serialised message ready to be signed with the Stark keys
-    @Suppress("MagicNumber")
-    fun pedersenHash(input: Array<String>): String {
-        val prime =
-            BigInteger("800000000000011000000000000000000000000000000000000000000000001", HEX_RADIX)
-
-        var point = Points.constantPoints[0]
-        for (i in input.indices) {
-            var x = BigInteger(input[i].hexRemovePrefix(), HEX_RADIX)
-            assert(x >= BigInteger.ZERO && x < prime) { "Invalid input: ${input[i]}" }
-            for (j in 0 until 252) {
-                val pt = Points.constantPoints[2 + i * 252 + j]
-                assert(!point.xCoord.equals(pt.xCoord))
-                if (x.and(BigInteger.ONE) != BigInteger.ZERO) {
-                    point = point.add(pt)
-                }
-                x = x.shr(1)
-            }
-        }
-        return point.xCoord.toString()
     }
 
     @Suppress("MagicNumber")

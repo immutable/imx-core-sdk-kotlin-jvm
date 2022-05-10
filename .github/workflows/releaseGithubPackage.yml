@@ -2,7 +2,6 @@ name: Release to Github Package
 
 on:
   pull_request:
-    types: [closed]
     branches: ['releases/**']
 
 jobs:

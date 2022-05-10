@@ -3,7 +3,7 @@ package com.immutable.sdk.extensions
 import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
-import com.immutable.sdk.utils.TokenType
+import com.immutable.sdk.model.TokenType
 
 /**
  * We need to strip the Token back to the required only fields otherwise the api validation will fail.

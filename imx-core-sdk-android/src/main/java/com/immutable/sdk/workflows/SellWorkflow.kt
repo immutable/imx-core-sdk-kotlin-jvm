@@ -17,7 +17,7 @@ import java.util.concurrent.CompletableFuture
 
 private const val CREATE_ORDER = "Create order"
 private const val SIGNABLE_ORDER = "Signable order"
-private const val GET_ASSETS = "Get assets"
+private const val GET_ASSET = "Get asset"
 
 @VisibleForTesting
 internal const val FEE_TYPE_ROYALTY = "royalty"
@@ -72,7 +72,7 @@ private fun getFees(
     sellToken: AssetModel,
     fees: List<FeeEntry>,
     api: AssetsApi
-): CompletableFuture<BigDecimal> = call(GET_ASSETS) {
+): CompletableFuture<BigDecimal> = call(GET_ASSET) {
     val feesList = arrayListOf<FeeEntry>()
     feesList += fees
 

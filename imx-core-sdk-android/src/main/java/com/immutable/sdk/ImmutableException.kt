@@ -16,7 +16,7 @@ class ImmutableException private constructor(
 ) : Exception(message, cause) {
     companion object {
         /**
-         * Exception for when a response is missing required data for the following call.
+         * Exception for when a response is missing required data.
          *
          * @param callName used to identify the step of the workflow that failed e.g. Signable order
          * @param cause the root cause of the error so the consumer can further diagnose
@@ -38,7 +38,7 @@ class ImmutableException private constructor(
             ImmutableException(ImmutableExceptionType.ApiError, "Api call failed: $callName", cause)
 
         /**
-         * Exception for when the issue is due to SDK logic
+         * Exception for when the issue is due to SDK logic.
          *
          * @param message user-facing description of the error
          */
@@ -46,7 +46,7 @@ class ImmutableException private constructor(
             ImmutableException(ImmutableExceptionType.ClientError, "SDK error: $message")
 
         /**
-         * Exception for when a request has been invalidated before sending
+         * Exception for when a request has been invalidated before sending.
          *
          * @param message user-facing description of the error
          */

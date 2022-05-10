@@ -87,7 +87,10 @@ import com.immutable.sdk.api.model.Transfer
 import com.immutable.sdk.api.model.UpdateCollectionRequest
 import com.immutable.sdk.api.model.Withdrawal
 
+import org.json.JSONObject
+
 import org.openapitools.client.infrastructure.ApiClient
+import org.openapitools.client.infrastructure.ApiErrorModel
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ClientError
 import org.openapitools.client.infrastructure.ServerException
@@ -134,11 +137,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -195,11 +206,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -255,11 +274,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -314,11 +341,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -373,11 +408,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -432,11 +475,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -491,11 +542,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -550,11 +609,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -609,11 +676,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -668,11 +743,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -729,11 +812,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -783,11 +874,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -836,11 +935,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -889,11 +996,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -942,11 +1057,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -996,11 +1119,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1053,11 +1184,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1122,11 +1261,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1184,11 +1331,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1258,11 +1413,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1311,11 +1474,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1364,11 +1535,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1417,11 +1596,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1470,11 +1657,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1523,11 +1718,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1576,11 +1779,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1629,11 +1840,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1682,11 +1901,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1735,11 +1962,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1788,11 +2023,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1841,11 +2084,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1894,11 +2145,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -1947,11 +2206,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2015,11 +2282,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2133,11 +2408,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2188,11 +2471,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2255,11 +2546,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2344,11 +2643,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2477,11 +2784,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2622,11 +2937,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2789,11 +3112,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2862,11 +3193,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -2979,11 +3318,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -3114,11 +3461,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -3240,11 +3595,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -3293,11 +3656,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -3349,11 +3720,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }
@@ -3411,11 +3790,19 @@ class PublicApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
                 val localVarError = localVarResponse as ClientError<*>
-                throw ClientException("Client error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
             ResponseType.ServerError -> {
                 val localVarError = localVarResponse as ServerError<*>
-                throw ServerException("Server error : ${localVarError.statusCode} ${localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse)
+                val errorModel = (localVarError.body as? String)?.let {
+                    val json = JSONObject(it)
+                    ApiErrorModel(json.optString("code"), json.optString("message"))
+                }
+                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
             }
         }
     }

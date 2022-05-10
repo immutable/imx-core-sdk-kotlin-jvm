@@ -2,12 +2,12 @@ name: Release to Github Package
 
 on:
   pull_request:
-    branches: ['releases/**']
+    branches: 
+      - 'releases/**'
 
 jobs:
   if-release-merged:
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
 
     steps:
       - uses: actions/checkout@v2

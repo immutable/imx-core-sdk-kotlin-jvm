@@ -95,9 +95,7 @@ internal fun buyCrypto(
             url = url,
             toolbarColourInt = colourInt
         )
-    } catch (e: Exception) {
-        e.cause?.let { throw it } ?: throw e
-    }
+    } catch (e: Exception) { e.cause?.let { throw it } ?: throw e }
 }
 
 @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")

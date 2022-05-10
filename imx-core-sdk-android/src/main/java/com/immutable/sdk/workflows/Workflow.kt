@@ -3,6 +3,10 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.ImmutableException
 import java.util.concurrent.CompletableFuture
 
+/**
+ * Within the provided call block force unwrap any response values that are required and if they are
+ * missing it will automatically be handled and return an invalidResponse exception.
+ */
 @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
 internal fun <T> call(callName: String, call: () -> T): CompletableFuture<T> {
     val future = CompletableFuture<T>()

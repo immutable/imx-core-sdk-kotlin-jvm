@@ -5,8 +5,6 @@ import androidx.appcompat.app.AppCompatActivity
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.ImmutableXSdk
 import com.immutable.sdk.api.CollectionsApi
-import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.api.model.CancelOrderRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -22,8 +20,6 @@ class MainActivity : AppCompatActivity() {
         GlobalScope.launch(Dispatchers.Default) {
             val response = CollectionsApi().listCollections(pageSize = 20)
             println("COLLECTIONS: " + response.result?.joinToString { it.name ?: "no name" })
-
-            OrdersApi().cancelOrder("0", CancelOrderRequest(0, "signature"))
         }
     }
 }

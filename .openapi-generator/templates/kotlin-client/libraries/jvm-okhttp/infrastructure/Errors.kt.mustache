@@ -1,0 +1,20 @@
+@file:Suppress("unused")
+package {{packageName}}.infrastructure
+
+import java.lang.RuntimeException
+
+{{#nonPublicApi}}internal {{/nonPublicApi}} data class ApiErrorModel(val code: String? = null, val message: String? = null)
+
+{{#nonPublicApi}}internal {{/nonPublicApi}}open class ClientException(message: kotlin.String? = null, val statusCode: Int = -1, val response: Response? = null, val errorModel: ApiErrorModel? = null) : RuntimeException(message) {
+
+    {{#nonPublicApi}}internal {{/nonPublicApi}}companion object {
+        private const val serialVersionUID: Long = 123L
+    }
+}
+
+{{#nonPublicApi}}internal {{/nonPublicApi}}open class ServerException(message: kotlin.String? = null, val statusCode: Int = -1, val response: Response? = null, val errorModel: ApiErrorModel? = null) : RuntimeException(message) {
+
+    {{#nonPublicApi}}internal {{/nonPublicApi}}companion object {
+        private const val serialVersionUID: Long = 456L
+    }
+}

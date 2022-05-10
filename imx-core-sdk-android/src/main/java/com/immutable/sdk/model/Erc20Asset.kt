@@ -3,7 +3,6 @@ package com.immutable.sdk.model
 import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
-import com.immutable.sdk.utils.TokenType
 
 /**
  * This is an ERC20 wrapper for the [Token] API model

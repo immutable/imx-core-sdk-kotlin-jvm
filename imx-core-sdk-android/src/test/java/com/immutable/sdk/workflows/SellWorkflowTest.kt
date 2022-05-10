@@ -9,7 +9,7 @@ import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
-import com.immutable.sdk.utils.TokenType
+import com.immutable.sdk.model.TokenType
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.After

@@ -1,8 +1,13 @@
 package com.immutable.sdk.workflows
 
 import android.content.Context
+import android.content.Intent
+import android.graphics.Color
+import android.net.Uri
 import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
+import androidx.browser.customtabs.CustomTabColorSchemeParams
+import androidx.browser.customtabs.CustomTabsIntent
 import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
@@ -12,7 +17,7 @@ import com.immutable.sdk.extensions.getJsonArray
 import com.immutable.sdk.extensions.toURLEncodedString
 import com.immutable.sdk.model.GetSignedMoonpayRequest
 import com.immutable.sdk.model.GetTransactionIdRequest
-import com.immutable.sdk.utils.Utils
+import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -85,7 +90,7 @@ internal fun buyCrypto(
             colourCodeHex = colourCodeHex
         )
         // Launch Chrome Custom Tab with Moonpay buy crypto URL
-        Utils.launchCustomTabs(
+        launchCustomTabs(
             context = context,
             url = url,
             toolbarColourInt = colourInt
@@ -196,4 +201,30 @@ private fun post(
         .build()
     val response = client.newCall(request).execute()
     return response.getJson() ?: JSONObject()
+}
+
+/**
+ * Launches a Chrome Custom Tab with the given [url]
+ *
+ * @param context the source context
+ * @param url the URL to open
+ * @param toolbarColourInt (optional) the colour of the Chrome Custom Tab address bar. The default
+ * value is [DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR]
+ */
+private fun launchCustomTabs(
+    context: Context,
+    url: String,
+    @ColorInt toolbarColourInt: Int = Color.parseColor(
+        DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+    )
+) {
+    val customTabsIntent = CustomTabsIntent.Builder().setDefaultColorSchemeParams(
+        CustomTabColorSchemeParams.Builder()
+            .setToolbarColor(toolbarColourInt)
+            .build()
+    ).build()
+    customTabsIntent.run {
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        launchUrl(context, Uri.parse(url))
+    }
 }

@@ -4,7 +4,6 @@ import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
 import com.immutable.sdk.utils.Constants
-import com.immutable.sdk.utils.TokenType
 
 /**
  * This is an ETH wrapper for the [Token] API model

@@ -1,6 +1,8 @@
 package com.immutable.sdk.workflows
 
 import android.content.Context
+import android.net.Uri
+import androidx.browser.customtabs.CustomTabsIntent
 import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
@@ -9,7 +11,6 @@ import com.immutable.sdk.api.model.GetUsersApiResponse
 import com.immutable.sdk.extensions.getJson
 import com.immutable.sdk.extensions.getJsonArray
 import com.immutable.sdk.extensions.toURLEncodedString
-import com.immutable.sdk.utils.Utils
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import okhttp3.Call
@@ -105,8 +106,10 @@ class BuyCryptoWorkflowTest {
         every { jsonObject.getLong(ID) } returns TRANSACTION_ID
         every { jsonObject.getString(SIGNATURE) } returns MOONPAY_SIGNED_REQUEST
 
-        mockkObject(Utils)
-        every { Utils.launchCustomTabs(any(), any(), any()) } returns Unit
+        mockkConstructor(CustomTabsIntent::class)
+        every {
+            anyConstructed<CustomTabsIntent>().launchUrl(any(), any())
+        } returns Unit
 
         mockkObject(ImmutableConfig)
         every { ImmutableConfig.getPublicApiUrl(base) } returns BASE_URL
@@ -142,18 +145,15 @@ class BuyCryptoWorkflowTest {
             "&walletAddress=$ADDRESS" +
             "&walletAddresses=" +
             URL_ENCODED_JSON_STRING
-        verify {
-            Utils.launchCustomTabs(
-                context,
-                String.format(
-                    MOONPAY_BUY_URL,
-                    BUY_CRYPTO_URL,
-                    expectedRequestParams,
-                    MOONPAY_SIGNED_REQUEST
-                ),
-                COLOUR
+        val uri = Uri.parse(
+            String.format(
+                MOONPAY_BUY_URL,
+                BUY_CRYPTO_URL,
+                expectedRequestParams,
+                MOONPAY_SIGNED_REQUEST
             )
-        }
+        )
+        verify { anyConstructed<CustomTabsIntent>().launchUrl(context, uri) }
     }
 
     @Test(expected = RuntimeException::class)
@@ -162,7 +162,7 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 
     @Test(expected = IOException::class)
@@ -171,7 +171,7 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 
     @Test(expected = JSONException::class)
@@ -180,7 +180,7 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 
     @Test(expected = JSONException::class)
@@ -189,7 +189,7 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 
     @Test(expected = JSONException::class)
@@ -198,7 +198,7 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 
     @Test(expected = IllegalStateException::class)
@@ -208,7 +208,7 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 
     @Test(expected = IllegalStateException::class)
@@ -217,6 +217,6 @@ class BuyCryptoWorkflowTest {
 
         buyCrypto()
 
-        verify(exactly = 0) { Utils.launchCustomTabs(any(), any(), any()) }
+        verify(exactly = 0) { anyConstructed<CustomTabsIntent>().launchUrl(any(), any()) }
     }
 }

@@ -11,7 +11,7 @@ import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
-import com.immutable.sdk.utils.TokenType
+import com.immutable.sdk.model.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
 

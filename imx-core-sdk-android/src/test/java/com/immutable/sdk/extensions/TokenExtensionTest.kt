@@ -3,7 +3,7 @@ package com.immutable.sdk.extensions
 import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
-import com.immutable.sdk.utils.TokenType
+import com.immutable.sdk.model.TokenType
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

@@ -50,7 +50,7 @@ open class ApiClient(val baseUrl: String) {
             builder.addInterceptor {
 				it.proceed(
 					it.request().newBuilder()
-						.addHeader("x-sdk-version", "imx-core-sdk-android-0.0.3")
+						.addHeader("x-sdk-version", "imx-core-sdk-android-0.0.4")
 						.build()
 				)
 			}.build()

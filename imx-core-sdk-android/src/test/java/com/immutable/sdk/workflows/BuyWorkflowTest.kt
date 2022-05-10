@@ -6,7 +6,7 @@ import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.OrderStatus
 import com.immutable.sdk.stark.StarkCurve
-import com.immutable.sdk.utils.TokenType
+import com.immutable.sdk.model.TokenType
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

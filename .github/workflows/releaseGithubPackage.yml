@@ -6,7 +6,7 @@ on:
 jobs:
   if-release-merged:
     runs-on: ubuntu-latest
-    if: startsWith(github.head_ref, 'releases/') == true && github.event.pull_request.merged
+    #if: startsWith(github.head_ref, 'releases/') == true && github.event.pull_request.merged
 
     steps:
       - uses: actions/checkout@v2
@@ -22,5 +22,5 @@ jobs:
       - name: Publish to GitHub Packages
         run: ./gradlew publish
         env:
-          GPR_USER: ${{ nbunx }}
+          GPR_USER: nbunx
           GPR_API_KEY: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}

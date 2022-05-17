@@ -10,7 +10,7 @@ internal object ImmutableConfig {
     private object Ropsten {
         const val PUBLIC_API_URL = "https://api.ropsten.x.immutable.com"
         const val MOONPAY_BUY_CRYPTO_URL = "https://buy-staging.moonpay.io"
-        const val MOONPAY_API_KEY = "pk_test_S33EgzH3XY5kfJSOS6GW0uxUWvoIUF"
+        const val MOONPAY_API_KEY = "pk_test_nGdsu1IBkjiFzmEvN8ddf4gM9GNy5Sgz"
     }
 
     fun getPublicApiUrl(base: ImmutableXBase) = when (base) {

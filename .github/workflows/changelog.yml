@@ -1,0 +1,20 @@
+name: Generate changelog and bump up version
+
+on:
+  workflow_dispatch:
+
+jobs:
+  if-release-merged:
+    runs-on: ubuntu-latest
+    if: contains('["nattb8", "dom-murray"]', github.actor)
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Generate changelog and bump up version
+        uses: TriPSs/conventional-changelog-action@v3
+        with:
+          github-token: "${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}"
+          skip-git-pull: 'true'
+          version-file: './version.yml'
+          version-path: 'version'

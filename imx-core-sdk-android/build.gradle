@@ -14,7 +14,8 @@ def getArtifactId = { ->
 }
 
 def getVersionName = { ->
-    return "0.0.4"
+    def versionFile = new org.yaml.snakeyaml.Yaml().load( new File("version.yml").newInputStream() )
+    return versionFile.version
 }
 
 task addHeader(type: Exec) {

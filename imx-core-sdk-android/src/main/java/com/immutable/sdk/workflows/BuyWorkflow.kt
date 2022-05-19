@@ -6,9 +6,9 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.OrderStatus
-import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
 
 private const val SIGNABLE_TRADE = "Signable trade"
@@ -34,7 +34,7 @@ internal fun buy(
         .thenCompose { (address, order) -> getSignableTrade(order, address, fees, tradesApi) }
         .thenCompose { response -> starkSigner.getStarkKeys().thenApply { response to it } }
         .thenApply { (response, starkKeys) ->
-            response to StarkCurve.sign(starkKeys, response.payloadHash!!)
+            response to StarkKey.sign(starkKeys, response.payloadHash!!)
         }
         .thenCompose { (response, signature) ->
             createTrade(orderId.toInt(), response, fees, signature, tradesApi)

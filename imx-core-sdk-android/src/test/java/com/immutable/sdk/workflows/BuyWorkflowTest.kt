@@ -4,8 +4,8 @@ import com.immutable.sdk.*
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.OrderStatus
-import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.model.TokenType
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -60,8 +60,8 @@ class BuyWorkflowTest {
         starkKeysFuture = CompletableFuture<ECKeyPair>()
         every { starkSigner.getStarkKeys() } returns starkKeysFuture
 
-        mockkObject(StarkCurve)
-        every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+        mockkObject(StarkKey)
+        every { StarkKey.sign(any(), any()) } returns SIGNATURE
 
         every {
             ordersApi.getOrder(ORDER_ID, true, "", "")

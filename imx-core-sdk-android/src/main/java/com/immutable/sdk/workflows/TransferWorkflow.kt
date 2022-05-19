@@ -4,8 +4,8 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.AssetModel
-import com.immutable.sdk.stark.StarkCurve
 import java.util.concurrent.CompletableFuture
 
 internal fun transfer(
@@ -73,7 +73,7 @@ private fun getTransferRequest(
         try {
             signer.getStarkKeys()
                 .thenCompose { starkKeys ->
-                    val signature = StarkCurve.sign(
+                    val signature = StarkKey.sign(
                         keyPair = starkKeys,
                         msg = response.signableResponses?.first()?.payloadHash!!
                     )

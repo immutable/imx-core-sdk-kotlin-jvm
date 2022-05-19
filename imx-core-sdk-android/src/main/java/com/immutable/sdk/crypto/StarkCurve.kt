@@ -1,19 +1,10 @@
-package com.immutable.sdk.stark
+package com.immutable.sdk.crypto
 
-import androidx.annotation.VisibleForTesting
-import com.immutable.sdk.extensions.addHexPrefix
-import com.immutable.sdk.extensions.hexRemovePrefix
-import com.immutable.sdk.extensions.toNoPrefixHexString
 import com.immutable.sdk.utils.Constants
-import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters
-import org.bouncycastle.crypto.signers.ECDSASigner
-import org.bouncycastle.crypto.signers.HMacDSAKCalculator
 import org.bouncycastle.math.ec.ECCurve
 import org.bouncycastle.math.ec.ECPoint
-import org.bouncycastle.util.BigIntegers
-import org.web3j.crypto.ECDSASignature
 import org.web3j.crypto.ECKeyPair
 import java.math.BigInteger
 
@@ -63,7 +54,7 @@ internal object StarkCurve {
     /**
      * @return ECPrivateKeyParameters with respect to G point
      */
-    private fun createPrivateKeyParams(privateKey: BigInteger?): ECPrivateKeyParameters {
+    fun createPrivateKeyParams(privateKey: BigInteger?): ECPrivateKeyParameters {
         return ECPrivateKeyParameters(
             privateKey,
             ECDomainParameters(
@@ -76,56 +67,11 @@ internal object StarkCurve {
 
     fun getKeyPair(privateKey: String): ECKeyPair {
         val pubKey = generatePublicKeyFromPrivateKey(
-            BigInteger(
-                privateKey,
-                Constants.HEX_RADIX
-            )
+            BigInteger(privateKey, Constants.HEX_RADIX)
         )
         return ECKeyPair(
             BigInteger(privateKey, Constants.HEX_RADIX),
             pubKey
         )
-    }
-
-    /**
-     * Signs the given [msg] with the given [keyPair]
-     *
-     * @return Stark signature
-     */
-    @Suppress("MagicNumber")
-    fun sign(keyPair: ECKeyPair, msg: String): String {
-        val fixMessage = fixMessage(msg)
-        val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
-
-        val privateKey = createPrivateKeyParams(keyPair.privateKey)
-        signer.init(true, privateKey)
-        val msgArray = BigIntegers.asUnsignedByteArray(BigInteger(fixMessage, Constants.HEX_RADIX))
-        val components = signer.generateSignature(msgArray)
-
-        val sig = ECDSASignature(components[0], components[1]).toCanonicalised()
-        // Serialise signature
-        return (
-            sig.r.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO) +
-                sig.s.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO)
-            ).addHexPrefix()
-    }
-
-    @VisibleForTesting
-    @Suppress("MagicNumber")
-    fun fixMessage(msg: String): String {
-        val message = msg.hexRemovePrefix()
-        return if (message.length <= 62) {
-            message
-        } else {
-            assert(message.length == 63)
-            "${msg}0"
-        }
-    }
-
-    /**
-     * @return point on curve which has given coordinates
-     */
-    fun createPoint(x: BigInteger, y: BigInteger): ECPoint {
-        return curve.createPoint(x, y)
     }
 }

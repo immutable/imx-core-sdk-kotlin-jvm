@@ -6,7 +6,7 @@ import com.immutable.sdk.TestException
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CancelOrderResponse
 import com.immutable.sdk.api.model.GetSignableCancelOrderResponse
-import com.immutable.sdk.stark.StarkCurve
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -51,8 +51,8 @@ class CancelWorkflowTest {
         starkKeysFuture = CompletableFuture<ECKeyPair>()
         every { starkSigner.getStarkKeys() } returns starkKeysFuture
 
-        mockkObject(StarkCurve)
-        every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+        mockkObject(StarkKey)
+        every { StarkKey.sign(any(), any()) } returns SIGNATURE
 
         every { ordersApi.getSignableCancelOrder(any()) } returns signableCancelOrderResponse
         every { signableCancelOrderResponse.payloadHash } returns PAYLOAD_HASH

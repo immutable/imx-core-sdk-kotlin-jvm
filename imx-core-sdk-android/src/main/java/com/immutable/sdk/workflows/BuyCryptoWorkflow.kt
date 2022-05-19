@@ -15,9 +15,9 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.extensions.getJson
 import com.immutable.sdk.extensions.getJsonArray
 import com.immutable.sdk.extensions.toURLEncodedString
-import com.immutable.sdk.model.GetSignedMoonpayRequest
-import com.immutable.sdk.model.GetTransactionIdRequest
 import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.squareup.moshi.Json
+import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.OkHttpClient
@@ -95,7 +95,9 @@ internal fun buyCrypto(
             url = url,
             toolbarColourInt = colourInt
         )
-    } catch (e: Exception) { e.cause?.let { throw it } ?: throw e }
+    } catch (e: Exception) {
+        e.cause?.let { throw it } ?: throw e
+    }
 }
 
 @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
@@ -226,3 +228,13 @@ private fun launchCustomTabs(
         launchUrl(context, Uri.parse(url))
     }
 }
+
+@JsonClass(generateAdapter = true)
+internal data class GetSignedMoonpayRequest(val request: String)
+
+@JsonClass(generateAdapter = true)
+internal data class GetTransactionIdRequest(
+    @Json(name = "wallet_address")
+    val walletAddress: String,
+    val provider: String
+)

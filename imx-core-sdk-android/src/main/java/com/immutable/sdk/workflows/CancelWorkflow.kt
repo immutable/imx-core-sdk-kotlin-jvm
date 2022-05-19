@@ -4,7 +4,7 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CancelOrderRequest
 import com.immutable.sdk.api.model.GetSignableCancelOrderRequest
-import com.immutable.sdk.stark.StarkCurve
+import com.immutable.sdk.crypto.StarkKey
 import java.util.concurrent.CompletableFuture
 
 private const val SIGNABLE_CANCEL_ORDER = "Signable cancel order"
@@ -22,7 +22,7 @@ internal fun cancel(
             getSignableCancelOrder(orderId, ordersApi).thenApply { starkKeys to it }
         }
         .thenCompose { (starkKeys, payloadHash) ->
-            val signature = StarkCurve.sign(starkKeys, payloadHash)
+            val signature = StarkKey.sign(starkKeys, payloadHash)
             CompletableFuture.completedFuture(signature)
         }
         .thenCompose { signature ->

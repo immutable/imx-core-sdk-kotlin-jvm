@@ -2,8 +2,8 @@ package com.immutable.sdk.crypto
 
 import com.immutable.sdk.extensions.addHexPrefix
 import com.immutable.sdk.extensions.hexRemovePrefix
-import com.immutable.sdk.utils.Constants
-import com.immutable.sdk.utils.Constants.HEX_RADIX
+import com.immutable.sdk.Constants
+import com.immutable.sdk.Constants.HEX_RADIX
 import java.math.BigInteger
 
 object Crypto {

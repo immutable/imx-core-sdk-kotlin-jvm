@@ -1,6 +1,6 @@
 package com.immutable.sdk.extensions
 
-import com.immutable.sdk.utils.Constants.HEX_PREFIX
+import com.immutable.sdk.Constants.HEX_PREFIX
 
 /**
  * Converts [this] [ByteArray] into its hexadecimal string representation prepending to it the given [prefix].

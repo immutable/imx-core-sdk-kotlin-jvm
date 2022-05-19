@@ -3,7 +3,7 @@ package com.immutable.sdk.model
 import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
 import com.immutable.sdk.api.model.TokenData
-import com.immutable.sdk.utils.Constants.ERC721_AMOUNT
+import com.immutable.sdk.Constants.ERC721_AMOUNT
 
 /**
  * This is an ERC721 wrapper for the [Token] API model

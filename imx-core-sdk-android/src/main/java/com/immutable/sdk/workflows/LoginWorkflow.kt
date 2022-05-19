@@ -10,7 +10,7 @@ import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.extensions.sanitizeBytes
 import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.Constants
 import org.openapitools.client.infrastructure.ClientException
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture

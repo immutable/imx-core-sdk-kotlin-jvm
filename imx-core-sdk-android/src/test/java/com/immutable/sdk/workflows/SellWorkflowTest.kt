@@ -7,7 +7,7 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.Constants
 import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.TokenType
 import io.mockk.*

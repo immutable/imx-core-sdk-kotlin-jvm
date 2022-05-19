@@ -1,6 +1,6 @@
 package com.immutable.sdk.crypto
 
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.Constants
 import org.bouncycastle.crypto.params.ECDomainParameters
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.math.ec.ECCurve

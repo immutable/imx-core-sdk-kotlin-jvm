@@ -1,6 +1,6 @@
 package com.immutable.sdk.extensions
 
-import com.immutable.sdk.utils.Constants.HEX_PREFIX
+import com.immutable.sdk.Constants.HEX_PREFIX
 
 private const val HEX_CHARS = "0123456789abcdef"
 

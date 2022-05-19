@@ -7,8 +7,8 @@ import androidx.annotation.VisibleForTesting
 import com.immutable.sdk.api.model.FeeEntry
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
-import com.immutable.sdk.utils.Constants.DEFAULT_MOONPAY_COLOUR_CODE
+import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 

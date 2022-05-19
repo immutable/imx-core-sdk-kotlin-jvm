@@ -1,9 +1,9 @@
 package com.immutable.sdk.extensions
 
 import androidx.annotation.VisibleForTesting
-import com.immutable.sdk.utils.Constants
-import com.immutable.sdk.utils.Constants.CHAR_ZERO
-import com.immutable.sdk.utils.Constants.HEX_PREFIX
+import com.immutable.sdk.Constants
+import com.immutable.sdk.Constants.CHAR_ZERO
+import com.immutable.sdk.Constants.HEX_PREFIX
 import java.math.BigInteger
 
 /**

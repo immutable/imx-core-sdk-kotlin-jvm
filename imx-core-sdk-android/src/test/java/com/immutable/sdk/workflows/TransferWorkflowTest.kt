@@ -5,10 +5,10 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.TestException
 import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every
@@ -58,8 +58,8 @@ class TransferWorkflowTest {
         starkKeysFuture = CompletableFuture<ECKeyPair>()
         every { starkSigner.getStarkKeys() } returns starkKeysFuture
 
-        mockkObject(StarkCurve)
-        every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+        mockkObject(StarkKey)
+        every { StarkKey.sign(any(), any()) } returns SIGNATURE
 
         every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
             senderStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",

@@ -9,8 +9,8 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
@@ -43,7 +43,7 @@ internal fun sell(
         }
         .thenCompose { response -> starkSigner.getStarkKeys().thenApply { response to it } }
         .thenApply { (response, starkKeys) ->
-            response to StarkCurve.sign(starkKeys, response.payloadHash!!)
+            response to StarkKey.sign(starkKeys, response.payloadHash!!)
         }
         .thenCompose { (response, signature) -> createOrder(response, signature, fees, ordersApi) }
         .whenComplete { tradeId, error ->

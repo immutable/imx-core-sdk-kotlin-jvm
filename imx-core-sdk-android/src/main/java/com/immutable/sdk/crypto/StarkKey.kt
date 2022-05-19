@@ -6,7 +6,7 @@ import com.immutable.sdk.extensions.addHexPrefix
 import com.immutable.sdk.extensions.hexRemovePrefix
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.extensions.toNoPrefixHexString
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.Constants
 import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator

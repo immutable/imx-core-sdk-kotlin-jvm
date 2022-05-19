@@ -1,7 +1,7 @@
 package com.immutable.sdk.crypto
 
 import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.Constants
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
 import org.junit.Test

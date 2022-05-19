@@ -1,4 +1,4 @@
-package com.immutable.sdk.utils
+package com.immutable.sdk
 
 internal object Constants {
     const val STARK_MESSAGE =

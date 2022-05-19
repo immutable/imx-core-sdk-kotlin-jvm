@@ -25,9 +25,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import org.openapitools.client.infrastructure.ClientException
-
-@VisibleForTesting
-internal const val HTTP_STATUS_CODE_NOT_FOUND = 404
+import java.net.HttpURLConnection
 
 @VisibleForTesting
 internal const val ID = "id"
@@ -105,7 +103,7 @@ private fun isWalletRegistered(address: String, userApi: UsersApi): Boolean {
     return try {
         userApi.getUsers(address).accounts?.isNotEmpty() == true
     } catch (e: Exception) {
-        if (e is ClientException && e.statusCode == HTTP_STATUS_CODE_NOT_FOUND) false
+        if (e is ClientException && e.statusCode == HttpURLConnection.HTTP_NOT_FOUND) false
         else throw e
     }
 }

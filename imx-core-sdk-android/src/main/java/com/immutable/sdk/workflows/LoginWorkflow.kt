@@ -13,6 +13,7 @@ import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.Constants
 import org.openapitools.client.infrastructure.ClientException
 import org.web3j.crypto.ECKeyPair
+import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
 private const val GET_USER = "Get user"
@@ -88,7 +89,7 @@ private fun isUserRegistered(
             )
         } catch (e: ClientException) {
             // Endpoint returns 404 when the user isn't registered
-            if (e.statusCode == 404)
+            if (e.statusCode == HttpURLConnection.HTTP_NOT_FOUND)
                 isRegisteredFuture.complete(
                     keyPair to data.copy(
                         isRegistered = false

@@ -15,7 +15,7 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.extensions.getJson
 import com.immutable.sdk.extensions.getJsonArray
 import com.immutable.sdk.extensions.toURLEncodedString
-import com.immutable.sdk.utils.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi

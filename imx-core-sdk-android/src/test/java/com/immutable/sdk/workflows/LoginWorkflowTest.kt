@@ -8,7 +8,7 @@ import com.immutable.sdk.api.model.GetSignableRegistrationOffchainResponse
 import com.immutable.sdk.api.model.GetUsersApiResponse
 import com.immutable.sdk.api.model.RegisterUserResponse
 import com.immutable.sdk.testFuture
-import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.Constants
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK

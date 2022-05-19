@@ -1,14 +1,10 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.ImmutableException
-import com.immutable.sdk.Signer
-import com.immutable.sdk.TestException
+import com.immutable.sdk.*
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationOffchainResponse
 import com.immutable.sdk.api.model.GetUsersApiResponse
 import com.immutable.sdk.api.model.RegisterUserResponse
-import com.immutable.sdk.testFuture
-import com.immutable.sdk.Constants
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -18,6 +14,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
+import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
@@ -151,7 +148,8 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnEthSignature() {
-        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws
+            ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
         addressFuture.complete(ADDRESS)
         starkSeedFuture.complete(SIGNATURE)
@@ -166,7 +164,8 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnGetSignableResponse() {
-        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws
+            ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
@@ -182,7 +181,8 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnGetSignableResponseInvalidResponse() {
-        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws
+            ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } returns
             GetSignableRegistrationOffchainResponse(null, null)
 
@@ -199,7 +199,8 @@ class LoginWorkflowTest {
 
     @Test
     fun testLoginFailedOnRegister() {
-        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getUsers(ADDRESS) } throws
+            ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
         every { api.registerUser(any()) } throws ClientException()
 

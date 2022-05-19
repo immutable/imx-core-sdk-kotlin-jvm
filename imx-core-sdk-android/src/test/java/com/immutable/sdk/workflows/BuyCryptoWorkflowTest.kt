@@ -24,6 +24,7 @@ import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
 import java.io.IOException
+import java.net.HttpURLConnection
 import java.net.URLEncoder
 import java.util.concurrent.CompletableFuture
 
@@ -204,7 +205,7 @@ class BuyCryptoWorkflowTest {
     @Test(expected = IllegalStateException::class)
     fun testBuyCryptoWalletNotRegistered_notFound() {
         every { getUsersApiResponse.accounts } throws
-            ClientException(statusCode = HTTP_STATUS_CODE_NOT_FOUND)
+            ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
 
         buyCrypto()
 

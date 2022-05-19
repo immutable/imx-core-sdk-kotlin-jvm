@@ -6,11 +6,10 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
 import com.immutable.sdk.api.model.RegisterUserRequest
 import com.immutable.sdk.crypto.Crypto
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.extensions.sanitizeBytes
 import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.stark.StarkCurve
-import com.immutable.sdk.stark.StarkKey
 import com.immutable.sdk.utils.Constants
 import org.openapitools.client.infrastructure.ClientException
 import org.web3j.crypto.ECKeyPair
@@ -121,8 +120,8 @@ private fun getSignatures(
         }.thenCompose { (payloadHash, signableMessage) ->
             signer.signMessage(signableMessage).thenApply { ethSignature ->
                 keyPairAndData.first to keyPairAndData.second.copy(
-                    ethSignature = Crypto.serializeEthSignature(ethSignature),
-                    starkSignature = StarkCurve.sign(keyPairAndData.first, payloadHash)
+                    ethSignature = Crypto.serialiseEthSignature(ethSignature),
+                    starkSignature = StarkKey.sign(keyPairAndData.first, payloadHash)
                 )
             }
         }

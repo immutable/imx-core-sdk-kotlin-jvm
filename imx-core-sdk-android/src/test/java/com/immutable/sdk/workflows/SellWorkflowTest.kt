@@ -7,8 +7,8 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.stark.StarkCurve
 import com.immutable.sdk.utils.Constants
+import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.TokenType
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -82,8 +82,8 @@ class SellWorkflowTest {
         every { assetsApi.getAsset(any(), any(), any()) } returns asset
         every { asset.fees } returns arrayListOf()
 
-        mockkObject(StarkCurve)
-        every { StarkCurve.sign(any(), any()) } returns SIGNATURE
+        mockkObject(StarkKey)
+        every { StarkKey.sign(any(), any()) } returns SIGNATURE
     }
 
     @After

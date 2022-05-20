@@ -1,15 +1,12 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.Signer
-import com.immutable.sdk.StarkSigner
-import com.immutable.sdk.TestException
+import com.immutable.sdk.*
 import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.testFuture
 import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
@@ -226,7 +223,7 @@ class TransferWorkflowTest {
                 api = api
             ),
             expectedResult = null,
-            expectedError = NullPointerException()
+            expectedError = ImmutableException.invalidResponse("")
         )
     }
 

@@ -17,7 +17,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
-import org.web3j.crypto.ECKeyPair
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
 
@@ -48,13 +47,10 @@ class SellWorkflowTest {
     private lateinit var starkSigner: StarkSigner
 
     @MockK
-    private lateinit var ecKeyPair: ECKeyPair
-
-    @MockK
     private lateinit var asset: Asset
 
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
+    private lateinit var signatureFuture: CompletableFuture<String>
 
     @Before
     fun setUp() {
@@ -63,8 +59,8 @@ class SellWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        starkKeysFuture = CompletableFuture<ECKeyPair>()
-        every { starkSigner.getStarkKeys() } returns starkKeysFuture
+        signatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns signatureFuture
 
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse(
             assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
@@ -104,7 +100,7 @@ class SellWorkflowTest {
     @Test
     fun testSellInEthSuccess() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         every {
             ordersApi.createOrder(any(), any(), any())
@@ -120,7 +116,7 @@ class SellWorkflowTest {
     @Test
     fun testSellInEthSuccess_withRoyaltyFee() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         every {
             ordersApi.createOrder(any(), any(), any())
@@ -158,7 +154,7 @@ class SellWorkflowTest {
     @Test
     fun testSellInErc20Success() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         every {
             ordersApi.createOrder(any(), any(), any())
@@ -204,7 +200,7 @@ class SellWorkflowTest {
     @Test
     fun testSellInErc20Success_withRoyaltyAndMakerFee() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         every {
             ordersApi.createOrder(any(), any(), any())
@@ -253,7 +249,7 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnAddress() {
         addressFuture.completeExceptionally(TestException())
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             future = createSellFuture(),
@@ -289,7 +285,7 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.completeExceptionally(TestException())
+        signatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = createSellFuture(),
@@ -301,20 +297,19 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnStarkSignatureInvalidSignableResponse() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.completeExceptionally(TestException())
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
 
         testFuture(
             future = createSellFuture(),
             expectedResult = null,
-            expectedError = TestException()
+            expectedError = ImmutableException.invalidResponse("")
         )
     }
 
     @Test
     fun testSellFailedOnCreateOrder() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
         every { ordersApi.createOrder(any(), any(), any()) } throws ClientException()
 
         testFuture(

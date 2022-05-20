@@ -16,7 +16,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
-import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
@@ -42,13 +41,10 @@ class BuyWorkflowTest {
     private lateinit var starkSigner: StarkSigner
 
     @MockK
-    private lateinit var ecKeyPair: ECKeyPair
-
-    @MockK
     private lateinit var order: Order
 
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
+    private lateinit var signatureFuture: CompletableFuture<String>
 
     @Before
     fun setUp() {
@@ -57,8 +53,8 @@ class BuyWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        starkKeysFuture = CompletableFuture<ECKeyPair>()
-        every { starkSigner.getStarkKeys() } returns starkKeysFuture
+        signatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns signatureFuture
 
         mockkObject(StarkKey)
         every { StarkKey.sign(any(), any()) } returns SIGNATURE
@@ -110,7 +106,7 @@ class BuyWorkflowTest {
             )
         } returns CreateTradeResponse(tradeId = TRADE_ID)
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
@@ -180,7 +176,7 @@ class BuyWorkflowTest {
     @Test
     fun testBuyFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.completeExceptionally(TestException())
+        signatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
@@ -194,7 +190,6 @@ class BuyWorkflowTest {
         every { tradesApi.getSignableTrade(any()) } returns GetSignableTradeResponse()
 
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.completeExceptionally(ImmutableException.invalidResponse(""))
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
@@ -208,7 +203,7 @@ class BuyWorkflowTest {
         every { tradesApi.createTrade(any(), any(), any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),

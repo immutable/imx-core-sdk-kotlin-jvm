@@ -19,7 +19,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
-import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7g"
@@ -38,11 +37,8 @@ class TransferWorkflowTest {
     @MockK
     private lateinit var starkSigner: StarkSigner
 
-    @MockK
-    private lateinit var ecKeyPair: ECKeyPair
-
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
+    private lateinit var signatureFuture: CompletableFuture<String>
 
     private val transferResponse = CreateTransferResponse(
         transferIds = arrayListOf(5)
@@ -55,8 +51,8 @@ class TransferWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        starkKeysFuture = CompletableFuture<ECKeyPair>()
-        every { starkSigner.getStarkKeys() } returns starkKeysFuture
+        signatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns signatureFuture
 
         mockkObject(StarkKey)
         every { StarkKey.sign(any(), any()) } returns SIGNATURE
@@ -111,7 +107,7 @@ class TransferWorkflowTest {
     @Test
     fun testTransferErc20Success() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             transfer(
@@ -129,7 +125,7 @@ class TransferWorkflowTest {
     @Test
     fun testTransferEthSuccess() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             transfer(
@@ -147,7 +143,7 @@ class TransferWorkflowTest {
     @Test
     fun testTransferErc721Success() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             transfer(
@@ -200,7 +196,7 @@ class TransferWorkflowTest {
     @Test
     fun testTransferFailOnGetSignature() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.completeExceptionally(TestException())
+        signatureFuture.completeExceptionally(TestException())
 
         testFuture(
             transfer(
@@ -219,7 +215,7 @@ class TransferWorkflowTest {
     fun testTransferFailOnInvalidSignableResponse() {
         every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(ADDRESS)
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             transfer(
@@ -237,7 +233,7 @@ class TransferWorkflowTest {
     @Test
     fun testTransferFailOnCreateTransfer() {
         addressFuture.complete(ADDRESS)
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
         every { api.createTransfer(any(), any(), any()) } throws ClientException()
 
         testFuture(

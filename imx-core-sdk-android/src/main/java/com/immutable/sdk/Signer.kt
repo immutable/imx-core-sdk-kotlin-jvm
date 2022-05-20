@@ -1,6 +1,5 @@
 package com.immutable.sdk
 
-import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -28,12 +27,17 @@ interface Signer {
 }
 
 /**
- * This represents the Immutable X Wallet on Layer 2 and will provide the users Stark key pair to be
+ * This represents the Immutable X Wallet on Layer 2 and will provide the user's Stark key pair to be
  * used for signing L2 transactions.
  */
 interface StarkSigner {
     /**
-     * Returns a CompletableFuture that resolves to the user's L2 Stark keys.
+     * Signs the [message] with the the user's L2 Stark keys which is returned by the login workflow.
+     *
+     * When implementing this, pass the L2 Stark key pair and [message] to the
+     * [StarkKey.sign(keyPair, msg)][com.immutable.sdk.crypto.StarkKey.sign] function.
+     *
+     * @see [com.immutable.sdk.workflows.LoginWorkflowKt]
      */
-    fun getStarkKeys(): CompletableFuture<ECKeyPair>
+    fun signMessage(message: String): CompletableFuture<String>
 }

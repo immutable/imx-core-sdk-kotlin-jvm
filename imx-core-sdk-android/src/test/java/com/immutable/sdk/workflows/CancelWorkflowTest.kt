@@ -17,7 +17,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
-import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 private const val SIGNATURE =
@@ -39,17 +38,14 @@ class CancelWorkflowTest {
     @MockK
     private lateinit var cancelOrderResponse: CancelOrderResponse
 
-    @MockK
-    private lateinit var ecKeyPair: ECKeyPair
-
-    private lateinit var starkKeysFuture: CompletableFuture<ECKeyPair>
+    private lateinit var signatureFuture: CompletableFuture<String>
 
     @Before
     fun setUp() {
         MockKAnnotations.init(this)
 
-        starkKeysFuture = CompletableFuture<ECKeyPair>()
-        every { starkSigner.getStarkKeys() } returns starkKeysFuture
+        signatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns signatureFuture
 
         mockkObject(StarkKey)
         every { StarkKey.sign(any(), any()) } returns SIGNATURE
@@ -71,7 +67,7 @@ class CancelWorkflowTest {
 
     @Test
     fun testCancelSuccess() {
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
         every { ordersApi.cancelOrder(any(), any(), any(), any()) } returns cancelOrderResponse
         every { cancelOrderResponse.orderId } returns ORDER_ID
 
@@ -84,7 +80,7 @@ class CancelWorkflowTest {
 
     @Test
     fun testCancelFailedOnStarkSignature() {
-        starkKeysFuture.completeExceptionally(TestException())
+        signatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = createCancelFuture(),
@@ -95,7 +91,7 @@ class CancelWorkflowTest {
 
     @Test
     fun testCancelFailedOnGetSignableCancelOrder() {
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
         every { ordersApi.getSignableCancelOrder(any()) } throws ClientException()
 
         testFuture(
@@ -107,7 +103,7 @@ class CancelWorkflowTest {
 
     @Test
     fun testCancelFailedOnGetSignableCancelOrder_nullPayloadHash() {
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
         every { signableCancelOrderResponse.payloadHash } returns null
 
         testFuture(
@@ -119,7 +115,7 @@ class CancelWorkflowTest {
 
     @Test
     fun testCancelFailedOnCancelOrder() {
-        starkKeysFuture.complete(ecKeyPair)
+        signatureFuture.complete(SIGNATURE)
         every { ordersApi.cancelOrder(any(), any(), any(), any()) } throws ClientException()
 
         testFuture(

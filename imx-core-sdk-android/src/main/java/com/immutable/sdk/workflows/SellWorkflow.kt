@@ -1,6 +1,7 @@
 package com.immutable.sdk.workflows
 
 import androidx.annotation.VisibleForTesting
+import com.immutable.sdk.Constants
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.AssetsApi
@@ -9,8 +10,6 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.Constants
-import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.TokenType
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
@@ -41,9 +40,8 @@ internal fun sell(
         .thenCompose { (address, totalFees) ->
             getSignableOrder(asset, sellToken, address, fees, totalFees, ordersApi)
         }
-        .thenCompose { response -> starkSigner.getStarkKeys().thenApply { response to it } }
-        .thenApply { (response, starkKeys) ->
-            response to StarkKey.sign(starkKeys, response.payloadHash!!)
+        .thenCompose { (payloadHash, response) ->
+            starkSigner.signMessage(payloadHash).thenApply { response to it }
         }
         .thenCompose { (response, signature) -> createOrder(response, signature, fees, ordersApi) }
         .whenComplete { tradeId, error ->
@@ -97,7 +95,7 @@ private fun getSignableOrder(
     fees: List<FeeEntry>,
     totalFees: BigDecimal,
     api: OrdersApi
-): CompletableFuture<GetSignableOrderResponse> = call(SIGNABLE_ORDER) {
+): CompletableFuture<Pair<String, GetSignableOrderResponse>> = call(SIGNABLE_ORDER) {
     val request = GetSignableOrderRequest(
         amountBuy = formatAmount(sellToken, totalFees),
         amountSell = asset.quantity,
@@ -106,7 +104,9 @@ private fun getSignableOrder(
         user = address,
         fees = fees
     )
-    api.getSignableOrder(request)
+    val response = api.getSignableOrder(request)
+    // Unwrapping payload hash here so if it's null, the correct exception is thrown
+    response.payloadHash!! to response
 }
 
 private fun createTokenSell(asset: Erc721Asset) = SignableToken(

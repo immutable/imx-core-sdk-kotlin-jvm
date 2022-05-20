@@ -32,7 +32,7 @@ private val SECP_ORDER = BigInteger(
 )
 private const val SHA_256 = "SHA-256"
 
-internal object StarkKey {
+object StarkKey {
     /**
      * Hashes the given [input] using SHA-256
      *
@@ -134,7 +134,7 @@ internal object StarkKey {
      * @return Stark key pair
      */
     @Suppress("MagicNumber")
-    fun getKeyFromRawSignature(signature: String?, ethereumAddress: String?): ECKeyPair? {
+    internal fun getKeyFromRawSignature(signature: String?, ethereumAddress: String?): ECKeyPair? {
         return if (signature != null && ethereumAddress != null) {
             val bytes = signature.hexToByteArray()
             val s = bytes.copyOfRange(32, 64).toNoPrefixHexString()
@@ -170,7 +170,7 @@ internal object StarkKey {
      */
     @VisibleForTesting
     @Suppress("MagicNumber")
-    fun fixMessage(msg: String): String {
+    internal fun fixMessage(msg: String): String {
         val message = msg.hexRemovePrefix()
         return if (message.length <= 62) {
             message

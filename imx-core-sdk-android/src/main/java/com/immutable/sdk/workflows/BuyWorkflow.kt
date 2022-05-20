@@ -6,7 +6,6 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
@@ -32,9 +31,8 @@ internal fun buy(
             getOrderDetails(orderId, fees, ordersApi).thenApply { address to it }
         }
         .thenCompose { (address, order) -> getSignableTrade(order, address, fees, tradesApi) }
-        .thenCompose { response -> starkSigner.getStarkKeys().thenApply { response to it } }
-        .thenApply { (response, starkKeys) ->
-            response to StarkKey.sign(starkKeys, response.payloadHash!!)
+        .thenCompose { (payloadHash, response) ->
+            starkSigner.signMessage(payloadHash).thenApply { response to it }
         }
         .thenCompose { (response, signature) ->
             createTrade(orderId.toInt(), response, fees, signature, tradesApi)
@@ -68,13 +66,13 @@ private fun getSignableTrade(
     address: String,
     fees: List<FeeEntry>,
     api: TradesApi
-): CompletableFuture<GetSignableTradeResponse> = when {
+): CompletableFuture<Pair<String, GetSignableTradeResponse>> = when {
     order.user == address ->
         completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
     order.status != OrderStatus.Active.value ->
         completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
     else -> call(SIGNABLE_TRADE) {
-        api.getSignableTrade(
+        val response = api.getSignableTrade(
             GetSignableTradeRequest(
                 amountBuy = order.sell!!.data!!.quantity!!,
                 amountSell = order.buy!!.data!!.quantity!!,
@@ -84,6 +82,8 @@ private fun getSignableTrade(
                 fees = fees
             )
         )
+        // Unwrapping payload hash here so if it's null, the correct exception is thrown
+        response.payloadHash!! to response
     }
 }
 

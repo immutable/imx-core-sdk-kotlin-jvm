@@ -48,7 +48,7 @@ $dokka.location:com.immutable.sdk/Signer///PointingToDeclaration/imx-core-sdk-a
 $dokka.location:com.immutable.sdk/Signer/getAddress/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-signer/get-address.html
 $dokka.location:com.immutable.sdk/Signer/signMessage/#kotlin.String/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-signer/sign-message.html
 $dokka.location:com.immutable.sdk/StarkSigner///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-stark-signer/index.html
-$dokka.location:com.immutable.sdk/StarkSigner/getStarkKeys/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-stark-signer/get-stark-keys.html
+$dokka.location:com.immutable.sdk/StarkSigner/signMessage/#kotlin.String/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-stark-signer/sign-message.html
 com.immutable.sdk
 com.immutable.sdk.model
 

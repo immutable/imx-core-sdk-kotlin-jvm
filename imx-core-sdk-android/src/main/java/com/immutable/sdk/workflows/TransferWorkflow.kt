@@ -4,7 +4,6 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.AssetModel
 import java.util.concurrent.CompletableFuture
 
@@ -71,14 +70,7 @@ private fun getTransferRequest(
 
     CompletableFuture.runAsync {
         try {
-            signer.getStarkKeys()
-                .thenCompose { starkKeys ->
-                    val signature = StarkKey.sign(
-                        keyPair = starkKeys,
-                        msg = response.signableResponses?.first()?.payloadHash!!
-                    )
-                    CompletableFuture.completedFuture(signature)
-                }
+            signer.signMessage(response.signableResponses?.first()?.payloadHash!!)
                 .whenComplete { signature, error ->
                     if (error != null) future.completeExceptionally(error)
                     else future.complete(getCreateTransferRequest(response, signature))

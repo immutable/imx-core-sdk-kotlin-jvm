@@ -4,9 +4,10 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.AssetModel
 import java.util.concurrent.CompletableFuture
+
+private const val GET_TRANSFER_REQUEST = "Get transfer request"
 
 internal fun transfer(
     token: AssetModel,
@@ -66,35 +67,17 @@ private fun getSignableTransfer(
 private fun getTransferRequest(
     response: GetSignableTransferResponse,
     signer: StarkSigner
-): CompletableFuture<CreateTransferRequest> {
-    val future = CompletableFuture<CreateTransferRequest>()
-
-    CompletableFuture.runAsync {
-        try {
-            signer.getStarkKeys()
-                .thenCompose { starkKeys ->
-                    val signature = StarkKey.sign(
-                        keyPair = starkKeys,
-                        msg = response.signableResponses?.first()?.payloadHash!!
-                    )
-                    CompletableFuture.completedFuture(signature)
-                }
-                .whenComplete { signature, error ->
-                    if (error != null) future.completeExceptionally(error)
-                    else future.complete(getCreateTransferRequest(response, signature))
-                }
-        } catch (e: Exception) {
-            future.completeExceptionally(e)
-        }
-    }
-
-    return future
+): CompletableFuture<CreateTransferRequest> = call(GET_TRANSFER_REQUEST) {
+    // Force unwrapping that the NPE gets handled by `call`
+    response.signableResponses?.first()?.payloadHash!!
 }
+    .thenCompose { payload -> signer.signMessage(payload) }
+    .thenCompose { signature -> getCreateTransferRequest(response, signature) }
 
 private fun getCreateTransferRequest(
     response: GetSignableTransferResponse,
     signature: String?
-): CreateTransferRequest {
+): CompletableFuture<CreateTransferRequest> {
     val signableResponse = response.signableResponses?.first()!!
     val transferRequest = TransferRequest(
         amount = signableResponse.amount!!,
@@ -106,9 +89,11 @@ private fun getCreateTransferRequest(
         senderVaultId = signableResponse.senderVaultId!!,
         starkSignature = signature!!,
     )
-    return CreateTransferRequest(
-        senderStarkKey = response.senderStarkKey,
-        requests = arrayListOf(transferRequest)
+    return CompletableFuture.completedFuture(
+        CreateTransferRequest(
+            senderStarkKey = response.senderStarkKey,
+            requests = arrayListOf(transferRequest)
+        )
     )
 }
 

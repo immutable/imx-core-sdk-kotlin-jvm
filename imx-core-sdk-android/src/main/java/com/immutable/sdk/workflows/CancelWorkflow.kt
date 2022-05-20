@@ -4,7 +4,6 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.CancelOrderRequest
 import com.immutable.sdk.api.model.GetSignableCancelOrderRequest
-import com.immutable.sdk.crypto.StarkKey
 import java.util.concurrent.CompletableFuture
 
 private const val SIGNABLE_CANCEL_ORDER = "Signable cancel order"
@@ -17,17 +16,9 @@ internal fun cancel(
 ): CompletableFuture<Int> {
     val future = CompletableFuture<Int>()
 
-    starkSigner.getStarkKeys()
-        .thenCompose { starkKeys ->
-            getSignableCancelOrder(orderId, ordersApi).thenApply { starkKeys to it }
-        }
-        .thenCompose { (starkKeys, payloadHash) ->
-            val signature = StarkKey.sign(starkKeys, payloadHash)
-            CompletableFuture.completedFuture(signature)
-        }
-        .thenCompose { signature ->
-            cancelOrder(orderId, signature, ordersApi)
-        }
+    getSignableCancelOrder(orderId, ordersApi)
+        .thenCompose { payloadHash -> starkSigner.signMessage(payloadHash) }
+        .thenCompose { signature -> cancelOrder(orderId, signature, ordersApi) }
         .whenComplete { cancelledOrderId, error ->
             // Forward any exceptions from the compose chain
             if (error != null)

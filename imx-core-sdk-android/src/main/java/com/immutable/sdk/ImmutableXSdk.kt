@@ -9,6 +9,7 @@ import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
+import okhttp3.logging.HttpLoggingInterceptor
 import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
@@ -17,6 +18,39 @@ import java.util.concurrent.CompletableFuture
  */
 enum class ImmutableXBase {
     Production, Ropsten
+}
+
+/**
+ * An enum for defining the log level of the API HTTP calls
+ */
+enum class ImmutableXHttpLoggingLevel {
+    /**
+     * No logs
+     *
+     * @see [HttpLoggingInterceptor.Level.NONE]
+     */
+    None,
+
+    /**
+     * Logs request and response lines
+     *
+     * @see [HttpLoggingInterceptor.Level.BASIC]
+     */
+    Basic,
+
+    /**
+     * Logs request and response lines and their respective headers
+     *
+     * @see [HttpLoggingInterceptor.Level.HEADERS]
+     */
+    Headers,
+
+    /**
+     * Logs request and response lines and their respective headers and bodies (if present).
+     *
+     * @see [HttpLoggingInterceptor.Level.BODY]
+     */
+    Body
 }
 
 @VisibleForTesting
@@ -31,6 +65,7 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
 object ImmutableXSdk {
 
     private var base: ImmutableXBase = ImmutableXBase.Ropsten
+    internal var httpLoggingLevel = ImmutableXHttpLoggingLevel.None
 
     init {
         setBaseUrl()
@@ -47,6 +82,13 @@ object ImmutableXSdk {
     private fun setBaseUrl() {
         System.getProperties()
             .setProperty(KEY_BASE_URL, ImmutableConfig.getPublicApiUrl(base))
+    }
+
+    /**
+     * Sets the API HTTP logging level. The default is [ImmutableXHttpLoggingLevel.None].
+     */
+    fun setHttpLoggingLevel(level: ImmutableXHttpLoggingLevel) {
+        httpLoggingLevel = level
     }
 
     /**

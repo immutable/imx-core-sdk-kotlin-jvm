@@ -18,11 +18,6 @@ def getVersionName = { ->
     return versionFile.version
 }
 
-task addHeader(type: Exec) {
-    workingDir '..'
-    commandLine 'python', 'addHeaderScript.py', getVersionName()
-}
-
 task cleanGeneratedClient() {
     delete "$project.projectDir/generated"
 }
@@ -46,6 +41,8 @@ android {
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
+
+        buildConfigField "String", "VERSION", "\"${getVersionName()}\""
     }
 
     testOptions {
@@ -108,10 +105,6 @@ android {
     // Generate all apis before every build
     preBuild.dependsOn(tasks.openApiGenerate)
 
-    // Add SDK version header to all API endpoint
-    preBuild.dependsOn(tasks.addHeader)
-    tasks.addHeader.shouldRunAfter(tasks.openApiGenerate)
-
     preBuild.dependsOn(tasks.ktlintCheck)
     preBuild.dependsOn(tasks.detekt)
     preBuild.finalizedBy(tasks.dokkaHtml)
@@ -125,6 +118,7 @@ dependencies {
     // Required for the generated SDK code
     implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
     // Web3
     implementation "org.web3j:core:4.8.7-android"

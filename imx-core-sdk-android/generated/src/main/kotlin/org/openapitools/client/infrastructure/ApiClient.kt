@@ -1,5 +1,8 @@
 package org.openapitools.client.infrastructure
 
+import com.immutable.sdk.BuildConfig
+import com.immutable.sdk.ImmutableXHttpLoggingLevel
+import com.immutable.sdk.ImmutableXSdk
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -28,6 +31,7 @@ import java.time.OffsetTime
 import java.util.Date
 import java.util.Locale
 import com.squareup.moshi.adapter
+import okhttp3.logging.HttpLoggingInterceptor
 
 open class ApiClient(val baseUrl: String) {
     companion object {
@@ -47,13 +51,23 @@ open class ApiClient(val baseUrl: String) {
 
         @JvmStatic
         val client: OkHttpClient by lazy {
-            builder.addInterceptor {
-				it.proceed(
-					it.request().newBuilder()
-						.addHeader("x-sdk-version", "imx-core-sdk-android-0.1.0")
-						.build()
-				)
-			}.build()
+            builder
+                .addInterceptor {
+                    it.proceed(
+                        it.request().newBuilder()
+                            .addHeader("x-sdk-version", "imx-core-sdk-android-${BuildConfig.VERSION}")
+                            .build()
+                    )
+                }
+                .addInterceptor(HttpLoggingInterceptor().apply {
+                    level = when (ImmutableXSdk.httpLoggingLevel) {
+                        ImmutableXHttpLoggingLevel.None -> HttpLoggingInterceptor.Level.NONE
+                        ImmutableXHttpLoggingLevel.Basic -> HttpLoggingInterceptor.Level.BASIC
+                        ImmutableXHttpLoggingLevel.Headers -> HttpLoggingInterceptor.Level.HEADERS
+                        ImmutableXHttpLoggingLevel.Body -> HttpLoggingInterceptor.Level.BODY
+                    }
+                })
+                .build()
         }
 
         @JvmStatic

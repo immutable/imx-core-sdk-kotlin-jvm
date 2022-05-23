@@ -90,4 +90,9 @@ class TokenExtensionTest {
             ).clean()
         )
     }
+
+    @Test
+    fun testCleanOtherType() {
+        assertNull(Token(data = TokenData(), type = "type").clean())
+    }
 }

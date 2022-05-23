@@ -36,6 +36,11 @@ $dokka.location:com.immutable.sdk/ImmutableExceptionType///PointingToDeclaration
 $dokka.location:com.immutable.sdk/ImmutableXBase.Production///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-base/-production/index.html
 $dokka.location:com.immutable.sdk/ImmutableXBase.Ropsten///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-base/-ropsten/index.html
 $dokka.location:com.immutable.sdk/ImmutableXBase///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-base/index.html
+$dokka.location:com.immutable.sdk/ImmutableXHttpLoggingLevel.Basic///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-http-logging-level/-basic/index.html
+$dokka.location:com.immutable.sdk/ImmutableXHttpLoggingLevel.Body///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-http-logging-level/-body/index.html
+$dokka.location:com.immutable.sdk/ImmutableXHttpLoggingLevel.Headers///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-http-logging-level/-headers/index.html
+$dokka.location:com.immutable.sdk/ImmutableXHttpLoggingLevel.None///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-http-logging-level/-none/index.html
+$dokka.location:com.immutable.sdk/ImmutableXHttpLoggingLevel///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-http-logging-level/index.html
 $dokka.location:com.immutable.sdk/ImmutableXSdk///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/index.html
 $dokka.location:com.immutable.sdk/ImmutableXSdk/buy/#kotlin.String#kotlin.collections.List[com.immutable.sdk.api.model.FeeEntry]#com.immutable.sdk.Signer#com.immutable.sdk.StarkSigner/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/buy.html
 $dokka.location:com.immutable.sdk/ImmutableXSdk/buyCrypto/#android.content.Context#com.immutable.sdk.Signer#kotlin.Int#kotlin.String/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/buy-crypto.html
@@ -43,6 +48,7 @@ $dokka.location:com.immutable.sdk/ImmutableXSdk/cancel/#kotlin.String#com.immuta
 $dokka.location:com.immutable.sdk/ImmutableXSdk/login/#com.immutable.sdk.Signer/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/login.html
 $dokka.location:com.immutable.sdk/ImmutableXSdk/sell/#com.immutable.sdk.model.Erc721Asset#com.immutable.sdk.model.AssetModel#kotlin.collections.List[com.immutable.sdk.api.model.FeeEntry]#com.immutable.sdk.Signer#com.immutable.sdk.StarkSigner/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/sell.html
 $dokka.location:com.immutable.sdk/ImmutableXSdk/setBase/#com.immutable.sdk.ImmutableXBase/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/set-base.html
+$dokka.location:com.immutable.sdk/ImmutableXSdk/setHttpLoggingLevel/#com.immutable.sdk.ImmutableXHttpLoggingLevel/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/set-http-logging-level.html
 $dokka.location:com.immutable.sdk/ImmutableXSdk/transfer/#com.immutable.sdk.model.AssetModel#kotlin.String#com.immutable.sdk.Signer#com.immutable.sdk.StarkSigner/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-x-sdk/transfer.html
 $dokka.location:com.immutable.sdk/Signer///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-signer/index.html
 $dokka.location:com.immutable.sdk/Signer/getAddress/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-signer/get-address.html

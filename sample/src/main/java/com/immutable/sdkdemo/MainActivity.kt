@@ -3,6 +3,7 @@ package com.immutable.sdkdemo
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.immutable.sdk.ImmutableXBase
+import com.immutable.sdk.ImmutableXHttpLoggingLevel
 import com.immutable.sdk.ImmutableXSdk
 import com.immutable.sdk.api.CollectionsApi
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +17,9 @@ class MainActivity : AppCompatActivity() {
 
         // Change Base to Ropsten
         ImmutableXSdk.setBase(ImmutableXBase.Ropsten)
+
+        // Set API logging level
+        ImmutableXSdk.setHttpLoggingLevel(ImmutableXHttpLoggingLevel.Body)
 
         GlobalScope.launch(Dispatchers.Default) {
             val response = CollectionsApi().listCollections(pageSize = 20)

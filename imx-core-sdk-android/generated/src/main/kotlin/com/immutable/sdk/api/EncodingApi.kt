@@ -20,7 +20,8 @@
 
 package com.immutable.sdk.api
 
-import com.immutable.sdk.api.model.GetTLVsResponse
+import com.immutable.sdk.api.model.EncodeAssetRequest
+import com.immutable.sdk.api.model.EncodeAssetResponse
 
 import org.openapitools.client.infrastructure.ApiClient
 import org.openapitools.client.infrastructure.ApiErrorModel
@@ -35,7 +36,7 @@ import org.openapitools.client.infrastructure.ResponseType
 import org.openapitools.client.infrastructure.Success
 import org.openapitools.client.infrastructure.toMultiValue
 
-class TlvsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
+class EncodingApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
@@ -44,26 +45,26 @@ class TlvsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
     }
 
     /**
-    * Get TLV information for a user for a token
-    * Get TLV information for a user for a token
-    * @param etherKey User&#39;s wallet address 
-    * @param tokenAddress Token address 
-    * @return GetTLVsResponse
+    * Retrieves the Starkex Encoded format for a given asset
+    * Retrieves the Starkex Encoded format for a given asset so that it can be used as parameter for Starkex smart contracts
+    * @param assetType Asset type to be encoded. (asset/mintable-asset) 
+    * @param encodeAssetRequest Encode Asset 
+    * @return EncodeAssetResponse
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
     * @throws ServerException If the API returns a server error response
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getTLVs(etherKey: kotlin.String, tokenAddress: kotlin.String) : GetTLVsResponse {
-        val localVariableConfig = getTLVsRequestConfig(etherKey = etherKey, tokenAddress = tokenAddress)
+    fun encodeAsset(assetType: kotlin.String, encodeAssetRequest: EncodeAssetRequest) : EncodeAssetResponse {
+        val localVariableConfig = encodeAssetRequestConfig(assetType = assetType, encodeAssetRequest = encodeAssetRequest)
 
-        val localVarResponse = request<Unit, GetTLVsResponse>(
+        val localVarResponse = request<EncodeAssetRequest, EncodeAssetResponse>(
             localVariableConfig
         )
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetTLVsResponse
+            ResponseType.Success -> (localVarResponse as Success<*>).data as EncodeAssetResponse
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -80,20 +81,20 @@ class TlvsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) {
     }
 
     /**
-    * To obtain the request config of the operation getTLVs
+    * To obtain the request config of the operation encodeAsset
     *
-    * @param etherKey User&#39;s wallet address 
-    * @param tokenAddress Token address 
+    * @param assetType Asset type to be encoded. (asset/mintable-asset) 
+    * @param encodeAssetRequest Encode Asset 
     * @return RequestConfig
     */
-    fun getTLVsRequestConfig(etherKey: kotlin.String, tokenAddress: kotlin.String) : RequestConfig<Unit> {
-        val localVariableBody = null
+    fun encodeAssetRequestConfig(assetType: kotlin.String, encodeAssetRequest: EncodeAssetRequest) : RequestConfig<EncodeAssetRequest> {
+        val localVariableBody = encodeAssetRequest
         val localVariableQuery: MultiValueMap = mutableMapOf()
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
 
         return RequestConfig(
-            method = RequestMethod.GET,
-            path = "/v1/claims/{etherKey}/{tokenAddress}".replace("{"+"etherKey"+"}", "$etherKey").replace("{"+"tokenAddress"+"}", "$tokenAddress"),
+            method = RequestMethod.POST,
+            path = "/v1/encode/{assetType}".replace("{"+"assetType"+"}", "$assetType"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody

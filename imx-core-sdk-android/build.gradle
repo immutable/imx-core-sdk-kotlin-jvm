@@ -87,6 +87,12 @@ android {
         typeMappings = [
                 number: "Double"
         ]
+        importMappings = [
+                // Swagger specs sets 'Asset.orders.sell_orders' type to an array of objects (i.e. List<Any>),
+                // this makes it really difficult to cast it to List<SellOrders>. So instead we create an
+                // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
+                OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"
+        ]
     }
 
     sourceSets {

@@ -20,21 +20,20 @@
 
 package com.immutable.sdk.api.model
 
-import com.immutable.sdk.api.model.MintRequestV1
+import com.immutable.sdk.api.model.EncodeAssetRequestToken
 
 import com.squareup.moshi.Json
 
 /**
  * 
  *
- * @param mints Details of requested mints
+ * @param token 
  */
 
-data class MintTokensRequestV1 (
+data class EncodeAssetRequest (
 
-    /* Details of requested mints */
-    @Json(name = "mints")
-    val mints: kotlin.collections.List<MintRequestV1>
+    @Json(name = "token")
+    val token: EncodeAssetRequestToken
 
 )
 

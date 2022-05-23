@@ -27,9 +27,7 @@ import com.immutable.sdk.api.model.CreateOrderResponse
 import com.immutable.sdk.api.model.GetSignableCancelOrderRequest
 import com.immutable.sdk.api.model.GetSignableCancelOrderResponse
 import com.immutable.sdk.api.model.GetSignableOrderRequest
-import com.immutable.sdk.api.model.GetSignableOrderRequestV1
 import com.immutable.sdk.api.model.GetSignableOrderResponse
-import com.immutable.sdk.api.model.GetSignableOrderResponseV1
 import com.immutable.sdk.api.model.ListOrdersResponse
 import com.immutable.sdk.api.model.Order
 
@@ -354,61 +352,6 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/v3/signable-order-details",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            body = localVariableBody
-        )
-    }
-
-    /**
-    * Get details a signable order
-    * Get details a signable order
-    * @param getSignableOrderRequest get a signable order 
-    * @return GetSignableOrderResponseV1
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getSignableOrderV1(getSignableOrderRequest: GetSignableOrderRequestV1) : GetSignableOrderResponseV1 {
-        val localVariableConfig = getSignableOrderV1RequestConfig(getSignableOrderRequest = getSignableOrderRequest)
-
-        val localVarResponse = request<GetSignableOrderRequestV1, GetSignableOrderResponseV1>(
-            localVariableConfig
-        )
-
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetSignableOrderResponseV1
-            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
-            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
-            ResponseType.ClientError -> {
-                val localVarError = localVarResponse as ClientError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-            ResponseType.ServerError -> {
-                val localVarError = localVarResponse as ServerError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-        }
-    }
-
-    /**
-    * To obtain the request config of the operation getSignableOrderV1
-    *
-    * @param getSignableOrderRequest get a signable order 
-    * @return RequestConfig
-    */
-    fun getSignableOrderV1RequestConfig(getSignableOrderRequest: GetSignableOrderRequestV1) : RequestConfig<GetSignableOrderRequestV1> {
-        val localVariableBody = getSignableOrderRequest
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
-        return RequestConfig(
-            method = RequestMethod.POST,
-            path = "/v1/signable-order-details",
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody

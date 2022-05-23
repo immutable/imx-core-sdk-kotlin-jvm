@@ -22,7 +22,6 @@ package com.immutable.sdk.api.model
 
 import com.immutable.sdk.api.model.CollectionDetails
 import com.immutable.sdk.api.model.Fee
-import com.immutable.sdk.api.model.OrderDetails
 
 import com.squareup.moshi.Json
 
@@ -80,7 +79,7 @@ data class Asset (
     val name: kotlin.String? = null,
 
     @Json(name = "orders")
-    val orders: OrderDetails? = null,
+    val orders: com.immutable.sdk.api.model.AssetOrderDetails? = null,
 
     /* Status of this asset (where it is in the system) */
     @Json(name = "status")

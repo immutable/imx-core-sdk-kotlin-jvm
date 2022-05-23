@@ -20,7 +20,7 @@
 
 package com.immutable.sdk.api
 
-import com.immutable.sdk.api.model.GetBalanceResponse
+import com.immutable.sdk.api.model.Balance
 import com.immutable.sdk.api.model.ListBalancesResponse
 
 import org.openapitools.client.infrastructure.ApiClient
@@ -49,22 +49,22 @@ class BalancesApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePat
     * Fetches the token balances of the user
     * @param owner Address of the owner/user 
     * @param address Token address 
-    * @return GetBalanceResponse
+    * @return Balance
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
     * @throws ServerException If the API returns a server error response
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun getBalance(owner: kotlin.String, address: kotlin.String) : GetBalanceResponse {
+    fun getBalance(owner: kotlin.String, address: kotlin.String) : Balance {
         val localVariableConfig = getBalanceRequestConfig(owner = owner, address = address)
 
-        val localVarResponse = request<Unit, GetBalanceResponse>(
+        val localVarResponse = request<Unit, Balance>(
             localVariableConfig
         )
 
         return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetBalanceResponse
+            ResponseType.Success -> (localVarResponse as Success<*>).data as Balance
             ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
             ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
             ResponseType.ClientError -> {
@@ -95,64 +95,6 @@ class BalancesApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePat
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/v2/balances/{owner}/{address}".replace("{"+"owner"+"}", "$owner").replace("{"+"address"+"}", "$address"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            body = localVariableBody
-        )
-    }
-
-    /**
-    * Fetches the WEI balances of the user
-    * Fetches the WEI balances of the user
-    * @param owner address of the owner/user 
-    * @return GetBalanceResponse
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    @Deprecated(message = "This operation is deprecated.")
-    fun getBalanceOfUser(owner: kotlin.String) : GetBalanceResponse {
-        @Suppress("DEPRECATION")
-        val localVariableConfig = getBalanceOfUserRequestConfig(owner = owner)
-
-        val localVarResponse = request<Unit, GetBalanceResponse>(
-            localVariableConfig
-        )
-
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as GetBalanceResponse
-            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
-            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
-            ResponseType.ClientError -> {
-                val localVarError = localVarResponse as ClientError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-            ResponseType.ServerError -> {
-                val localVarError = localVarResponse as ServerError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-        }
-    }
-
-    /**
-    * To obtain the request config of the operation getBalanceOfUser
-    *
-    * @param owner address of the owner/user 
-    * @return RequestConfig
-    */
-    @Deprecated(message = "This operation is deprecated.")
-    fun getBalanceOfUserRequestConfig(owner: kotlin.String) : RequestConfig<Unit> {
-        val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
-        return RequestConfig(
-            method = RequestMethod.GET,
-            path = "/v1/balances/{owner}".replace("{"+"owner"+"}", "$owner"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody

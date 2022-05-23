@@ -5,11 +5,9 @@ All URIs are relative to *https://api.ropsten.x.immutable.com*
 Method | HTTP request | Description
 ------------- | ------------- | -------------
 [**getMint**](MintsApi.md#getMint) | **GET** /v1/mints/{id} | Get details of a mint with the given ID
-[**getMintableTokenDetails**](MintsApi.md#getMintableTokenDetails) | **GET** /v1/mintable-token/{id} | Get details of a mintable token with the given IMX token ID
 [**getMintableTokenDetailsByClientTokenId**](MintsApi.md#getMintableTokenDetailsByClientTokenId) | **GET** /v1/mintable-token/{token_address}/{token_id} | Get details of a mintable token with the given token address and token ID
 [**listMints**](MintsApi.md#listMints) | **GET** /v1/mints | Get a list of mints
 [**mintTokens**](MintsApi.md#mintTokens) | **POST** /v2/mints | Mint Tokens V2
-[**mintTokensV1**](MintsApi.md#mintTokensV1) | **POST** /v1/mints | Mint tokens
 
 
 <a name="getMint"></a>
@@ -49,53 +47,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**Mint**](Mint.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: Not defined
- - **Accept**: application/json
-
-<a name="getMintableTokenDetails"></a>
-# **getMintableTokenDetails**
-> MintableTokenDetails getMintableTokenDetails(id)
-
-Get details of a mintable token with the given IMX token ID
-
-Get details of a mintable token with the given IMX token ID
-
-### Example
-```kotlin
-// Import classes:
-//import org.openapitools.client.infrastructure.*
-//import com.immutable.sdk.api.model.*
-
-val apiInstance = MintsApi()
-val id : kotlin.String = id_example // kotlin.String | IMX ID
-try {
-    val result : MintableTokenDetails = apiInstance.getMintableTokenDetails(id)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling MintsApi#getMintableTokenDetails")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling MintsApi#getMintableTokenDetails")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **id** | **kotlin.String**| IMX ID |
-
-### Return type
-
-[**MintableTokenDetails**](MintableTokenDetails.md)
 
 ### Authorization
 
@@ -269,53 +220,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**MintTokensResponse**](MintTokensResponse.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a name="mintTokensV1"></a>
-# **mintTokensV1**
-> MintTokensResponseV1 mintTokensV1(mintTokensRequestV1)
-
-Mint tokens
-
-Mint tokens in a batch
-
-### Example
-```kotlin
-// Import classes:
-//import org.openapitools.client.infrastructure.*
-//import com.immutable.sdk.api.model.*
-
-val apiInstance = MintsApi()
-val mintTokensRequestV1 : MintTokensRequestV1 =  // MintTokensRequestV1 | details of tokens to mint
-try {
-    val result : MintTokensResponseV1 = apiInstance.mintTokensV1(mintTokensRequestV1)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling MintsApi#mintTokensV1")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling MintsApi#mintTokensV1")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **mintTokensRequestV1** | [**MintTokensRequestV1**](MintTokensRequestV1.md)| details of tokens to mint |
-
-### Return type
-
-[**MintTokensResponseV1**](MintTokensResponseV1.md)
 
 ### Authorization
 

@@ -1,4 +1,13 @@
-# 0.2.0 (2022-05-23)
+# [0.2.0](https://github.com/immutable/imx-core-sdk-android/compare/v0.1.0...v0.2.0) (2022-05-23)
+
+
+### Features
+
+* change StarkSigner getStarkKeys to signMessage ([2ecaa0d](https://github.com/immutable/imx-core-sdk-android/commit/2ecaa0d03e249324f1aecb5d4d7f58ffc654cdb7))
+* enable logging and replace add sdk version header script with template ([61bed0f](https://github.com/immutable/imx-core-sdk-android/commit/61bed0f026a01e68acbec891953af96479f731e8))
+* properly handle null pointer exception in transfer workflow ([dbf0a80](https://github.com/immutable/imx-core-sdk-android/commit/dbf0a806b7261315cb4463d017f4abcf347bcafe))
+
+# [0.1.0](https://github.com/immutable/imx-core-sdk-android/compare/b2c1318883e9793d896502e1516995795de292d2...v0.1.0) (2022-05-18)
 
 
 ### Bug Fixes

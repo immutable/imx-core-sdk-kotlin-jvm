@@ -237,7 +237,9 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     * @param cursor Cursor (optional)
     * @param orderBy Property to sort by (optional)
     * @param direction Direction to sort (asc/desc) (optional)
-    * @param blacklist List of collections not to be displayed, separated by commas (optional)
+    * @param blacklist List of collections not to be included, separated by commas (optional)
+    * @param whitelist List of collections to be included, separated by commas (optional)
+    * @param keyword Keyword to search in collection name and description (optional)
     * @return ListCollectionsResponse
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
@@ -245,8 +247,8 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listCollections(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, blacklist: kotlin.String? = null) : ListCollectionsResponse {
-        val localVariableConfig = listCollectionsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, blacklist = blacklist)
+    fun listCollections(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, blacklist: kotlin.String? = null, whitelist: kotlin.String? = null, keyword: kotlin.String? = null) : ListCollectionsResponse {
+        val localVariableConfig = listCollectionsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, blacklist = blacklist, whitelist = whitelist, keyword = keyword)
 
         val localVarResponse = request<Unit, ListCollectionsResponse>(
             localVariableConfig
@@ -276,10 +278,12 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     * @param cursor Cursor (optional)
     * @param orderBy Property to sort by (optional)
     * @param direction Direction to sort (asc/desc) (optional)
-    * @param blacklist List of collections not to be displayed, separated by commas (optional)
+    * @param blacklist List of collections not to be included, separated by commas (optional)
+    * @param whitelist List of collections to be included, separated by commas (optional)
+    * @param keyword Keyword to search in collection name and description (optional)
     * @return RequestConfig
     */
-    fun listCollectionsRequestConfig(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, blacklist: kotlin.String?) : RequestConfig<Unit> {
+    fun listCollectionsRequestConfig(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, blacklist: kotlin.String?, whitelist: kotlin.String?, keyword: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, List<kotlin.String>>()
             .apply {
@@ -297,6 +301,12 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
                 }
                 if (blacklist != null) {
                     put("blacklist", listOf(blacklist.toString()))
+                }
+                if (whitelist != null) {
+                    put("whitelist", listOf(whitelist.toString()))
+                }
+                if (keyword != null) {
+                    put("keyword", listOf(keyword.toString()))
                 }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()

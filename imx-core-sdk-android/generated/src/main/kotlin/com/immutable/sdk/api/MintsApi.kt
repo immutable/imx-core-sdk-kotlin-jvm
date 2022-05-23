@@ -23,9 +23,7 @@ package com.immutable.sdk.api
 import com.immutable.sdk.api.model.ListMintsResponse
 import com.immutable.sdk.api.model.Mint
 import com.immutable.sdk.api.model.MintRequest
-import com.immutable.sdk.api.model.MintTokensRequestV1
 import com.immutable.sdk.api.model.MintTokensResponse
-import com.immutable.sdk.api.model.MintTokensResponseV1
 import com.immutable.sdk.api.model.MintableTokenDetails
 
 import org.openapitools.client.infrastructure.ApiClient
@@ -98,64 +96,6 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
         return RequestConfig(
             method = RequestMethod.GET,
             path = "/v1/mints/{id}".replace("{"+"id"+"}", "$id"),
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            body = localVariableBody
-        )
-    }
-
-    /**
-    * Get details of a mintable token with the given IMX token ID
-    * Get details of a mintable token with the given IMX token ID
-    * @param id IMX ID 
-    * @return MintableTokenDetails
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    @Deprecated(message = "This operation is deprecated.")
-    fun getMintableTokenDetails(id: kotlin.String) : MintableTokenDetails {
-        @Suppress("DEPRECATION")
-        val localVariableConfig = getMintableTokenDetailsRequestConfig(id = id)
-
-        val localVarResponse = request<Unit, MintableTokenDetails>(
-            localVariableConfig
-        )
-
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as MintableTokenDetails
-            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
-            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
-            ResponseType.ClientError -> {
-                val localVarError = localVarResponse as ClientError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-            ResponseType.ServerError -> {
-                val localVarError = localVarResponse as ServerError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-        }
-    }
-
-    /**
-    * To obtain the request config of the operation getMintableTokenDetails
-    *
-    * @param id IMX ID 
-    * @return RequestConfig
-    */
-    @Deprecated(message = "This operation is deprecated.")
-    fun getMintableTokenDetailsRequestConfig(id: kotlin.String) : RequestConfig<Unit> {
-        val localVariableBody = null
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
-        return RequestConfig(
-            method = RequestMethod.GET,
-            path = "/v1/mintable-token/{id}".replace("{"+"id"+"}", "$id"),
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody
@@ -403,64 +343,6 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
         return RequestConfig(
             method = RequestMethod.POST,
             path = "/v2/mints",
-            query = localVariableQuery,
-            headers = localVariableHeaders,
-            body = localVariableBody
-        )
-    }
-
-    /**
-    * Mint tokens
-    * Mint tokens in a batch
-    * @param mintTokensRequestV1 details of tokens to mint 
-    * @return MintTokensResponseV1
-    * @throws UnsupportedOperationException If the API returns an informational or redirection response
-    * @throws ClientException If the API returns a client error response
-    * @throws ServerException If the API returns a server error response
-    */
-    @Suppress("UNCHECKED_CAST")
-    @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    @Deprecated(message = "This operation is deprecated.")
-    fun mintTokensV1(mintTokensRequestV1: MintTokensRequestV1) : MintTokensResponseV1 {
-        @Suppress("DEPRECATION")
-        val localVariableConfig = mintTokensV1RequestConfig(mintTokensRequestV1 = mintTokensRequestV1)
-
-        val localVarResponse = request<MintTokensRequestV1, MintTokensResponseV1>(
-            localVariableConfig
-        )
-
-        return when (localVarResponse.responseType) {
-            ResponseType.Success -> (localVarResponse as Success<*>).data as MintTokensResponseV1
-            ResponseType.Informational -> throw UnsupportedOperationException("Client does not support Informational responses.")
-            ResponseType.Redirection -> throw UnsupportedOperationException("Client does not support Redirection responses.")
-            ResponseType.ClientError -> {
-                val localVarError = localVarResponse as ClientError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ClientException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-            ResponseType.ServerError -> {
-                val localVarError = localVarResponse as ServerError<*>
-                val errorModel = localVarError.body?.let { ApiErrorModel(localVarError.body) }
-                throw ServerException("${localVarError.statusCode} ${errorModel?.message ?: localVarError.message.orEmpty()}", localVarError.statusCode, localVarResponse, errorModel)
-            }
-        }
-    }
-
-    /**
-    * To obtain the request config of the operation mintTokensV1
-    *
-    * @param mintTokensRequestV1 details of tokens to mint 
-    * @return RequestConfig
-    */
-    @Deprecated(message = "This operation is deprecated.")
-    fun mintTokensV1RequestConfig(mintTokensRequestV1: MintTokensRequestV1) : RequestConfig<MintTokensRequestV1> {
-        val localVariableBody = mintTokensRequestV1
-        val localVariableQuery: MultiValueMap = mutableMapOf()
-        val localVariableHeaders: MutableMap<String, String> = mutableMapOf()
-
-        return RequestConfig(
-            method = RequestMethod.POST,
-            path = "/v1/mints",
             query = localVariableQuery,
             headers = localVariableHeaders,
             body = localVariableBody

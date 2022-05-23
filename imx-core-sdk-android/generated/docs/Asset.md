@@ -12,7 +12,7 @@ Name | Type | Description | Notes
 **imageUrl** | **kotlin.String** | URL of the image which should be used for this asset |  [optional]
 **metadata** | [**kotlin.Any**](.md) | Metadata of this asset |  [optional]
 **name** | **kotlin.String** | Name of this asset |  [optional]
-**orders** | [**OrderDetails**](OrderDetails.md) |  |  [optional]
+**orders** | [**com.immutable.sdk.api.model.AssetOrderDetails**](com.immutable.sdk.api.model.AssetOrderDetails.md) |  |  [optional]
 **status** | **kotlin.String** | Status of this asset (where it is in the system) |  [optional]
 **tokenAddress** | **kotlin.String** | Address of the ERC721 contract |  [optional]
 **tokenId** | **kotlin.String** | ERC721 Token ID of this asset |  [optional]

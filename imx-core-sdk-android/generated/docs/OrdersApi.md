@@ -9,7 +9,6 @@ Method | HTTP request | Description
 [**getOrder**](OrdersApi.md#getOrder) | **GET** /v1/orders/{id} | Get details of an order with the given ID
 [**getSignableCancelOrder**](OrdersApi.md#getSignableCancelOrder) | **POST** /v1/signable-cancel-order-details | Get details a signable cancel order
 [**getSignableOrder**](OrdersApi.md#getSignableOrder) | **POST** /v3/signable-order-details | Get details a signable order V3
-[**getSignableOrderV1**](OrdersApi.md#getSignableOrderV1) | **POST** /v1/signable-order-details | Get details a signable order
 [**listOrders**](OrdersApi.md#listOrders) | **GET** /v1/orders | Get a list of orders
 
 
@@ -254,53 +253,6 @@ Name | Type | Description  | Notes
 ### Return type
 
 [**GetSignableOrderResponse**](GetSignableOrderResponse.md)
-
-### Authorization
-
-No authorization required
-
-### HTTP request headers
-
- - **Content-Type**: application/json
- - **Accept**: application/json
-
-<a name="getSignableOrderV1"></a>
-# **getSignableOrderV1**
-> GetSignableOrderResponseV1 getSignableOrderV1(getSignableOrderRequest)
-
-Get details a signable order
-
-Get details a signable order
-
-### Example
-```kotlin
-// Import classes:
-//import org.openapitools.client.infrastructure.*
-//import com.immutable.sdk.api.model.*
-
-val apiInstance = OrdersApi()
-val getSignableOrderRequest : GetSignableOrderRequestV1 =  // GetSignableOrderRequestV1 | get a signable order
-try {
-    val result : GetSignableOrderResponseV1 = apiInstance.getSignableOrderV1(getSignableOrderRequest)
-    println(result)
-} catch (e: ClientException) {
-    println("4xx response calling OrdersApi#getSignableOrderV1")
-    e.printStackTrace()
-} catch (e: ServerException) {
-    println("5xx response calling OrdersApi#getSignableOrderV1")
-    e.printStackTrace()
-}
-```
-
-### Parameters
-
-Name | Type | Description  | Notes
-------------- | ------------- | ------------- | -------------
- **getSignableOrderRequest** | [**GetSignableOrderRequestV1**](GetSignableOrderRequestV1.md)| get a signable order |
-
-### Return type
-
-[**GetSignableOrderResponseV1**](GetSignableOrderResponseV1.md)
 
 ### Authorization
 

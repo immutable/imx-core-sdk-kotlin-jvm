@@ -81,7 +81,7 @@ val direction : kotlin.String = direction_example // kotlin.String | Direction t
 val user : kotlin.String = user_example // kotlin.String | Ethereum address of the user who owns these assets
 val status : kotlin.String = status_example // kotlin.String | Status of these assets
 val name : kotlin.String = name_example // kotlin.String | Name of the asset to search
-val metadata : kotlin.String = metadata_example // kotlin.String | JSON-encoded metadata filters for these asset. Example: {
+val metadata : kotlin.String = metadata_example // kotlin.String | JSON-encoded metadata filters for these asset. Example: {'proto':['1147'],'quality':['Meteorite']}
 val sellOrders : kotlin.Boolean = true // kotlin.Boolean | Set flag to true to fetch an array of sell order details with accepted status associated with the asset
 val buyOrders : kotlin.Boolean = true // kotlin.Boolean | Set flag to true to fetch an array of buy order details  with accepted status associated with the asset
 val includeFees : kotlin.Boolean = true // kotlin.Boolean | Set flag to include fees associated with the asset
@@ -113,7 +113,7 @@ Name | Type | Description  | Notes
  **user** | **kotlin.String**| Ethereum address of the user who owns these assets | [optional]
  **status** | **kotlin.String**| Status of these assets | [optional]
  **name** | **kotlin.String**| Name of the asset to search | [optional]
- **metadata** | **kotlin.String**| JSON-encoded metadata filters for these asset. Example: { | [optional]
+ **metadata** | **kotlin.String**| JSON-encoded metadata filters for these asset. Example: {&#39;proto&#39;:[&#39;1147&#39;],&#39;quality&#39;:[&#39;Meteorite&#39;]} | [optional]
  **sellOrders** | **kotlin.Boolean**| Set flag to true to fetch an array of sell order details with accepted status associated with the asset | [optional]
  **buyOrders** | **kotlin.Boolean**| Set flag to true to fetch an array of buy order details  with accepted status associated with the asset | [optional]
  **includeFees** | **kotlin.Boolean**| Set flag to include fees associated with the asset | [optional]

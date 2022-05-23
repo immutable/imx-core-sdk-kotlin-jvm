@@ -20,28 +20,23 @@
 
 package com.immutable.sdk.api.model
 
-import com.immutable.sdk.api.model.GetTLVsResult
 
 import com.squareup.moshi.Json
 
 /**
  * 
  *
- * @param code 
- * @param message 
- * @param result 
+ * @param assetId 
+ * @param assetType 
  */
 
-data class GetTLVsResponse (
+data class EncodeAssetResponse (
 
-    @Json(name = "code")
-    val code: kotlin.Int? = null,
+    @Json(name = "asset_id")
+    val assetId: kotlin.String? = null,
 
-    @Json(name = "message")
-    val message: kotlin.String? = null,
-
-    @Json(name = "result")
-    val result: GetTLVsResult? = null
+    @Json(name = "asset_type")
+    val assetType: kotlin.String? = null
 
 )
 

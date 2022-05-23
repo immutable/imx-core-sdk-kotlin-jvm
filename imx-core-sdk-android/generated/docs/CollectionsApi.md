@@ -162,7 +162,7 @@ No authorization required
 
 <a name="listCollections"></a>
 # **listCollections**
-> ListCollectionsResponse listCollections(pageSize, cursor, orderBy, direction, blacklist)
+> ListCollectionsResponse listCollections(pageSize, cursor, orderBy, direction, blacklist, whitelist, keyword)
 
 Get a list of collections
 
@@ -179,9 +179,11 @@ val pageSize : kotlin.Int = 56 // kotlin.Int | Page size of the result
 val cursor : kotlin.String = cursor_example // kotlin.String | Cursor
 val orderBy : kotlin.String = orderBy_example // kotlin.String | Property to sort by
 val direction : kotlin.String = direction_example // kotlin.String | Direction to sort (asc/desc)
-val blacklist : kotlin.String = blacklist_example // kotlin.String | List of collections not to be displayed, separated by commas
+val blacklist : kotlin.String = blacklist_example // kotlin.String | List of collections not to be included, separated by commas
+val whitelist : kotlin.String = whitelist_example // kotlin.String | List of collections to be included, separated by commas
+val keyword : kotlin.String = keyword_example // kotlin.String | Keyword to search in collection name and description
 try {
-    val result : ListCollectionsResponse = apiInstance.listCollections(pageSize, cursor, orderBy, direction, blacklist)
+    val result : ListCollectionsResponse = apiInstance.listCollections(pageSize, cursor, orderBy, direction, blacklist, whitelist, keyword)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling CollectionsApi#listCollections")
@@ -200,7 +202,9 @@ Name | Type | Description  | Notes
  **cursor** | **kotlin.String**| Cursor | [optional]
  **orderBy** | **kotlin.String**| Property to sort by | [optional]
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
- **blacklist** | **kotlin.String**| List of collections not to be displayed, separated by commas | [optional]
+ **blacklist** | **kotlin.String**| List of collections not to be included, separated by commas | [optional]
+ **whitelist** | **kotlin.String**| List of collections to be included, separated by commas | [optional]
+ **keyword** | **kotlin.String**| Keyword to search in collection name and description | [optional]
 
 ### Return type
 

@@ -1,6 +1,6 @@
 # EncodingApi
 
-All URIs are relative to *https://api.ropsten.x.immutable.com*
+All URIs are relative to *http://api.ropsten.x.immutable.com*
 
 Method | HTTP request | Description
 ------------- | ------------- | -------------

@@ -43,7 +43,7 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     companion object {
         @JvmStatic
         val defaultBasePath: String by lazy {
-            System.getProperties().getProperty("org.openapitools.client.baseUrl", "https://api.ropsten.x.immutable.com")
+            System.getProperties().getProperty("org.openapitools.client.baseUrl", "http://api.ropsten.x.immutable.com")
         }
     }
 

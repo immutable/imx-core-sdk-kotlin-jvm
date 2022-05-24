@@ -1,0 +1,33 @@
+name: Pull latest Swagger specs
+
+on:
+  workflow_dispatch:
+
+jobs:
+  if-release-merged:
+    runs-on: ubuntu-latest
+    if: contains('["nattb8", "dom-murray"]', github.actor)
+
+    steps:
+      - uses: actions/checkout@v1
+        with:
+          token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
+
+      - name: Download Swagger
+        uses: carlosperate/download-file-action@v1
+        with:
+          file-url: 'https://api.x.immutable.com/openapi'
+          file-name: 'swagger.json'
+
+      - name: Build
+        run: ./gradlew imx-core-sdk-android:build
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v4
+        with:
+          commit-message: "feat: update swagger specs with latest version"
+          branch: "feat/updateSwagger"
+          base: "main"
+          title: "feat: update swagger specs with latest version"
+          body: "Update `swagger.json` with latest version from https://api.x.immutable.com/openapi"
+          token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}

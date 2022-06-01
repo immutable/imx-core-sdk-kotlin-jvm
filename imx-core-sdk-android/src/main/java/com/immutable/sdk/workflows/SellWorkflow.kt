@@ -1,21 +1,19 @@
 package com.immutable.sdk.workflows
 
-import androidx.annotation.VisibleForTesting
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
-import com.immutable.sdk.api.AssetsApi
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.api.model.*
-import com.immutable.sdk.model.*
-import java.math.BigDecimal
+import com.immutable.sdk.api.model.CreateOrderRequest
+import com.immutable.sdk.api.model.FeeEntry
+import com.immutable.sdk.api.model.GetSignableOrderRequest
+import com.immutable.sdk.api.model.GetSignableOrderResponse
+import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.formatQuantity
 import java.util.concurrent.CompletableFuture
 
 private const val CREATE_ORDER = "Create order"
 private const val SIGNABLE_ORDER = "Signable order"
-private const val GET_ASSET = "Get asset"
-
-@VisibleForTesting
-internal const val FEE_TYPE_ROYALTY = "royalty"
 
 @Suppress("LongParameterList")
 internal fun sell(
@@ -24,17 +22,13 @@ internal fun sell(
     fees: List<FeeEntry>,
     signer: Signer,
     starkSigner: StarkSigner,
-    ordersApi: OrdersApi = OrdersApi(),
-    assetsApi: AssetsApi = AssetsApi()
+    ordersApi: OrdersApi = OrdersApi()
 ): CompletableFuture<Int> {
     val future = CompletableFuture<Int>()
 
     signer.getAddress()
         .thenCompose { address ->
-            getFees(asset, sellToken, fees, assetsApi).thenApply { address to it }
-        }
-        .thenCompose { (address, totalFees) ->
-            getSignableOrder(asset, sellToken, address, fees, totalFees, ordersApi)
+            getSignableOrder(asset, sellToken, address, fees, ordersApi)
         }
         .thenCompose { (payloadHash, response) ->
             starkSigner.signMessage(payloadHash).thenApply { response to it }
@@ -49,53 +43,18 @@ internal fun sell(
     return future
 }
 
-private fun calculateMakerOrderFee(
-    amount: BigDecimal,
-    fees: List<FeeEntry>
-): BigDecimal {
-    var totalFee = BigDecimal.ZERO
-    fees.forEach { fee ->
-        val percentage = BigDecimal(fee.feePercentage?.div(100) ?: 0.0)
-        totalFee += amount.multiply(percentage)
-    }
-    return totalFee
-}
-
-private fun getFees(
-    asset: Erc721Asset,
-    sellToken: AssetModel,
-    fees: List<FeeEntry>,
-    api: AssetsApi
-): CompletableFuture<BigDecimal> = call(GET_ASSET) {
-    val feesList = arrayListOf<FeeEntry>()
-    feesList += fees
-
-    feesList += api.getAsset(
-        tokenAddress = asset.tokenAddress,
-        tokenId = asset.tokenId,
-        includeFees = true // to return fees related to the asset e.g. royalty
-    ).fees
-        // Look for royalty fees only
-        ?.filter { it.type == FEE_TYPE_ROYALTY }
-        ?.map { fee -> FeeEntry(address = fee.address, feePercentage = fee.percentage) }
-        ?: emptyList()
-
-    calculateMakerOrderFee(BigDecimal(sellToken.quantity), feesList)
-}
-
 @Suppress("LongParameterList")
 private fun getSignableOrder(
     asset: Erc721Asset,
     sellToken: AssetModel,
     address: String,
     fees: List<FeeEntry>,
-    totalFees: BigDecimal,
     api: OrdersApi
 ): CompletableFuture<Pair<String, GetSignableOrderResponse>> = call(SIGNABLE_ORDER) {
     val request = GetSignableOrderRequest(
         amountBuy = sellToken.formatQuantity(),
         amountSell = asset.quantity,
-        tokenBuy = sellToken.toSignableToken(totalFees),
+        tokenBuy = sellToken.toSignableToken(),
         tokenSell = asset.toSignableToken(),
         user = address,
         fees = fees

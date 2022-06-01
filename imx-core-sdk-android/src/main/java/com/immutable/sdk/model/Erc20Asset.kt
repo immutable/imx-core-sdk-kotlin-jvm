@@ -2,7 +2,6 @@ package com.immutable.sdk.model
 
 import com.immutable.sdk.api.model.SignableToken
 import com.immutable.sdk.api.model.Token
-import java.math.BigDecimal
 
 /**
  * This is an ERC20 wrapper for the [Token] API model
@@ -17,7 +16,7 @@ class Erc20Asset(
     val decimals: Int,
     quantity: String,
 ) : AssetModel(quantity) {
-    override fun toSignableToken(fees: BigDecimal): SignableToken = SignableToken(
+    override fun toSignableToken(): SignableToken = SignableToken(
         type = TokenType.ERC20.name,
         data = SignableTokenData(
             tokenAddress = tokenAddress,

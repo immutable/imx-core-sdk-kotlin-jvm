@@ -14,10 +14,8 @@ sealed class AssetModel(val quantity: String) {
     /**
      * This converts this convenience model into the [SignableToken] API model which will be used for the
      * client calls.
-     *
-     * @param fees the sum of all fees applied to the asset
      */
-    abstract fun toSignableToken(fees: BigDecimal = BigDecimal.ZERO): SignableToken
+    abstract fun toSignableToken(): SignableToken
 }
 
 /**

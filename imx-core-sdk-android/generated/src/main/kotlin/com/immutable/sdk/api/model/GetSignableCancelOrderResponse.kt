@@ -35,15 +35,15 @@ data class GetSignableCancelOrderResponse (
 
     /* ID of the order to be cancelled */
     @Json(name = "order_id")
-    val orderId: kotlin.Int? = null,
+    val orderId: kotlin.Int,
 
     /* Hash of the payload to be signed for cancel order */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null,
+    val payloadHash: kotlin.String,
 
     /* Message to sign from wallet to confirm cancel order */
     @Json(name = "signable_message")
-    val signableMessage: kotlin.String? = null
+    val signableMessage: kotlin.String
 
 )
 

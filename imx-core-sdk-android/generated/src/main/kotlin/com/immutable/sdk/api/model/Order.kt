@@ -31,54 +31,54 @@ import com.squareup.moshi.Json
  * @param amountSold Amount of the asset already sold by this order
  * @param buy 
  * @param expirationTimestamp Expiration timestamp of this order
- * @param fees Fee information for the order
  * @param orderId ID of the order
  * @param sell 
  * @param status Status of the order
  * @param timestamp Timestamp this order was created
  * @param updatedTimestamp Updated timestamp of this order
  * @param user Ethereum address of the user who submitted the order
+ * @param fees Fee information for the order
  */
 
 data class Order (
 
     /* Amount of the asset already sold by this order */
     @Json(name = "amount_sold")
-    val amountSold: kotlin.String? = null,
+    val amountSold: kotlin.String?,
 
     @Json(name = "buy")
-    val buy: Token? = null,
+    val buy: Token,
 
     /* Expiration timestamp of this order */
     @Json(name = "expiration_timestamp")
-    val expirationTimestamp: kotlin.String? = null,
-
-    /* Fee information for the order */
-    @Json(name = "fees")
-    val fees: kotlin.collections.List<OrderFeeInfo>? = null,
+    val expirationTimestamp: kotlin.String?,
 
     /* ID of the order */
     @Json(name = "order_id")
-    val orderId: kotlin.Int? = null,
+    val orderId: kotlin.Int,
 
     @Json(name = "sell")
-    val sell: Token? = null,
+    val sell: Token,
 
     /* Status of the order */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Timestamp this order was created */
     @Json(name = "timestamp")
-    val timestamp: kotlin.String? = null,
+    val timestamp: kotlin.String?,
 
     /* Updated timestamp of this order */
     @Json(name = "updated_timestamp")
-    val updatedTimestamp: kotlin.String? = null,
+    val updatedTimestamp: kotlin.String?,
 
     /* Ethereum address of the user who submitted the order */
     @Json(name = "user")
-    val user: kotlin.String? = null
+    val user: kotlin.String,
+
+    /* Fee information for the order */
+    @Json(name = "fees")
+    val fees: kotlin.collections.List<OrderFeeInfo>? = null
 
 )
 

@@ -33,7 +33,7 @@ data class RegisterUserResponse (
 
     /* Immutable signature authorising registration */
     @Json(name = "tx_hash")
-    val txHash: kotlin.String? = null
+    val txHash: kotlin.String
 
 )
 

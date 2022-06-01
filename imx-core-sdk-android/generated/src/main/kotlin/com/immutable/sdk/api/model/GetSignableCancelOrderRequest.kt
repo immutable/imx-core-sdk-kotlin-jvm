@@ -33,7 +33,7 @@ data class GetSignableCancelOrderRequest (
 
     /* ID of the order to be cancelled */
     @Json(name = "order_id")
-    val orderId: kotlin.Int? = null
+    val orderId: kotlin.Int
 
 )
 

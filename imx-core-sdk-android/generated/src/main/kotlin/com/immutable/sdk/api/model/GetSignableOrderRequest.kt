@@ -28,7 +28,7 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param amountBuy Amount to buy
+ * @param amountBuy Fee-exclusive amount to buy
  * @param amountSell Amount to sell
  * @param tokenBuy 
  * @param tokenSell 
@@ -39,7 +39,7 @@ import com.squareup.moshi.Json
 
 data class GetSignableOrderRequest (
 
-    /* Amount to buy */
+    /* Fee-exclusive amount to buy */
     @Json(name = "amount_buy")
     val amountBuy: kotlin.String,
 

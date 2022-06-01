@@ -4,20 +4,14 @@ import com.immutable.sdk.*
 import com.immutable.sdk.api.AssetsApi
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.model.Erc20Asset
-import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.Constants
 import com.immutable.sdk.crypto.StarkKey
-import com.immutable.sdk.model.TokenType
+import com.immutable.sdk.model.*
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.After
-import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
-import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
@@ -32,6 +26,8 @@ private const val SIGNATURE =
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
 private const val ORDER_ID = 8426
 private const val PAYLOAD_HASH = "payloadHash"
+private const val SIGNABLE_MESSAGE = "messageForL1"
+private const val TIME = 9
 
 class SellWorkflowTest {
     @MockK
@@ -72,7 +68,15 @@ class SellWorkflowTest {
             nonce = 596_252_354,
             expirationTimestamp = 1_325_907,
             starkKey = STARK_KEY,
-            payloadHash = PAYLOAD_HASH
+            payloadHash = PAYLOAD_HASH,
+            signableMessage = SIGNABLE_MESSAGE
+        )
+        every {
+            ordersApi.createOrder(any(), any(), any())
+        } returns CreateOrderResponse(
+            orderId = ORDER_ID,
+            status = OrderStatus.Active.value,
+            time = TIME
         )
 
         every { assetsApi.getAsset(any(), any(), any()) } returns asset
@@ -102,10 +106,6 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
 
-        every {
-            ordersApi.createOrder(any(), any(), any())
-        } returns CreateOrderResponse(orderId = ORDER_ID)
-
         testFuture(
             future = createSellFuture(),
             expectedResult = ORDER_ID,
@@ -118,9 +118,6 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
 
-        every {
-            ordersApi.createOrder(any(), any(), any())
-        } returns CreateOrderResponse(orderId = ORDER_ID)
         every { asset.fees } returns arrayListOf(
             Fee(address = ADDRESS, percentage = 2.0, type = FEE_TYPE_ROYALTY)
         )
@@ -134,14 +131,19 @@ class SellWorkflowTest {
         verify {
             ordersApi.getSignableOrder(
                 GetSignableOrderRequest(
-                    amountBuy = "10302000000000000",
+                    amountBuy = "10100000000000000",
                     amountSell = "1",
                     tokenBuy = SignableToken(
                         type = TokenType.ETH.name,
-                        data = TokenData(decimals = Constants.ETH_DECIMALS)
+                        data = SignableTokenData(
+                            decimals = Constants.ETH_DECIMALS
+                        )
                     ),
                     tokenSell = SignableToken(
-                        data = TokenData(tokenId = TOKEN_ID, tokenAddress = TOKEN_ADDRESS),
+                        data = SignableTokenData(
+                            tokenId = TOKEN_ID,
+                            tokenAddress = TOKEN_ADDRESS
+                        ),
                         type = TokenType.ERC721.name
                     ),
                     user = ADDRESS,
@@ -155,10 +157,6 @@ class SellWorkflowTest {
     fun testSellInErc20Success() {
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
-
-        every {
-            ordersApi.createOrder(any(), any(), any())
-        } returns CreateOrderResponse(orderId = ORDER_ID)
 
         testFuture(
             future = sell(
@@ -174,20 +172,24 @@ class SellWorkflowTest {
             expectedError = null
         )
 
+        val amountBuy = "10100"
         verify {
             ordersApi.getSignableOrder(
                 GetSignableOrderRequest(
-                    amountBuy = "10100",
+                    amountBuy = amountBuy,
                     amountSell = "1",
                     tokenBuy = SignableToken(
                         type = TokenType.ERC20.name,
-                        data = TokenData(
+                        data = SignableTokenData(
                             tokenAddress = SELL_TOKEN_ADDRESS,
                             decimals = SELL_TOKEN_DECIMALS
                         )
                     ),
                     tokenSell = SignableToken(
-                        data = TokenData(tokenId = TOKEN_ID, tokenAddress = TOKEN_ADDRESS),
+                        data = SignableTokenData(
+                            tokenId = TOKEN_ID,
+                            tokenAddress = TOKEN_ADDRESS
+                        ),
                         type = TokenType.ERC721.name
                     ),
                     user = ADDRESS,
@@ -202,9 +204,6 @@ class SellWorkflowTest {
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
 
-        every {
-            ordersApi.createOrder(any(), any(), any())
-        } returns CreateOrderResponse(orderId = ORDER_ID)
         every { asset.fees } returns arrayListOf(
             Fee(address = ADDRESS, percentage = 3.5, type = FEE_TYPE_ROYALTY)
         )
@@ -226,17 +225,20 @@ class SellWorkflowTest {
         verify {
             ordersApi.getSignableOrder(
                 GetSignableOrderRequest(
-                    amountBuy = "10554",
+                    amountBuy = "10100",
                     amountSell = "1",
                     tokenBuy = SignableToken(
                         type = TokenType.ERC20.name,
-                        data = TokenData(
+                        data = SignableTokenData(
                             tokenAddress = SELL_TOKEN_ADDRESS,
                             decimals = SELL_TOKEN_DECIMALS
                         )
                     ),
                     tokenSell = SignableToken(
-                        data = TokenData(tokenId = TOKEN_ID, tokenAddress = TOKEN_ADDRESS),
+                        data = SignableTokenData(
+                            tokenId = TOKEN_ID,
+                            tokenAddress = TOKEN_ADDRESS
+                        ),
                         type = TokenType.ERC721.name
                     ),
                     user = ADDRESS,
@@ -295,18 +297,6 @@ class SellWorkflowTest {
     }
 
     @Test
-    fun testSellFailedOnStarkSignatureInvalidSignableResponse() {
-        addressFuture.complete(ADDRESS)
-        every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse()
-
-        testFuture(
-            future = createSellFuture(),
-            expectedResult = null,
-            expectedError = ImmutableException.invalidResponse("")
-        )
-    }
-
-    @Test
     fun testSellFailedOnCreateOrder() {
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
@@ -316,25 +306,6 @@ class SellWorkflowTest {
             future = createSellFuture(),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
-        )
-    }
-
-    @Test
-    fun testFormatAmount() {
-        assertEquals("81000000000000000", formatAmount(EthAsset("0.081"), BigDecimal.ZERO))
-        assertEquals(
-            "55000000",
-            formatAmount(
-                Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, "55"),
-                BigDecimal.ZERO
-            )
-        )
-        assertEquals(
-            "2000000",
-            formatAmount(
-                Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, "1"),
-                BigDecimal.ONE
-            )
         )
     }
 }

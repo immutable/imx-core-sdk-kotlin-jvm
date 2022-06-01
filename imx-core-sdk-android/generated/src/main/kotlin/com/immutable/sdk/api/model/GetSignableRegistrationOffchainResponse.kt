@@ -34,11 +34,11 @@ data class GetSignableRegistrationOffchainResponse (
 
     /* Hash of the payload to be signed for user registration offchain */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null,
+    val payloadHash: kotlin.String,
 
     /* Message to sign with L1 wallet to register user offchain */
     @Json(name = "signable_message")
-    val signableMessage: kotlin.String? = null
+    val signableMessage: kotlin.String
 
 )
 

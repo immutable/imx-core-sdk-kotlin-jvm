@@ -34,11 +34,11 @@ data class CreateTradeResponse (
 
     /* Current status of trade */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* ID of trade within Immutable X */
     @Json(name = "trade_id")
-    val tradeId: kotlin.Int? = null
+    val tradeId: kotlin.Int
 
 )
 

@@ -37,22 +37,22 @@ import com.squareup.moshi.Json
 data class Trade (
 
     @Json(name = "a")
-    val a: TradeSide? = null,
+    val a: TradeSide,
 
     @Json(name = "b")
-    val b: TradeSide? = null,
+    val b: TradeSide,
 
     /* Status of this trade */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Time this trade occurred */
     @Json(name = "timestamp")
-    val timestamp: kotlin.String? = null,
+    val timestamp: kotlin.String?,
 
     /* Sequential ID of this trade within Immutable X */
     @Json(name = "transaction_id")
-    val transactionId: kotlin.Int? = null
+    val transactionId: kotlin.Int
 
 )
 

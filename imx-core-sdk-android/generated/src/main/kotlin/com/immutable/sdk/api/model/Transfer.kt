@@ -39,31 +39,31 @@ import com.squareup.moshi.Json
 data class Transfer (
 
     @Json(name = "data")
-    val `data`: TokenData? = null,
+    val `data`: TokenData,
 
     /* Ethereum address of the user who received this transfer */
     @Json(name = "receiver")
-    val `receiver`: kotlin.String? = null,
+    val `receiver`: kotlin.String,
 
     /* Status of the transaction */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Timestamp of the transfer */
     @Json(name = "timestamp")
-    val timestamp: kotlin.String? = null,
+    val timestamp: kotlin.String?,
 
     /* Sequential transaction ID */
     @Json(name = "transaction_id")
-    val transactionId: kotlin.Int? = null,
+    val transactionId: kotlin.Int,
 
     /* Type of this asset (ETH/ERC20/ERC721) */
     @Json(name = "type")
-    val type: kotlin.String? = null,
+    val type: kotlin.String,
 
     /* Ethereum address of the user  who submitted this transfer */
     @Json(name = "user")
-    val user: kotlin.String? = null
+    val user: kotlin.String
 
 )
 

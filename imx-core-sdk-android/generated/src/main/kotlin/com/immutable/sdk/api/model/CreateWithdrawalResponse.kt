@@ -35,15 +35,15 @@ data class CreateWithdrawalResponse (
 
     /* Status of the withdrawal */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Time of the withdrawal */
     @Json(name = "time")
-    val time: kotlin.Int? = null,
+    val time: kotlin.Int,
 
     /* ID of the withdrawal */
     @Json(name = "withdrawal_id")
-    val withdrawalId: kotlin.Int? = null
+    val withdrawalId: kotlin.Int
 
 )
 

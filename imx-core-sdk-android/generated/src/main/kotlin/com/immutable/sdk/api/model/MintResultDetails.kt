@@ -27,7 +27,7 @@ import com.squareup.moshi.Json
  * 
  *
  * @param contractAddress Contract address of this token
- * @param tokenId IMX Id of this token
+ * @param tokenId IMX ID of this token
  * @param txId Mint Transaction ID
  */
 
@@ -35,15 +35,15 @@ data class MintResultDetails (
 
     /* Contract address of this token */
     @Json(name = "contract_address")
-    val contractAddress: kotlin.String? = null,
+    val contractAddress: kotlin.String,
 
-    /* IMX Id of this token */
+    /* IMX ID of this token */
     @Json(name = "token_id")
-    val tokenId: kotlin.String? = null,
+    val tokenId: kotlin.String,
 
     /* Mint Transaction ID */
     @Json(name = "tx_id")
-    val txId: kotlin.Int? = null
+    val txId: kotlin.Int
 
 )
 

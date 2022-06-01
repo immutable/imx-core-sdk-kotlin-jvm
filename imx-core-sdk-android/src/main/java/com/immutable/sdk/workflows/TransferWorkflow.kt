@@ -7,6 +7,7 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import java.util.concurrent.CompletableFuture
 
+private const val GET_SIGNABLE_TRANSFER = "Get signable transfer"
 private const val GET_TRANSFER_REQUEST = "Get transfer request"
 
 internal fun transfer(
@@ -27,7 +28,7 @@ internal fun transfer(
             if (error != null)
                 future.completeExceptionally(error)
             else
-                future.complete(response.transferIds?.first())
+                future.complete(response.transferIds.first())
         }
 
     return future
@@ -39,28 +40,19 @@ private fun getSignableTransfer(
     token: AssetModel,
     recipientAddress: String,
     api: TransfersApi
-): CompletableFuture<GetSignableTransferResponse> {
-    val future = CompletableFuture<GetSignableTransferResponse>()
-
-    CompletableFuture.runAsync {
-        try {
-            val transferDetails = arrayListOf(
-                SignableTransferDetails(
-                    amount = token.quantity,
-                    receiver = recipientAddress,
-                    token = token.toSignableToken()
-                )
-            )
-            val request = GetSignableTransferRequest(
-                senderEtherKey = address,
-                signableRequests = transferDetails
-            )
-            future.complete(api.getSignableTransfer(request))
-        } catch (e: Exception) {
-            future.completeExceptionally(e)
-        }
-    }
-    return future
+): CompletableFuture<GetSignableTransferResponse> = call(GET_SIGNABLE_TRANSFER) {
+    val transferDetails = arrayListOf(
+        SignableTransferDetails(
+            amount = token.quantity,
+            receiver = recipientAddress,
+            token = token.toSignableToken()
+        )
+    )
+    val request = GetSignableTransferRequest(
+        senderEtherKey = address,
+        signableRequests = transferDetails
+    )
+    api.getSignableTransfer(request)
 }
 
 @Suppress("TooGenericExceptionCaught")
@@ -69,7 +61,7 @@ private fun getTransferRequest(
     signer: StarkSigner
 ): CompletableFuture<CreateTransferRequest> = call(GET_TRANSFER_REQUEST) {
     // Force unwrapping that the NPE gets handled by `call`
-    response.signableResponses?.first()?.payloadHash!!
+    response.signableResponses.firstOrNull()?.payloadHash!!
 }
     .thenCompose { payload -> signer.signMessage(payload) }
     .thenCompose { signature -> getCreateTransferRequest(response, signature) }
@@ -78,15 +70,15 @@ private fun getCreateTransferRequest(
     response: GetSignableTransferResponse,
     signature: String?
 ): CompletableFuture<CreateTransferRequest> {
-    val signableResponse = response.signableResponses?.first()!!
+    val signableResponse = response.signableResponses.first()
     val transferRequest = TransferRequest(
-        amount = signableResponse.amount!!,
-        assetId = signableResponse.assetId!!,
-        expirationTimestamp = signableResponse.expirationTimestamp!!,
-        nonce = signableResponse.nonce!!,
-        receiverStarkKey = signableResponse.receiverStarkKey!!,
-        receiverVaultId = signableResponse.receiverVaultId!!,
-        senderVaultId = signableResponse.senderVaultId!!,
+        amount = signableResponse.amount,
+        assetId = signableResponse.assetId,
+        expirationTimestamp = signableResponse.expirationTimestamp,
+        nonce = signableResponse.nonce,
+        receiverStarkKey = signableResponse.receiverStarkKey,
+        receiverVaultId = signableResponse.receiverVaultId,
+        senderVaultId = signableResponse.senderVaultId,
         starkSignature = signature!!,
     )
     return CompletableFuture.completedFuture(

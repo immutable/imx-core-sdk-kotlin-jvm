@@ -36,19 +36,19 @@ data class Balance (
 
     /* Amount which is currently inside the exchange */
     @Json(name = "balance")
-    val balance: kotlin.String? = null,
+    val balance: kotlin.String,
 
     /* Amount which is currently preparing withdrawal from the exchange */
     @Json(name = "preparing_withdrawal")
-    val preparingWithdrawal: kotlin.String? = null,
+    val preparingWithdrawal: kotlin.String,
 
     /* Symbol of the token (e.g. ETH, IMX) */
     @Json(name = "symbol")
-    val symbol: kotlin.String? = null,
+    val symbol: kotlin.String,
 
     /* Amount which is currently withdrawable from the exchange */
     @Json(name = "withdrawable")
-    val withdrawable: kotlin.String? = null
+    val withdrawable: kotlin.String
 
 )
 

@@ -33,7 +33,7 @@ data class CreateTransferResponse (
 
     /* List of transfer IDs */
     @Json(name = "transfer_ids")
-    val transferIds: kotlin.collections.List<kotlin.Int>? = null
+    val transferIds: kotlin.collections.List<kotlin.Int>
 
 )
 

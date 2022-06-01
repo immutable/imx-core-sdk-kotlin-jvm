@@ -42,43 +42,43 @@ data class Project (
 
     /* The current period expiry date for collection limit */
     @Json(name = "collection_limit_expires_at")
-    val collectionLimitExpiresAt: kotlin.String? = null,
+    val collectionLimitExpiresAt: kotlin.String,
 
     /* The total monthly collection limit */
     @Json(name = "collection_monthly_limit")
-    val collectionMonthlyLimit: kotlin.Int? = null,
+    val collectionMonthlyLimit: kotlin.Int,
 
     /* The number of collection remaining in the current period */
     @Json(name = "collection_remaining")
-    val collectionRemaining: kotlin.Int? = null,
+    val collectionRemaining: kotlin.Int,
 
     /* The company name */
     @Json(name = "company_name")
-    val companyName: kotlin.String? = null,
+    val companyName: kotlin.String,
 
     /* The project contact email */
     @Json(name = "contact_email")
-    val contactEmail: kotlin.String? = null,
+    val contactEmail: kotlin.String,
 
     /* The project ID */
     @Json(name = "id")
-    val id: kotlin.Int? = null,
+    val id: kotlin.Int,
 
     /* The current period expiry date for mint operation limit */
     @Json(name = "mint_limit_expires_at")
-    val mintLimitExpiresAt: kotlin.String? = null,
+    val mintLimitExpiresAt: kotlin.String,
 
     /* The total monthly mint operation limit */
     @Json(name = "mint_monthly_limit")
-    val mintMonthlyLimit: kotlin.Int? = null,
+    val mintMonthlyLimit: kotlin.Int,
 
     /* The number of mint operation remaining in the current period */
     @Json(name = "mint_remaining")
-    val mintRemaining: kotlin.Int? = null,
+    val mintRemaining: kotlin.Int,
 
     /* The project name */
     @Json(name = "name")
-    val name: kotlin.String? = null
+    val name: kotlin.String
 
 )
 

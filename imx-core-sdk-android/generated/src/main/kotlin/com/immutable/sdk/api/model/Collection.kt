@@ -39,31 +39,31 @@ data class Collection (
 
     /* Ethereum address of the ERC721 contract */
     @Json(name = "address")
-    val address: kotlin.String? = null,
+    val address: kotlin.String,
 
     /* URL of the tile image for this collection */
     @Json(name = "collection_image_url")
-    val collectionImageUrl: kotlin.String? = null,
+    val collectionImageUrl: kotlin.String?,
 
     /* Description of the collection */
     @Json(name = "description")
-    val description: kotlin.String? = null,
+    val description: kotlin.String?,
 
     /* URL of the icon for this collection */
     @Json(name = "icon_url")
-    val iconUrl: kotlin.String? = null,
+    val iconUrl: kotlin.String?,
 
     /* URL of the metadata for this collection */
     @Json(name = "metadata_api_url")
-    val metadataApiUrl: kotlin.String? = null,
+    val metadataApiUrl: kotlin.String?,
 
     /* Name of the collection */
     @Json(name = "name")
-    val name: kotlin.String? = null,
+    val name: kotlin.String,
 
     /* The collection's project ID */
     @Json(name = "project_id")
-    val projectId: kotlin.Int? = null
+    val projectId: kotlin.Int
 
 )
 

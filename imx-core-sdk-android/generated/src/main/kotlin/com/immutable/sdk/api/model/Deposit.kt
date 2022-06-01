@@ -38,22 +38,22 @@ data class Deposit (
 
     /* Status of this deposit in Immutable X */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Timestamp of the deposit */
     @Json(name = "timestamp")
-    val timestamp: kotlin.String? = null,
+    val timestamp: kotlin.String,
 
     @Json(name = "token")
-    val token: Token? = null,
+    val token: Token,
 
     /* Sequential ID of this transaction within Immutable X */
     @Json(name = "transaction_id")
-    val transactionId: kotlin.Int? = null,
+    val transactionId: kotlin.Int,
 
     /* Ethereum address of the user making this deposit */
     @Json(name = "user")
-    val user: kotlin.String? = null
+    val user: kotlin.String
 
 )
 

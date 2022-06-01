@@ -40,30 +40,30 @@ data class Withdrawal (
 
     /* Status of the on-chain batch confirmation for this withdrawal */
     @Json(name = "rollup_status")
-    val rollupStatus: kotlin.String? = null,
+    val rollupStatus: kotlin.String,
 
     /* Ethereum address of the user who requested this withdrawal */
     @Json(name = "sender")
-    val sender: kotlin.String? = null,
+    val sender: kotlin.String,
 
     /* Status of this withdrawal */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Time when this withdrawal was initiated */
     @Json(name = "timestamp")
-    val timestamp: kotlin.String? = null,
+    val timestamp: kotlin.String,
 
     @Json(name = "token")
-    val token: Token? = null,
+    val token: Token,
 
     /* Sequential ID of this transaction */
     @Json(name = "transaction_id")
-    val transactionId: kotlin.Int? = null,
+    val transactionId: kotlin.Int,
 
     /* Withdrawal has been transferred to user's Layer 1 wallet */
     @Json(name = "withdrawn_to_wallet")
-    val withdrawnToWallet: kotlin.Boolean? = null
+    val withdrawnToWallet: kotlin.Boolean
 
 )
 

@@ -35,15 +35,15 @@ data class MintableTokenDetails (
 
     /* Blueprint of this token */
     @Json(name = "blueprint")
-    val blueprint: kotlin.String? = null,
+    val blueprint: kotlin.String,
 
     /* ID provided by the client for this token */
     @Json(name = "client_token_id")
-    val clientTokenId: kotlin.String? = null,
+    val clientTokenId: kotlin.String,
 
     /* IMX Id of this token */
     @Json(name = "token_id")
-    val tokenId: kotlin.String? = null
+    val tokenId: kotlin.String
 
 )
 

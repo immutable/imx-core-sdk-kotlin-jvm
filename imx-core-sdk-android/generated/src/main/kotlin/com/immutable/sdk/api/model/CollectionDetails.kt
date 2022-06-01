@@ -34,11 +34,11 @@ data class CollectionDetails (
 
     /* URL of the icon of the collection */
     @Json(name = "icon_url")
-    val iconUrl: kotlin.String? = null,
+    val iconUrl: kotlin.String?,
 
     /* Name of the collection */
     @Json(name = "name")
-    val name: kotlin.String? = null
+    val name: kotlin.String
 
 )
 

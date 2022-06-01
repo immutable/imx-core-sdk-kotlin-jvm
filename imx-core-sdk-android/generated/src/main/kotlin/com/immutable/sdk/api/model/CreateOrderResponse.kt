@@ -35,15 +35,15 @@ data class CreateOrderResponse (
 
     /* ID of the created order */
     @Json(name = "order_id")
-    val orderId: kotlin.Int? = null,
+    val orderId: kotlin.Int,
 
     /* Status of the created order */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* Timestamp of the created order */
     @Json(name = "time")
-    val time: kotlin.Int? = null
+    val time: kotlin.Int
 
 )
 

@@ -23,6 +23,7 @@ private const val RECIPIENT_ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7
 private const val SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
+private const val SIGNABLE_MESSAGE = "messageForL1"
 
 class TransferWorkflowTest {
     @MockK
@@ -56,6 +57,7 @@ class TransferWorkflowTest {
 
         every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
             senderStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
+            signableMessage = SIGNABLE_MESSAGE,
             signableResponses = arrayListOf(
                 SignableTransferResponseDetails(
                     amount = "1",
@@ -66,7 +68,8 @@ class TransferWorkflowTest {
                     receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
                         "e971a23485",
                     receiverVaultId = 1_502_450_104,
-                    senderVaultId = 1_502_450_105
+                    senderVaultId = 1_502_450_105,
+                    token = Erc721Asset("tokenAddress", "tokenId").toSignableToken()
                 )
             )
         )
@@ -186,7 +189,7 @@ class TransferWorkflowTest {
                 api = api
             ),
             expectedResult = null,
-            expectedError = ClientException()
+            expectedError = ImmutableException.apiError("")
         )
     }
 
@@ -210,7 +213,11 @@ class TransferWorkflowTest {
 
     @Test
     fun testTransferFailOnInvalidSignableResponse() {
-        every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(ADDRESS)
+        every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
+            senderStarkKey = ADDRESS,
+            signableMessage = SIGNABLE_MESSAGE,
+            signableResponses = emptyList()
+        )
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
 

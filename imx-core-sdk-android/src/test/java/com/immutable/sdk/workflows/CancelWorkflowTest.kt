@@ -102,18 +102,6 @@ class CancelWorkflowTest {
     }
 
     @Test
-    fun testCancelFailedOnGetSignableCancelOrder_nullPayloadHash() {
-        signatureFuture.complete(SIGNATURE)
-        every { signableCancelOrderResponse.payloadHash } returns null
-
-        testFuture(
-            future = createCancelFuture(),
-            expectedResult = null,
-            expectedError = ImmutableException.invalidResponse("")
-        )
-    }
-
-    @Test
     fun testCancelFailedOnCancelOrder() {
         signatureFuture.complete(SIGNATURE)
         every { ordersApi.cancelOrder(any(), any(), any(), any()) } throws ClientException()

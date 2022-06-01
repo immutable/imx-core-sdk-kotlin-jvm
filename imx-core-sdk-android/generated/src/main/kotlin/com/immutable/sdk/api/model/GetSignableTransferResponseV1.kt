@@ -33,52 +33,52 @@ import com.squareup.moshi.Json
  * @param payloadHash Hash of the payload
  * @param receiverStarkKey Receiver of the transfer
  * @param receiverVaultId ID of the vault being transferred to
- * @param senderStarkKey Sender of the transfer
  * @param senderVaultId ID of the vault being transferred from
  * @param signableMessage Message to sign with L1 wallet to confirm transfer request
+ * @param senderStarkKey Sender of the transfer
  */
 
 data class GetSignableTransferResponseV1 (
 
     /* Amount of the asset being transferred */
     @Json(name = "amount")
-    val amount: kotlin.String? = null,
+    val amount: kotlin.String,
 
     /* ID of the asset being transferred */
     @Json(name = "asset_id")
-    val assetId: kotlin.String? = null,
+    val assetId: kotlin.String,
 
     /* Token in request to match in SDK implementation */
     @Json(name = "expiration_timestamp")
-    val expirationTimestamp: kotlin.Int? = null,
+    val expirationTimestamp: kotlin.Int,
 
     /* Nonce of the transfer */
     @Json(name = "nonce")
-    val nonce: kotlin.Int? = null,
+    val nonce: kotlin.Int,
 
     /* Hash of the payload */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null,
+    val payloadHash: kotlin.String,
 
     /* Receiver of the transfer */
     @Json(name = "receiver_stark_key")
-    val receiverStarkKey: kotlin.String? = null,
+    val receiverStarkKey: kotlin.String,
 
     /* ID of the vault being transferred to */
     @Json(name = "receiver_vault_id")
-    val receiverVaultId: kotlin.Int? = null,
-
-    /* Sender of the transfer */
-    @Json(name = "sender_stark_key")
-    val senderStarkKey: kotlin.String? = null,
+    val receiverVaultId: kotlin.Int,
 
     /* ID of the vault being transferred from */
     @Json(name = "sender_vault_id")
-    val senderVaultId: kotlin.Int? = null,
+    val senderVaultId: kotlin.Int,
 
     /* Message to sign with L1 wallet to confirm transfer request */
     @Json(name = "signable_message")
-    val signableMessage: kotlin.String? = null
+    val signableMessage: kotlin.String,
+
+    /* Sender of the transfer */
+    @Json(name = "sender_stark_key")
+    val senderStarkKey: kotlin.String? = null
 
 )
 

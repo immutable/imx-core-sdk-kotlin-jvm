@@ -28,20 +28,24 @@ import com.squareup.moshi.Json
  *
  * @param orderId The ID of the order involved in the trade
  * @param sold The amount of that order's asset this trade sold
+ * @param tokenType The type of the token that this trade sold
  * @param tokenAddress The contract address of the token that this trade sold
  * @param tokenId The ID of the token that this trade sold
- * @param tokenType The type of the token that this trade sold
  */
 
 data class TradeSide (
 
     /* The ID of the order involved in the trade */
     @Json(name = "order_id")
-    val orderId: kotlin.Int? = null,
+    val orderId: kotlin.Int,
 
     /* The amount of that order's asset this trade sold */
     @Json(name = "sold")
-    val sold: kotlin.String? = null,
+    val sold: kotlin.String,
+
+    /* The type of the token that this trade sold */
+    @Json(name = "token_type")
+    val tokenType: kotlin.String,
 
     /* The contract address of the token that this trade sold */
     @Json(name = "token_address")
@@ -49,11 +53,7 @@ data class TradeSide (
 
     /* The ID of the token that this trade sold */
     @Json(name = "token_id")
-    val tokenId: kotlin.String? = null,
-
-    /* The type of the token that this trade sold */
-    @Json(name = "token_type")
-    val tokenType: kotlin.String? = null
+    val tokenId: kotlin.String? = null
 
 )
 

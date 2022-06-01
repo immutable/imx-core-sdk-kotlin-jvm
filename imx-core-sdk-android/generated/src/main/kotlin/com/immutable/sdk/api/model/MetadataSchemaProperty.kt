@@ -35,15 +35,15 @@ data class MetadataSchemaProperty (
 
     /* Sets the metadata as filterable */
     @Json(name = "filterable")
-    val filterable: kotlin.Boolean? = null,
+    val filterable: kotlin.Boolean,
 
     /* Name of the metadata key */
     @Json(name = "name")
-    val name: kotlin.String? = null,
+    val name: kotlin.String,
 
     /* Type of the metadata. Values: \"enum\", \"text\", \"boolean\", \"continuous\", \"discrete\" | Default: \"text\". Src: https://docs.x.immutable.com/docs/asset-metadata#property-type-mapping */
     @Json(name = "type")
-    val type: kotlin.String? = null
+    val type: kotlin.String
 
 )
 

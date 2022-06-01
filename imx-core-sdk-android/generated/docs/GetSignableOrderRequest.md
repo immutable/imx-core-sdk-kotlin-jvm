@@ -4,7 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**amountBuy** | **kotlin.String** | Amount to buy | 
+**amountBuy** | **kotlin.String** | Fee-exclusive amount to buy | 
 **amountSell** | **kotlin.String** | Amount to sell | 
 **tokenBuy** | [**SignableToken**](SignableToken.md) |  | 
 **tokenSell** | [**SignableToken**](SignableToken.md) |  | 

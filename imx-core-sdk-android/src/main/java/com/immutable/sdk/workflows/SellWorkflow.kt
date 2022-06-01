@@ -1,16 +1,12 @@
 package com.immutable.sdk.workflows
 
 import androidx.annotation.VisibleForTesting
-import com.immutable.sdk.Constants
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.AssetsApi
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.model.AssetModel
-import com.immutable.sdk.model.Erc20Asset
-import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.model.TokenType
+import com.immutable.sdk.model.*
 import java.math.BigDecimal
 import java.util.concurrent.CompletableFuture
 
@@ -97,33 +93,16 @@ private fun getSignableOrder(
     api: OrdersApi
 ): CompletableFuture<Pair<String, GetSignableOrderResponse>> = call(SIGNABLE_ORDER) {
     val request = GetSignableOrderRequest(
-        amountBuy = formatAmount(sellToken, totalFees),
+        amountBuy = sellToken.formatQuantity(),
         amountSell = asset.quantity,
-        tokenBuy = sellToken.toSignableToken(),
-        tokenSell = createTokenSell(asset),
+        tokenBuy = sellToken.toSignableToken(totalFees),
+        tokenSell = asset.toSignableToken(),
         user = address,
         fees = fees
     )
     val response = api.getSignableOrder(request)
     // Unwrapping payload hash here so if it's null, the correct exception is thrown
-    response.payloadHash!! to response
-}
-
-private fun createTokenSell(asset: Erc721Asset) = SignableToken(
-    data = TokenData(tokenId = asset.tokenId, tokenAddress = asset.tokenAddress),
-    type = TokenType.ERC721.name
-)
-
-@VisibleForTesting
-internal fun formatAmount(sellToken: AssetModel, totalFees: BigDecimal): String {
-    val decimals = when (sellToken) {
-        is Erc20Asset -> sellToken.decimals
-        is Erc721Asset -> return sellToken.quantity
-        else -> Constants.ETH_DECIMALS
-    }
-    val sellTokenAmount = BigDecimal(sellToken.quantity) + totalFees
-    return (BigDecimal.TEN.pow(decimals) * sellTokenAmount).toBigInteger()
-        .toString()
+    response.payloadHash to response
 }
 
 @Suppress(
@@ -139,23 +118,22 @@ private fun createOrder(
     api: OrdersApi
 ): CompletableFuture<Int> = call(CREATE_ORDER) {
     api.createOrder(
-        // If the forced unwrapping below fails it will be forwarded on as an error
         CreateOrderRequest(
-            amountBuy = response.amountBuy!!,
-            amountSell = response.amountSell!!,
-            assetIdBuy = response.assetIdBuy!!,
-            assetIdSell = response.assetIdSell!!,
-            expirationTimestamp = response.expirationTimestamp!!,
-            nonce = response.nonce!!,
-            starkKey = response.starkKey!!,
+            amountBuy = response.amountBuy,
+            amountSell = response.amountSell,
+            assetIdBuy = response.assetIdBuy,
+            assetIdSell = response.assetIdSell,
+            expirationTimestamp = response.expirationTimestamp,
+            nonce = response.nonce,
+            starkKey = response.starkKey,
             starkSignature = starkSignature,
-            vaultIdBuy = response.vaultIdBuy!!,
-            vaultIdSell = response.vaultIdSell!!,
+            vaultIdBuy = response.vaultIdBuy,
+            vaultIdSell = response.vaultIdSell,
             fees = fees,
             // Always include fees in order, the 'fees' field will either have fees details or nothing at all
             includeFees = true
         ),
         xImxEthAddress = null,
         xImxEthSignature = null
-    ).orderId!!
+    ).orderId
 }

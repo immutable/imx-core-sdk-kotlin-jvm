@@ -180,24 +180,6 @@ class LoginWorkflowTest {
     }
 
     @Test
-    fun testLoginFailedOnGetSignableResponseInvalidResponse() {
-        every { api.getUsers(ADDRESS) } throws
-            ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
-        every { api.getSignableRegistrationOffchain(any()) } returns
-            GetSignableRegistrationOffchainResponse(null, null)
-
-        addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
-        ethSignatureFuture.complete(SIGNATURE)
-
-        testFuture(
-            future = login(signer, api),
-            expectedResult = null,
-            expectedError = ImmutableException.invalidResponse("")
-        )
-    }
-
-    @Test
     fun testLoginFailedOnRegister() {
         every { api.getUsers(ADDRESS) } throws
             ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)

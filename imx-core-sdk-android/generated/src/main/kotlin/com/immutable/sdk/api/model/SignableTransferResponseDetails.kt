@@ -42,38 +42,38 @@ data class SignableTransferResponseDetails (
 
     /* Amount of the asset being transferred */
     @Json(name = "amount")
-    val amount: kotlin.String? = null,
+    val amount: kotlin.String,
 
     /* ID of the asset being transferred */
     @Json(name = "asset_id")
-    val assetId: kotlin.String? = null,
+    val assetId: kotlin.String,
 
     /* Timestamp when this transfer will expire */
     @Json(name = "expiration_timestamp")
-    val expirationTimestamp: kotlin.Int? = null,
+    val expirationTimestamp: kotlin.Int,
 
     /* Nonce of the transfer */
     @Json(name = "nonce")
-    val nonce: kotlin.Int? = null,
+    val nonce: kotlin.Int,
 
     /* Hash of the payload to be signed for transfer */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null,
+    val payloadHash: kotlin.String,
 
     /* Receiver of the transfer */
     @Json(name = "receiver_stark_key")
-    val receiverStarkKey: kotlin.String? = null,
+    val receiverStarkKey: kotlin.String,
 
     /* ID of the vault being transferred to */
     @Json(name = "receiver_vault_id")
-    val receiverVaultId: kotlin.Int? = null,
+    val receiverVaultId: kotlin.Int,
 
     /* ID of the vault being transferred from */
     @Json(name = "sender_vault_id")
-    val senderVaultId: kotlin.Int? = null,
+    val senderVaultId: kotlin.Int,
 
     @Json(name = "token")
-    val token: SignableToken? = null
+    val token: SignableToken
 
 )
 

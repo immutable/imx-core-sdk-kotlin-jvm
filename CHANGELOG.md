@@ -1,3 +1,13 @@
+# [0.4.0](https://github.com/immutable/imx-core-sdk-android/compare/v0.3.0...v0.4.0) (2022-06-01)
+
+
+### Features
+
+* remove maker order fee calculation from sell workflow ([4537ea6](https://github.com/immutable/imx-core-sdk-android/commit/4537ea6bc4dcee9a68e69ded3b097975fc1970ab))
+* update public API ([9a5c4ba](https://github.com/immutable/imx-core-sdk-android/commit/9a5c4ba8081048761eec9fc376abbde7011fddf5))
+
+
+
 # [0.3.0](https://github.com/immutable/imx-core-sdk-android/compare/v0.2.0...v0.3.0) (2022-05-24)
 
 

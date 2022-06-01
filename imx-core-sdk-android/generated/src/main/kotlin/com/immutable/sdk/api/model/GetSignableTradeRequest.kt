@@ -21,17 +21,13 @@
 package com.immutable.sdk.api.model
 
 import com.immutable.sdk.api.model.FeeEntry
-import com.immutable.sdk.api.model.SignableToken
 
 import com.squareup.moshi.Json
 
 /**
  * 
  *
- * @param amountBuy Amount to buy
- * @param amountSell Amount to sell
- * @param tokenBuy 
- * @param tokenSell 
+ * @param orderId The ID of the maker order involved
  * @param user Ethereum address of the submitting user
  * @param expirationTimestamp ExpirationTimestamp in Unix time. Note: will be rounded down to the nearest hour
  * @param fees Inclusion of either maker or taker fees
@@ -39,19 +35,9 @@ import com.squareup.moshi.Json
 
 data class GetSignableTradeRequest (
 
-    /* Amount to buy */
-    @Json(name = "amount_buy")
-    val amountBuy: kotlin.String,
-
-    /* Amount to sell */
-    @Json(name = "amount_sell")
-    val amountSell: kotlin.String,
-
-    @Json(name = "token_buy")
-    val tokenBuy: SignableToken,
-
-    @Json(name = "token_sell")
-    val tokenSell: SignableToken,
+    /* The ID of the maker order involved */
+    @Json(name = "order_id")
+    val orderId: kotlin.Int,
 
     /* Ethereum address of the submitting user */
     @Json(name = "user")

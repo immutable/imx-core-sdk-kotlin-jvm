@@ -34,11 +34,11 @@ data class GetSignableRegistrationResponse (
 
     /* Signature from authorised operator */
     @Json(name = "operator_signature")
-    val operatorSignature: kotlin.String? = null,
+    val operatorSignature: kotlin.String,
 
     /* Hash of the payload to be signed for user registration */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null
+    val payloadHash: kotlin.String
 
 )
 

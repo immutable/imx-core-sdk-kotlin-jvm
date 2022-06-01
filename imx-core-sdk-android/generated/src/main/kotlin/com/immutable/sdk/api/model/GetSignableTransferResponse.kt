@@ -40,11 +40,11 @@ data class GetSignableTransferResponse (
 
     /* Message to sign with L1 wallet to confirm transfer request */
     @Json(name = "signable_message")
-    val signableMessage: kotlin.String? = null,
+    val signableMessage: kotlin.String,
 
     /* List of transfer responses without the sender stark key */
     @Json(name = "signable_responses")
-    val signableResponses: kotlin.collections.List<SignableTransferResponseDetails>? = null
+    val signableResponses: kotlin.collections.List<SignableTransferResponseDetails>
 
 )
 

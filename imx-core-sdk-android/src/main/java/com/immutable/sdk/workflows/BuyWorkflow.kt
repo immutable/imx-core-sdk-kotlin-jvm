@@ -6,7 +6,6 @@ import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.extensions.clean
 import com.immutable.sdk.model.OrderStatus
 import java.util.concurrent.CompletableFuture
 
@@ -74,16 +73,13 @@ private fun getSignableTrade(
     else -> call(SIGNABLE_TRADE) {
         val response = api.getSignableTrade(
             GetSignableTradeRequest(
-                amountBuy = order.sell!!.data!!.quantity!!,
-                amountSell = order.buy!!.data!!.quantity!!,
-                tokenBuy = order.sell.clean()!!,
-                tokenSell = order.buy.clean()!!,
+                orderId = order.orderId,
                 user = address,
                 fees = fees
             )
         )
         // Unwrapping payload hash here so if it's null, the correct exception is thrown
-        response.payloadHash!! to response
+        response.payloadHash to response
     }
 }
 
@@ -96,19 +92,18 @@ private fun createTrade(
     api: TradesApi
 ): CompletableFuture<Int> = call(CREATE_TRADE) {
     api.createTrade(
-        // If the forced unwrapping below fails it will be forwarded on as an error
         CreateTradeRequestV1(
-            amountBuy = response.amountBuy!!,
-            amountSell = response.amountSell!!,
-            assetIdBuy = response.assetIdBuy!!,
-            assetIdSell = response.assetIdSell!!,
-            expirationTimestamp = response.expirationTimestamp!!,
-            nonce = response.nonce!!,
+            amountBuy = response.amountBuy,
+            amountSell = response.amountSell,
+            assetIdBuy = response.assetIdBuy,
+            assetIdSell = response.assetIdSell,
+            expirationTimestamp = response.expirationTimestamp,
+            nonce = response.nonce,
             orderId = orderId,
-            starkKey = response.starkKey!!,
+            starkKey = response.starkKey,
             starkSignature = starkSignature,
-            vaultIdBuy = response.vaultIdBuy!!,
-            vaultIdSell = response.vaultIdSell!!,
+            vaultIdBuy = response.vaultIdBuy,
+            vaultIdSell = response.vaultIdSell,
             feeInfo = response.feeInfo,
             fees = fees,
             // Always include fees, the 'fees' field will contain fees details or nothing at all
@@ -116,5 +111,5 @@ private fun createTrade(
         ),
         xImxEthAddress = null,
         xImxEthSignature = null
-    ).tradeId!!
+    ).tradeId
 }

@@ -37,23 +37,23 @@ data class GetSignableDepositResponse (
 
     /* Amount this user is depositing */
     @Json(name = "amount")
-    val amount: kotlin.String? = null,
+    val amount: kotlin.String,
 
     /* ID of the asset this user is depositing */
     @Json(name = "asset_id")
-    val assetId: kotlin.String? = null,
+    val assetId: kotlin.String,
 
     /* Nonce of the deposit */
     @Json(name = "nonce")
-    val nonce: kotlin.Int? = null,
+    val nonce: kotlin.Int,
 
     /* Public stark key of the depositing user */
     @Json(name = "stark_key")
-    val starkKey: kotlin.String? = null,
+    val starkKey: kotlin.String,
 
     /* ID of the vault this user is depositing to */
     @Json(name = "vault_id")
-    val vaultId: kotlin.Int? = null
+    val vaultId: kotlin.Int
 
 )
 

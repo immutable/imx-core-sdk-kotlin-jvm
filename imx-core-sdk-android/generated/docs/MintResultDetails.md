@@ -4,9 +4,9 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**contractAddress** | **kotlin.String** | Contract address of this token |  [optional]
-**tokenId** | **kotlin.String** | IMX Id of this token |  [optional]
-**txId** | **kotlin.Int** | Mint Transaction ID |  [optional]
+**contractAddress** | **kotlin.String** | Contract address of this token | 
+**tokenId** | **kotlin.String** | IMX ID of this token | 
+**txId** | **kotlin.Int** | Mint Transaction ID | 
 
 
 

@@ -35,11 +35,11 @@ data class ListTokensResponse (
 
     /* Generated cursor returned by previous query */
     @Json(name = "cursor")
-    val cursor: kotlin.String? = null,
+    val cursor: kotlin.String,
 
     /* Tokens matching query parameters */
     @Json(name = "result")
-    val result: kotlin.collections.List<TokenDetails>? = null
+    val result: kotlin.collections.List<TokenDetails>
 
 )
 

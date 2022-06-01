@@ -32,7 +32,7 @@ import com.squareup.moshi.Json
 data class SuccessResponse (
 
     @Json(name = "result")
-    val result: kotlin.String? = null
+    val result: kotlin.String
 
 )
 

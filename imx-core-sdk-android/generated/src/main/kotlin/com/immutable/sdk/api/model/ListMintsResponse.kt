@@ -36,15 +36,15 @@ data class ListMintsResponse (
 
     /* Generated cursor returned by previous query */
     @Json(name = "cursor")
-    val cursor: kotlin.String? = null,
+    val cursor: kotlin.String,
 
     /* Remaining results flag. 1: there are remaining results matching this query, 0: no remaining results */
     @Json(name = "remaining")
-    val remaining: kotlin.Int? = null,
+    val remaining: kotlin.Int,
 
     /* Mints matching query parameters */
     @Json(name = "result")
-    val result: kotlin.collections.List<Mint>? = null
+    val result: kotlin.collections.List<Mint>
 
 )
 

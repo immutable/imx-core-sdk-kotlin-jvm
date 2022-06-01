@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**assetId** | **kotlin.String** |  |  [optional]
-**assetType** | **kotlin.String** |  |  [optional]
+**assetId** | **kotlin.String** | Stark encoded asset id | 
+**assetType** | **kotlin.String** | Stark encoded asset type | 
 
 
 

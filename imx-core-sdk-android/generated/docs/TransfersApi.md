@@ -257,7 +257,7 @@ No authorization required
 
 <a name="listTransfers"></a>
 # **listTransfers**
-> ListTransfersResponse listTransfers(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
+> ListTransfersResponse listTransfers(pageSize, cursor, orderBy, direction, user, `receiver`, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
 
 Get a list of transfers
 
@@ -275,6 +275,7 @@ val cursor : kotlin.String = cursor_example // kotlin.String | Cursor
 val orderBy : kotlin.String = orderBy_example // kotlin.String | Property to sort by
 val direction : kotlin.String = direction_example // kotlin.String | Direction to sort (asc/desc)
 val user : kotlin.String = user_example // kotlin.String | Ethereum address of the user who submitted this transfer
+val `receiver` : kotlin.String = `receiver`_example // kotlin.String | Ethereum address of the user who received this transfer
 val status : kotlin.String = status_example // kotlin.String | Status of this transfer
 val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this transfer
 val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this transfer
@@ -287,7 +288,7 @@ val minQuantity : kotlin.String = minQuantity_example // kotlin.String | Max qua
 val maxQuantity : kotlin.String = maxQuantity_example // kotlin.String | Max quantity for the transferred asset
 val metadata : kotlin.String = metadata_example // kotlin.String | JSON-encoded metadata filters for the transferred asset
 try {
-    val result : ListTransfersResponse = apiInstance.listTransfers(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
+    val result : ListTransfersResponse = apiInstance.listTransfers(pageSize, cursor, orderBy, direction, user, `receiver`, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling TransfersApi#listTransfers")
@@ -307,6 +308,7 @@ Name | Type | Description  | Notes
  **orderBy** | **kotlin.String**| Property to sort by | [optional]
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
  **user** | **kotlin.String**| Ethereum address of the user who submitted this transfer | [optional]
+ **&#x60;receiver&#x60;** | **kotlin.String**| Ethereum address of the user who received this transfer | [optional]
  **status** | **kotlin.String**| Status of this transfer | [optional] [enum: success, failure]
  **minTimestamp** | **kotlin.String**| Minimum timestamp for this transfer | [optional]
  **maxTimestamp** | **kotlin.String**| Maximum timestamp for this transfer | [optional]

@@ -34,7 +34,7 @@ data class MintTokensResponse (
 
     /* List of mint result details */
     @Json(name = "results")
-    val results: kotlin.collections.List<MintResultDetails>? = null
+    val results: kotlin.collections.List<MintResultDetails>
 
 )
 

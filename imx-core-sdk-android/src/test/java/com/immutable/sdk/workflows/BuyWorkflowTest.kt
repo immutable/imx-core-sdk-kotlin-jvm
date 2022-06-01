@@ -1,6 +1,7 @@
 package com.immutable.sdk.workflows
 
 import com.immutable.sdk.*
+import com.immutable.sdk.Constants.ERC721_AMOUNT
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
@@ -26,6 +27,7 @@ private const val SIGNATURE =
 private const val ORDER_ID = "5"
 private const val TRADE_ID = 6
 private const val PAYLOAD_HASH = "tradePayloadHash"
+private const val SIGNABLE_MESSAGE = "messageForL1"
 
 class BuyWorkflowTest {
     @MockK
@@ -62,17 +64,23 @@ class BuyWorkflowTest {
         every {
             ordersApi.getOrder(ORDER_ID, true, "", "")
         } returns order
+        every { order.orderId } returns ORDER_ID.toInt()
         every { order.user } returns ASSET_OWNER
         every { order.status } returns OrderStatus.Active.value
         every { order.buy } returns Token(
-            TokenData(quantity = "200000000000000", decimals = 18),
+            TokenData(
+                quantity = "200000000000000",
+                decimals = 18,
+                quantityWithFees = "200000000000000"
+            ),
             TokenType.ETH.name
         )
         every { order.sell } returns Token(
             TokenData(
-                quantity = "1",
+                quantity = ERC721_AMOUNT,
                 tokenId = "11",
-                tokenAddress = "0x6ee5c0836ba5523c9f0eee40da69befa30b3d97e"
+                tokenAddress = "0x6ee5c0836ba5523c9f0eee40da69befa30b3d97e",
+                quantityWithFees = ERC721_AMOUNT
             ),
             TokenType.ERC721.name
         )
@@ -87,7 +95,8 @@ class BuyWorkflowTest {
             nonce = 639_749_977,
             expirationTimestamp = 1_325_765,
             starkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
-            payloadHash = PAYLOAD_HASH
+            payloadHash = PAYLOAD_HASH,
+            signableMessage = SIGNABLE_MESSAGE
         )
     }
 
@@ -104,7 +113,7 @@ class BuyWorkflowTest {
                 any(),
                 any()
             )
-        } returns CreateTradeResponse(tradeId = TRADE_ID)
+        } returns CreateTradeResponse(tradeId = TRADE_ID, status = OrderStatus.Filled.value)
         addressFuture.complete(ADDRESS)
         signatureFuture.complete(SIGNATURE)
 
@@ -182,19 +191,6 @@ class BuyWorkflowTest {
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = TestException()
-        )
-    }
-
-    @Test
-    fun testBuyFailedOnStarkSignatureInvalidSignableResponse() {
-        every { tradesApi.getSignableTrade(any()) } returns GetSignableTradeResponse()
-
-        addressFuture.complete(ADDRESS)
-
-        testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
-            expectedResult = null,
-            expectedError = ImmutableException.invalidResponse("")
         )
     }
 

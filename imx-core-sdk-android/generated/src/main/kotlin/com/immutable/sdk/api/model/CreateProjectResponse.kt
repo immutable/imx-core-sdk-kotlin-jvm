@@ -33,7 +33,7 @@ data class CreateProjectResponse (
 
     /* The project ID */
     @Json(name = "id")
-    val id: kotlin.Int? = null
+    val id: kotlin.Int
 
 )
 

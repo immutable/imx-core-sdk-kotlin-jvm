@@ -36,19 +36,19 @@ data class CreateTransferResponseV1 (
 
     /* [deprecated] Sent signature */
     @Json(name = "sent_signature")
-    val sentSignature: kotlin.String? = null,
+    val sentSignature: kotlin.String,
 
     /* [deprecated] The status of transfer */
     @Json(name = "status")
-    val status: kotlin.String? = null,
+    val status: kotlin.String,
 
     /* [deprecated] Time of the transfer */
     @Json(name = "time")
-    val time: kotlin.Int? = null,
+    val time: kotlin.Int,
 
     /* ID of the transfer */
     @Json(name = "transfer_id")
-    val transferId: kotlin.Int? = null
+    val transferId: kotlin.Int
 
 )
 

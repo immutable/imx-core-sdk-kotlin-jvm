@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
 
         GlobalScope.launch(Dispatchers.Default) {
             val response = CollectionsApi().listCollections(pageSize = 20)
-            println("COLLECTIONS: " + response.result?.joinToString { it.name ?: "no name" })
+            println("COLLECTIONS: " + response.result.joinToString { it.name })
         }
     }
 }

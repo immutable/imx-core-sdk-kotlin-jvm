@@ -4,7 +4,7 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**accounts** | **kotlin.collections.List&lt;kotlin.String&gt;** | Accounts |  [optional]
+**accounts** | **kotlin.collections.List&lt;kotlin.String&gt;** | Accounts | 
 
 
 

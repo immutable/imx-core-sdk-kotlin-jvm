@@ -4,13 +4,13 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**amount** | **kotlin.String** | Amount of the token we are withdrawing |  [optional]
-**assetId** | **kotlin.String** | ID of the asset to be withdrawn |  [optional]
-**nonce** | **kotlin.Int** | Nonce of this transaction |  [optional]
-**payloadHash** | **kotlin.String** | Encoded payload hash |  [optional]
-**signableMessage** | **kotlin.String** | Message to sign with L1 wallet to verity withdrawal request |  [optional]
-**starkKey** | **kotlin.String** | Public stark key of this user |  [optional]
-**vaultId** | **kotlin.Int** | ID of the vault we are withdrawing from |  [optional]
+**amount** | **kotlin.String** | Amount of the token we are withdrawing | 
+**assetId** | **kotlin.String** | ID of the asset to be withdrawn | 
+**nonce** | **kotlin.Int** | Nonce of this transaction | 
+**payloadHash** | **kotlin.String** | Encoded payload hash | 
+**signableMessage** | **kotlin.String** | Message to sign with L1 wallet to verity withdrawal request | 
+**starkKey** | **kotlin.String** | Public stark key of this user | 
+**vaultId** | **kotlin.Int** | ID of the vault we are withdrawing from | 
 
 
 

@@ -33,7 +33,7 @@ data class GetUsersApiResponse (
 
     /* Accounts */
     @Json(name = "accounts")
-    val accounts: kotlin.collections.List<kotlin.String>? = null
+    val accounts: kotlin.collections.List<kotlin.String>
 
 )
 

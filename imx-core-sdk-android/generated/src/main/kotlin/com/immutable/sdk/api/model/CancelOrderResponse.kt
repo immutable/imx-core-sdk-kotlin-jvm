@@ -34,11 +34,11 @@ data class CancelOrderResponse (
 
     /* ID of the cancelled order */
     @Json(name = "order_id")
-    val orderId: kotlin.Int? = null,
+    val orderId: kotlin.Int,
 
     /* New status of the order */
     @Json(name = "status")
-    val status: kotlin.String? = null
+    val status: kotlin.String
 
 )
 

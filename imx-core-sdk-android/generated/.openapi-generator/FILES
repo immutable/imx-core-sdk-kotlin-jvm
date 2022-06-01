@@ -2,7 +2,6 @@
 README.md
 build.gradle
 docs/AddMetadataSchemaToCollectionRequest.md
-docs/Application.md
 docs/Asset.md
 docs/AssetProperties.md
 docs/AssetsApi.md
@@ -57,7 +56,6 @@ docs/GetSignableTransferResponse.md
 docs/GetSignableTransferResponseV1.md
 docs/GetSignableWithdrawalRequest.md
 docs/GetSignableWithdrawalResponse.md
-docs/GetTLVsResult.md
 docs/GetUsersApiResponse.md
 docs/ListAssetsResponse.md
 docs/ListBalancesResponse.md
@@ -75,12 +73,8 @@ docs/MetadataSchemaRequest.md
 docs/Mint.md
 docs/MintFee.md
 docs/MintRequest.md
-docs/MintRequestV1.md
 docs/MintResultDetails.md
-docs/MintResultV1.md
-docs/MintTokenData.md
 docs/MintTokenDataV2.md
-docs/MintTokens.md
 docs/MintTokensResponse.md
 docs/MintUser.md
 docs/MintableTokenDetails.md
@@ -96,7 +90,6 @@ docs/RegisterUserResponse.md
 docs/SignableToken.md
 docs/SignableTransferDetails.md
 docs/SignableTransferResponseDetails.md
-docs/SnapshotBalancesRecord.md
 docs/SuccessResponse.md
 docs/Token.md
 docs/TokenData.md
@@ -132,7 +125,6 @@ src/main/kotlin/com/immutable/sdk/api/TransfersApi.kt
 src/main/kotlin/com/immutable/sdk/api/UsersApi.kt
 src/main/kotlin/com/immutable/sdk/api/WithdrawalsApi.kt
 src/main/kotlin/com/immutable/sdk/api/model/AddMetadataSchemaToCollectionRequest.kt
-src/main/kotlin/com/immutable/sdk/api/model/Application.kt
 src/main/kotlin/com/immutable/sdk/api/model/Asset.kt
 src/main/kotlin/com/immutable/sdk/api/model/AssetProperties.kt
 src/main/kotlin/com/immutable/sdk/api/model/Balance.kt
@@ -182,7 +174,6 @@ src/main/kotlin/com/immutable/sdk/api/model/GetSignableTransferResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableTransferResponseV1.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableWithdrawalRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetSignableWithdrawalResponse.kt
-src/main/kotlin/com/immutable/sdk/api/model/GetTLVsResult.kt
 src/main/kotlin/com/immutable/sdk/api/model/GetUsersApiResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListAssetsResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/ListBalancesResponse.kt
@@ -199,12 +190,8 @@ src/main/kotlin/com/immutable/sdk/api/model/MetadataSchemaRequest.kt
 src/main/kotlin/com/immutable/sdk/api/model/Mint.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintFee.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintRequest.kt
-src/main/kotlin/com/immutable/sdk/api/model/MintRequestV1.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintResultDetails.kt
-src/main/kotlin/com/immutable/sdk/api/model/MintResultV1.kt
-src/main/kotlin/com/immutable/sdk/api/model/MintTokenData.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintTokenDataV2.kt
-src/main/kotlin/com/immutable/sdk/api/model/MintTokens.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintTokensResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintUser.kt
 src/main/kotlin/com/immutable/sdk/api/model/MintableTokenDetails.kt
@@ -217,7 +204,6 @@ src/main/kotlin/com/immutable/sdk/api/model/RegisterUserResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableToken.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableTransferDetails.kt
 src/main/kotlin/com/immutable/sdk/api/model/SignableTransferResponseDetails.kt
-src/main/kotlin/com/immutable/sdk/api/model/SnapshotBalancesRecord.kt
 src/main/kotlin/com/immutable/sdk/api/model/SuccessResponse.kt
 src/main/kotlin/com/immutable/sdk/api/model/Token.kt
 src/main/kotlin/com/immutable/sdk/api/model/TokenData.kt

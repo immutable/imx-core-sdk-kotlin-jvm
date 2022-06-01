@@ -38,27 +38,27 @@ data class TokenDetails (
 
     /* Number of decimals for token */
     @Json(name = "decimals")
-    val decimals: kotlin.String? = null,
+    val decimals: kotlin.String,
 
     /* Url for the icon of the token */
     @Json(name = "image_url")
-    val imageUrl: kotlin.String? = null,
+    val imageUrl: kotlin.String,
 
     /* Full name of the token (e.g. Ether) */
     @Json(name = "name")
-    val name: kotlin.String? = null,
+    val name: kotlin.String,
 
     /* Quantum for token */
     @Json(name = "quantum")
-    val quantum: kotlin.String? = null,
+    val quantum: kotlin.String,
 
     /* Ticker symbol for token (e.g. ETH/USDC/IMX) */
     @Json(name = "symbol")
-    val symbol: kotlin.String? = null,
+    val symbol: kotlin.String,
 
     /* Address of the ERC721 contract */
     @Json(name = "token_address")
-    val tokenAddress: kotlin.String? = null
+    val tokenAddress: kotlin.String
 
 )
 

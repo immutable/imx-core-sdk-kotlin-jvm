@@ -39,31 +39,31 @@ data class GetSignableWithdrawalResponse (
 
     /* Amount of the token we are withdrawing */
     @Json(name = "amount")
-    val amount: kotlin.String? = null,
+    val amount: kotlin.String,
 
     /* ID of the asset to be withdrawn */
     @Json(name = "asset_id")
-    val assetId: kotlin.String? = null,
+    val assetId: kotlin.String,
 
     /* Nonce of this transaction */
     @Json(name = "nonce")
-    val nonce: kotlin.Int? = null,
+    val nonce: kotlin.Int,
 
     /* Encoded payload hash */
     @Json(name = "payload_hash")
-    val payloadHash: kotlin.String? = null,
+    val payloadHash: kotlin.String,
 
     /* Message to sign with L1 wallet to verity withdrawal request */
     @Json(name = "signable_message")
-    val signableMessage: kotlin.String? = null,
+    val signableMessage: kotlin.String,
 
     /* Public stark key of this user */
     @Json(name = "stark_key")
-    val starkKey: kotlin.String? = null,
+    val starkKey: kotlin.String,
 
     /* ID of the vault we are withdrawing from */
     @Json(name = "vault_id")
-    val vaultId: kotlin.Int? = null
+    val vaultId: kotlin.Int
 
 )
 

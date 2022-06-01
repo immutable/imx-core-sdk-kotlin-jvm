@@ -26,17 +26,19 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param assetId 
- * @param assetType 
+ * @param assetId Stark encoded asset id
+ * @param assetType Stark encoded asset type
  */
 
 data class EncodeAssetResponse (
 
+    /* Stark encoded asset id */
     @Json(name = "asset_id")
-    val assetId: kotlin.String? = null,
+    val assetId: kotlin.String,
 
+    /* Stark encoded asset type */
     @Json(name = "asset_type")
-    val assetType: kotlin.String? = null
+    val assetType: kotlin.String
 
 )
 

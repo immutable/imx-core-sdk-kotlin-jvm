@@ -24,6 +24,11 @@ $dokka.location:com.immutable.sdk.model/OrderStatus.Filled///PointingToDeclarati
 $dokka.location:com.immutable.sdk.model/OrderStatus.Inactive///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-order-status/-inactive/index.html
 $dokka.location:com.immutable.sdk.model/OrderStatus///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-order-status/index.html
 $dokka.location:com.immutable.sdk.model/OrderStatus/value/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-order-status/value.html
+$dokka.location:com.immutable.sdk.model/SignableTokenData///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-signable-token-data/index.html
+$dokka.location:com.immutable.sdk.model/SignableTokenData/SignableTokenData/#kotlin.String?#kotlin.String?#kotlin.Int?/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-signable-token-data/-signable-token-data.html
+$dokka.location:com.immutable.sdk.model/SignableTokenData/decimals/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-signable-token-data/decimals.html
+$dokka.location:com.immutable.sdk.model/SignableTokenData/tokenAddress/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-signable-token-data/token-address.html
+$dokka.location:com.immutable.sdk.model/SignableTokenData/tokenId/#/PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk.model/-signable-token-data/token-id.html
 $dokka.location:com.immutable.sdk////PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/index.html
 $dokka.location:com.immutable.sdk/ImmutableException.Companion///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-exception/-companion/index.html
 $dokka.location:com.immutable.sdk/ImmutableException///PointingToDeclaration/imx-core-sdk-android/com.immutable.sdk/-immutable-exception/index.html

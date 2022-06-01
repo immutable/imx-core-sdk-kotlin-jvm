@@ -34,11 +34,11 @@ import com.squareup.moshi.Json
 data class Token (
 
     @Json(name = "data")
-    val `data`: TokenData? = null,
+    val `data`: TokenData,
 
     /* Type of this asset (ETH/ERC20/ERC721) */
     @Json(name = "type")
-    val type: kotlin.String? = null
+    val type: kotlin.String
 
 )
 

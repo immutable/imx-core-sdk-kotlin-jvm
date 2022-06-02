@@ -19,6 +19,9 @@ jobs:
         with:
           java-version: 11
 
+      - name: Build
+        run: ./gradlew imx-core-sdk-android:build
+
       - name: Generate changelog and bump up version
         uses: TriPSs/conventional-changelog-action@v3
         with:
@@ -26,9 +29,6 @@ jobs:
           skip-git-pull: 'true'
           version-file: './version.yml'
           version-path: 'version'
-
-      - name: Build
-        run: ./gradlew imx-core-sdk-android:build
 
       - name: Publish to GitHub Packages
         run: ./gradlew publish

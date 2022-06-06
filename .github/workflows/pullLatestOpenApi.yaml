@@ -1,4 +1,4 @@
-name: Pull latest Swagger specs
+name: Pull latest OpenAPI specs
 
 on:
   workflow_dispatch:
@@ -13,11 +13,11 @@ jobs:
         with:
           token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}
 
-      - name: Download Swagger
+      - name: Download OpenAPI Specs
         uses: carlosperate/download-file-action@v1
         with:
           file-url: 'https://api.x.immutable.com/openapi'
-          file-name: 'swagger.json'
+          file-name: 'openapi.json'
 
       - name: Build
         run: ./gradlew imx-core-sdk-android:build
@@ -25,9 +25,9 @@ jobs:
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4
         with:
-          commit-message: "feat: update swagger specs with latest version"
-          branch: "feat/updateSwagger"
+          commit-message: "feat: update OpenAPI specs with latest version"
+          branch: "feat/updateOpenAPI"
           base: "main"
-          title: "feat: update swagger specs with latest version"
-          body: "Update `swagger.json` with latest version from https://api.x.immutable.com/openapi"
+          title: "feat: update OpenAPI specs with latest version"
+          body: "Update `openapi.json` with latest version from https://api.x.immutable.com/openapi"
           token: ${{ secrets.PLATFORM_SA_GITHUB_TOKEN }}

@@ -1,6 +1,8 @@
 plugins {
     id 'com.android.library'
     id 'kotlin-android'
+    // If updating openapi version check the custom templates are still relevant in
+    // this directory: .openapi-generator/templates
     id "org.openapi.generator" version "5.3.0"
     id 'maven-publish'
     id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
@@ -73,7 +75,7 @@ android {
 
     openApiGenerate {
         generatorName = "kotlin"
-        inputSpec = "$rootDir/swagger.json".toString()
+        inputSpec = "$rootDir/openapi.json".toString()
         outputDir = "$project.projectDir/generated".toString()
         apiPackage = "com.immutable.sdk.api"
         invokerPackage = "com.immutable.sdk.invoker"
@@ -88,7 +90,7 @@ android {
                 number: "Double"
         ]
         importMappings = [
-                // Swagger specs sets 'Asset.orders.sell_orders' type to an array of objects (i.e. List<Any>),
+                // OpenAPI specs sets 'Asset.orders.sell_orders' type to an array of objects (i.e. List<Any>),
                 // this makes it really difficult to cast it to List<SellOrders>. So instead we create an
                 // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
                 OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"

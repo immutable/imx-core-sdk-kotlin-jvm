@@ -24,7 +24,7 @@ private const val SIGNATURE =
 private const val STARK_PAYLOAD = "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466b"
 private const val ETH_SIGNATURE = "Only sign this key linking request from Immutable X"
 
-class LoginWorkflowTest {
+class RegisterWorkflowTest {
     @MockK
     private lateinit var api: UsersApi
 
@@ -60,13 +60,13 @@ class LoginWorkflowTest {
     }
 
     @Test
-    fun testPreRegisteredUserLoginSuccess() {
+    fun testPreRegisteredUserRegisterOffChainSuccess() {
         every { api.getUsers(ADDRESS) } returns GetUsersApiResponse(listOf("account"))
         addressFuture.complete(ADDRESS)
         starkSeedFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api)
+            future = registerOffChain(signer, api)
         ) { ecKeyPair, throwable ->
             assert(throwable == null)
             assert(ecKeyPair != null)
@@ -74,7 +74,7 @@ class LoginWorkflowTest {
     }
 
     @Test
-    fun testUnregisteredUserLoginSuccess() {
+    fun testUnregisteredUserRegisterOffChainSuccess() {
         every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
         every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
         every { api.registerUser(any()) } returns RegisterUserResponse("txHash")
@@ -84,7 +84,7 @@ class LoginWorkflowTest {
         ethSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api)
+            future = registerOffChain(signer, api)
         ) { ecKeyPair, throwable ->
             assert(throwable == null)
             assert(ecKeyPair != null)
@@ -94,11 +94,11 @@ class LoginWorkflowTest {
     }
 
     @Test
-    fun testLoginFailedOnAddress() {
+    fun testRegisterOffChainFailedOnAddress() {
         addressFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -107,19 +107,19 @@ class LoginWorkflowTest {
     }
 
     @Test
-    fun testLoginFailedOnStarkSignature() {
+    fun testRegisterOffChainFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
         starkSeedFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = TestException()
         )
     }
 
     @Test
-    fun testLoginFailedOnStarkKeyGenerationException() {
+    fun testRegisterOffChainFailedOnStarkKeyGenerationException() {
         // Invalid argument
         val address = "5"
         val signature = "5"
@@ -127,27 +127,27 @@ class LoginWorkflowTest {
         starkSeedFuture.complete(signature)
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = ImmutableException.clientError("")
         )
     }
 
     @Test
-    fun testLoginFailedOnIsRegistered() {
+    fun testRegisterOffChainFailedOnIsRegistered() {
         every { api.getUsers(any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
         starkSeedFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
     }
 
     @Test
-    fun testLoginFailedOnEthSignature() {
+    fun testRegisterOffChainFailedOnEthSignature() {
         every { api.getUsers(ADDRESS) } throws
             ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
@@ -156,14 +156,14 @@ class LoginWorkflowTest {
         ethSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = TestException()
         )
     }
 
     @Test
-    fun testLoginFailedOnGetSignableResponse() {
+    fun testRegisterOffChainFailedOnGetSignableResponse() {
         every { api.getUsers(ADDRESS) } throws
             ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } throws ClientException()
@@ -173,14 +173,14 @@ class LoginWorkflowTest {
         ethSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
     }
 
     @Test
-    fun testLoginFailedOnRegister() {
+    fun testRegisterOffChainFailedOnRegister() {
         every { api.getUsers(ADDRESS) } throws
             ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
@@ -191,7 +191,7 @@ class LoginWorkflowTest {
         ethSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = login(signer, api),
+            future = registerOffChain(signer, api),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )

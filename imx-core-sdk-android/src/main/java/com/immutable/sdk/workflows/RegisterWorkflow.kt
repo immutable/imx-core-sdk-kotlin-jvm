@@ -20,7 +20,7 @@ private const val GET_USER = "Get user"
 private const val REGISTER_USER = "Register user"
 private const val SIGNABLE_REGISTRATION = "Signable registration"
 
-private data class LoginData(
+private data class RegisterData(
     val address: String = "",
     val seed: String = "",
     val isRegistered: Boolean = false,
@@ -32,10 +32,10 @@ private data class LoginData(
  * This is a utility function that will register a user to Immutable X if they aren't already
  * and then return their Stark key pair.
  */
-internal fun login(signer: Signer, api: UsersApi = UsersApi()): CompletableFuture<ECKeyPair> {
+internal fun registerOffChain(signer: Signer, api: UsersApi = UsersApi()): CompletableFuture<ECKeyPair> {
     val future = CompletableFuture<ECKeyPair>()
 
-    signer.getAddress().thenApply { LoginData(address = it) }
+    signer.getAddress().thenApply { RegisterData(address = it) }
         .thenCompose { data ->
             signer.signMessage(Constants.STARK_MESSAGE).thenApply { data.copy(seed = it) }
         }
@@ -55,7 +55,7 @@ internal fun login(signer: Signer, api: UsersApi = UsersApi()): CompletableFutur
 }
 
 @Suppress("TooGenericExceptionCaught", "SwallowedException")
-private fun generateStarkKeyPair(data: LoginData): CompletableFuture<Pair<ECKeyPair, LoginData>> {
+private fun generateStarkKeyPair(data: RegisterData): CompletableFuture<Pair<ECKeyPair, RegisterData>> {
     val keyPairFuture = CompletableFuture<ECKeyPair>()
     CompletableFuture.runAsync {
         try {
@@ -74,10 +74,10 @@ private fun generateStarkKeyPair(data: LoginData): CompletableFuture<Pair<ECKeyP
 @Suppress("MagicNumber")
 private fun isUserRegistered(
     keyPair: ECKeyPair,
-    data: LoginData,
+    data: RegisterData,
     api: UsersApi
-): CompletableFuture<Pair<ECKeyPair, LoginData>> {
-    val isRegisteredFuture = CompletableFuture<Pair<ECKeyPair, LoginData>>()
+): CompletableFuture<Pair<ECKeyPair, RegisterData>> {
+    val isRegisteredFuture = CompletableFuture<Pair<ECKeyPair, RegisterData>>()
     CompletableFuture.runAsync {
         try {
             val isRegistered =
@@ -106,7 +106,7 @@ private fun getSignatures(
     signer: Signer,
     api: UsersApi,
     keyPair: ECKeyPair,
-    data: LoginData
+    data: RegisterData
 ) =
     if (data.isRegistered)
         CompletableFuture.completedFuture(keyPair to data)
@@ -133,7 +133,7 @@ private fun getSignatures(
 @Suppress("TooGenericExceptionCaught")
 private fun registerUser(
     keyPair: ECKeyPair,
-    data: LoginData,
+    data: RegisterData,
     api: UsersApi
 ): CompletableFuture<ECKeyPair> = if (data.isRegistered)
     CompletableFuture.completedFuture(keyPair)

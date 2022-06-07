@@ -8,6 +8,7 @@ import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
 import androidx.browser.customtabs.CustomTabColorSchemeParams
 import androidx.browser.customtabs.CustomTabsIntent
+import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
@@ -15,7 +16,6 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.extensions.getJson
 import com.immutable.sdk.extensions.getJsonArray
 import com.immutable.sdk.extensions.toURLEncodedString
-import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import com.squareup.moshi.Moshi
@@ -72,7 +72,9 @@ internal fun buyCrypto(
         val address = signer.getAddress().get()
         // Check that the wallet is registered
         val isRegistered = isWalletRegistered(address, usersApi)
-        check(isRegistered) { "Wallet is not registered. Call ImmutableXSdk.login() to register your wallet." }
+        check(isRegistered) {
+            "Wallet is not registered. Call ImmutableXSdk.registerOffChain() to register your wallet."
+        }
         // Get transaction ID
         val transactionId = getTransactionId(walletAddress = address, base = base, client = client)
         // Get supported fiat to crypto currencies

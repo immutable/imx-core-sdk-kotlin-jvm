@@ -32,12 +32,10 @@ interface Signer {
  */
 interface StarkSigner {
     /**
-     * Signs the [message] with the the user's L2 Stark keys which is returned by the login workflow.
+     * Signs the [message] with the the user's L2 Stark keys.
      *
      * When implementing this, pass the L2 Stark key pair and [message] to the
      * [StarkKey.sign(keyPair, msg)][com.immutable.sdk.crypto.StarkKey.sign] function.
-     *
-     * @see [com.immutable.sdk.workflows.LoginWorkflowKt]
      */
     fun signMessage(message: String): CompletableFuture<String>
 }

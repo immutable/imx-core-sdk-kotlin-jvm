@@ -100,8 +100,8 @@ object ImmutableXSdk {
      * @return a [CompletableFuture] that will provide the Stark key pair if successful. This
      * key pair needs to be securely stored as exposing this risks the users assets and wallet.
      */
-    fun login(signer: Signer): CompletableFuture<ECKeyPair> =
-        com.immutable.sdk.workflows.login(signer)
+    fun registerOffChain(signer: Signer): CompletableFuture<ECKeyPair> =
+        com.immutable.sdk.workflows.registerOffChain(signer)
 
     /**
      * This is a utility function that will chain the necessary calls to buy an existing order.

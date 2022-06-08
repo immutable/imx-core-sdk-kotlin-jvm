@@ -2,17 +2,12 @@ package com.immutable.sdk.workflows
 
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
+import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
 import com.immutable.sdk.api.model.RegisterUserRequest
 import com.immutable.sdk.crypto.Crypto
-import com.immutable.sdk.extensions.hexToByteArray
-import com.immutable.sdk.extensions.sanitizeBytes
-import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.crypto.StarkKey
-import com.immutable.sdk.Constants
 import org.openapitools.client.infrastructure.ClientException
-import org.web3j.crypto.ECKeyPair
 import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
@@ -22,7 +17,7 @@ private const val SIGNABLE_REGISTRATION = "Signable registration"
 
 private data class RegisterData(
     val address: String = "",
-    val seed: String = "",
+    val starkAddress: String = "",
     val isRegistered: Boolean = false,
     val ethSignature: String = "",
     val starkSignature: String = ""
@@ -32,69 +27,44 @@ private data class RegisterData(
  * This is a utility function that will register a user to Immutable X if they aren't already
  * and then return their Stark key pair.
  */
-internal fun registerOffChain(signer: Signer, api: UsersApi = UsersApi()): CompletableFuture<ECKeyPair> {
-    val future = CompletableFuture<ECKeyPair>()
+internal fun registerOffChain(
+    signer: Signer,
+    starkSigner: StarkSigner,
+    api: UsersApi = UsersApi()
+): CompletableFuture<Unit> {
+    val future = CompletableFuture<Unit>()
 
     signer.getAddress().thenApply { RegisterData(address = it) }
-        .thenCompose { data ->
-            signer.signMessage(Constants.STARK_MESSAGE).thenApply { data.copy(seed = it) }
-        }
-        .thenCompose { data -> generateStarkKeyPair(data) }
-        .thenCompose { (keyPair, data) -> isUserRegistered(keyPair, data, api) }
-        .thenCompose { (keyPair, data) -> getSignatures(signer, api, keyPair, data) }
-        .thenCompose { (keyPair, data) -> registerUser(keyPair, data, api) }
-        .whenComplete { ecKeyPair, throwable ->
+        .thenCompose { data -> starkSigner.getAddress().thenApply { data.copy(starkAddress = it) } }
+        .thenCompose { data -> isUserRegistered(data, api) }
+        .thenCompose { data -> getSignatures(signer, starkSigner, api, data) }
+        .thenCompose { data -> registerUser(data, api) }
+        .whenComplete { _, throwable ->
             // Forward any exceptions from the compose chain
             if (throwable != null)
                 future.completeExceptionally(throwable)
             else
-                future.complete(ecKeyPair)
+                future.complete(Unit)
         }
 
     return future
 }
 
-@Suppress("TooGenericExceptionCaught", "SwallowedException")
-private fun generateStarkKeyPair(data: RegisterData): CompletableFuture<Pair<ECKeyPair, RegisterData>> {
-    val keyPairFuture = CompletableFuture<ECKeyPair>()
-    CompletableFuture.runAsync {
-        try {
-            val keyPair = StarkKey.getKeyFromRawSignature(data.seed, data.address)
-            if (keyPair == null)
-                keyPairFuture.completeExceptionally(ImmutableException.clientError("Failed to generate Stark key pair"))
-            else
-                keyPairFuture.complete(keyPair)
-        } catch (e: Exception) {
-            keyPairFuture.completeExceptionally(ImmutableException.clientError("Failed to generate Stark key pair"))
-        }
-    }
-    return keyPairFuture.thenApply { it to data }
-}
-
 @Suppress("MagicNumber")
 private fun isUserRegistered(
-    keyPair: ECKeyPair,
     data: RegisterData,
     api: UsersApi
-): CompletableFuture<Pair<ECKeyPair, RegisterData>> {
-    val isRegisteredFuture = CompletableFuture<Pair<ECKeyPair, RegisterData>>()
+): CompletableFuture<RegisterData> {
+    val isRegisteredFuture = CompletableFuture<RegisterData>()
     CompletableFuture.runAsync {
         try {
             val isRegistered =
-                api.getUsers(data.address).accounts?.isNotEmpty() == true
-            isRegisteredFuture.complete(
-                keyPair to data.copy(
-                    isRegistered = isRegistered
-                )
-            )
+                api.getUsers(data.address).accounts.isNotEmpty()
+            isRegisteredFuture.complete(data.copy(isRegistered = isRegistered))
         } catch (e: ClientException) {
             // Endpoint returns 404 when the user isn't registered
             if (e.statusCode == HttpURLConnection.HTTP_NOT_FOUND)
-                isRegisteredFuture.complete(
-                    keyPair to data.copy(
-                        isRegistered = false
-                    )
-                )
+                isRegisteredFuture.complete(data.copy(isRegistered = false))
             else
                 isRegisteredFuture.completeExceptionally(ImmutableException.apiError(GET_USER, e))
         }
@@ -104,42 +74,44 @@ private fun isUserRegistered(
 
 private fun getSignatures(
     signer: Signer,
+    starkSigner: StarkSigner,
     api: UsersApi,
-    keyPair: ECKeyPair,
     data: RegisterData
 ) =
     if (data.isRegistered)
-        CompletableFuture.completedFuture(keyPair to data)
+        CompletableFuture.completedFuture(data)
     else {
         call(SIGNABLE_REGISTRATION) {
             val result = api.getSignableRegistrationOffchain(
                 GetSignableRegistrationRequest(
                     etherKey = data.address,
-                    starkKey = keyPair.getStarkPublicKey()
+                    starkKey = data.starkAddress
                 )
             )
-            // Force unwrap here so that the NPE gets handled by `call`
-            result.payloadHash!! to result.signableMessage!!
-        }.thenCompose { (payloadHash, signableMessage) ->
-            signer.signMessage(signableMessage).thenApply { ethSignature ->
-                keyPair to data.copy(
-                    ethSignature = Crypto.serialiseEthSignature(ethSignature),
-                    starkSignature = StarkKey.sign(keyPair, payloadHash)
-                )
-            }
+            result.payloadHash to result.signableMessage
         }
+            .thenCompose { (payloadHash, signableMessage) ->
+                starkSigner.signMessage(payloadHash).thenApply { it to signableMessage }
+            }
+            .thenCompose { (starkSignature, signableMessage) ->
+                signer.signMessage(signableMessage).thenApply { ethSignature ->
+                    data.copy(
+                        ethSignature = Crypto.serialiseEthSignature(ethSignature),
+                        starkSignature = starkSignature
+                    )
+                }
+            }
     }
 
 @Suppress("TooGenericExceptionCaught")
 private fun registerUser(
-    keyPair: ECKeyPair,
     data: RegisterData,
     api: UsersApi
-): CompletableFuture<ECKeyPair> = if (data.isRegistered)
-    CompletableFuture.completedFuture(keyPair)
+): CompletableFuture<Unit> = if (data.isRegistered)
+    CompletableFuture.completedFuture(Unit)
 else {
     call(REGISTER_USER) {
-        val starkPublicKey = keyPair.getStarkPublicKey()
+        val starkPublicKey = data.starkAddress
         val body = RegisterUserRequest(
             ethSignature = data.ethSignature,
             etherKey = data.address,
@@ -147,12 +119,6 @@ else {
             starkSignature = data.starkSignature
         )
         api.registerUser(body)
-        keyPair
+        Unit
     }
 }
-
-internal fun ECKeyPair.getStarkPublicKey() =
-    publicKey.toString(Constants.HEX_RADIX)
-        .sanitizeBytes()
-        .hexToByteArray()
-        .toHexString(byteLength = Constants.STARK_KEY_PUBLIC_BYTE_LENGTH)

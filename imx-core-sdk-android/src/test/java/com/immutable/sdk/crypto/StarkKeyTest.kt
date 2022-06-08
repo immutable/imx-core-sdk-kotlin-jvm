@@ -1,14 +1,29 @@
 package com.immutable.sdk.crypto
 
+import com.immutable.sdk.*
 import com.immutable.sdk.extensions.toHexString
-import com.immutable.sdk.Constants
+import com.immutable.sdk.workflows.SIGNATURE
+import io.mockk.MockKAnnotations
+import io.mockk.every
+import io.mockk.impl.annotations.MockK
+import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
+import org.junit.Before
 import org.junit.Test
 import org.web3j.crypto.ECKeyPair
 import java.math.BigInteger
+import java.util.concurrent.CompletableFuture
 
 class StarkKeyTest {
+    @MockK
+    lateinit var signer: Signer
+
+    @Before
+    fun setUp() {
+        MockKAnnotations.init(this)
+    }
+
     @Test
     fun testGetAccountPath() {
         val path = StarkKey.getAccountPath("0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f")
@@ -88,6 +103,97 @@ class StarkKeyTest {
             StarkKey.fixMessage(
                 "074180eaec7e68712b5a0fbf5d63a70c33940c9b02e60565e36f84d705b669e"
             )
+        )
+    }
+
+    @Test
+    fun testGenerateSuccess() {
+        val addressFuture = CompletableFuture<String>()
+        val signatureFuture = CompletableFuture<String>()
+        every { signer.getAddress() } returns addressFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns signatureFuture
+
+        val signature =
+            "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
+                "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
+        addressFuture.complete("0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f")
+        signatureFuture.complete(signature)
+
+        testFuture(
+            future = StarkKey.generate(signer)
+        ) { ecKeyPair, throwable ->
+            assert(ecKeyPair != null)
+            assert(throwable == null)
+        }
+    }
+
+    @Test
+    fun testGenerateFailedOnGetAddress() {
+        val addressFuture = CompletableFuture<String>()
+        val signatureFuture = CompletableFuture<String>()
+        every { signer.getAddress() } returns addressFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns signatureFuture
+
+        addressFuture.completeExceptionally(TestException())
+
+        testFuture(
+            future = StarkKey.generate(signer),
+            expectedResult = null,
+            expectedError = TestException()
+        )
+    }
+
+    @Test
+    fun testGenerateFailedOnSignMessage() {
+        val addressFuture = CompletableFuture<String>()
+        val signatureFuture = CompletableFuture<String>()
+        every { signer.getAddress() } returns addressFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns signatureFuture
+
+        addressFuture.complete("5")
+        signatureFuture.completeExceptionally(TestException())
+
+        testFuture(
+            future = StarkKey.generate(signer),
+            expectedResult = null,
+            expectedError = TestException()
+        )
+    }
+
+    @Test
+    fun testGenerateFailedInvalidAddress() {
+        val addressFuture = CompletableFuture<String>()
+        val signatureFuture = CompletableFuture<String>()
+        every { signer.getAddress() } returns addressFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns signatureFuture
+
+        // invalid argument
+        addressFuture.complete("5")
+        signatureFuture.complete(SIGNATURE)
+
+        testFuture(
+            future = StarkKey.generate(signer),
+            expectedResult = null,
+            expectedError = ImmutableException.clientError("")
+        )
+    }
+
+    @Test
+    fun testGenerateFailedInvalidSignature() {
+        val signer = mockk<Signer>()
+        val addressFuture = CompletableFuture<String>()
+        val signatureFuture = CompletableFuture<String>()
+        every { signer.getAddress() } returns addressFuture
+        every { signer.signMessage(Constants.STARK_MESSAGE) } returns signatureFuture
+
+        addressFuture.complete("0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f")
+        // invalid argument
+        signatureFuture.complete("5")
+
+        testFuture(
+            future = StarkKey.generate(signer),
+            expectedResult = null,
+            expectedError = ImmutableException.clientError("")
         )
     }
 }

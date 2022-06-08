@@ -38,4 +38,12 @@ interface StarkSigner {
      * [StarkKey.sign(keyPair, msg)][com.immutable.sdk.crypto.StarkKey.sign] function.
      */
     fun signMessage(message: String): CompletableFuture<String>
+
+    /**
+     * Returns a CompletableFuture that resolves to the account address.
+     *
+     * This is a CompletableFuture so that a Signer can be designed around an asynchronous source,
+     * such as hardware wallets.
+     */
+    fun getAddress(): CompletableFuture<String>
 }

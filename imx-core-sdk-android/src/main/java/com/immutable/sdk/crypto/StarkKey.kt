@@ -1,12 +1,10 @@
 package com.immutable.sdk.crypto
 
 import androidx.annotation.VisibleForTesting
-import com.immutable.sdk.extensions.*
-import com.immutable.sdk.extensions.addHexPrefix
-import com.immutable.sdk.extensions.hexRemovePrefix
-import com.immutable.sdk.extensions.hexToByteArray
-import com.immutable.sdk.extensions.toNoPrefixHexString
 import com.immutable.sdk.Constants
+import com.immutable.sdk.ImmutableException
+import com.immutable.sdk.Signer
+import com.immutable.sdk.extensions.*
 import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.signers.ECDSASigner
 import org.bouncycastle.crypto.signers.HMacDSAKCalculator
@@ -16,6 +14,7 @@ import org.web3j.crypto.ECDSASignature
 import org.web3j.crypto.ECKeyPair
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.concurrent.CompletableFuture
 
 private const val LAYER = "starkex"
 private const val APPLICATION = "immutablex"
@@ -107,7 +106,8 @@ object StarkKey {
      * Generates the Stark key pair from the [seed] and [path]
      */
     private fun getKeyPairFromPath(seed: String, path: String): ECKeyPair {
-        val master = Bip32ECKeyPair.generateKeyPair(BigInteger(seed, Constants.HEX_RADIX).toByteArray())
+        val master =
+            Bip32ECKeyPair.generateKeyPair(BigInteger(seed, Constants.HEX_RADIX).toByteArray())
         val pathArray =
             path.split("/") // Example: "m/2645'/579218131'/211006541'/9971226311'/947333111'/1"
         val p = pathArray
@@ -163,6 +163,36 @@ object StarkKey {
             sig.r.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO) +
                 sig.s.toByteArray().toNoPrefixHexString().padStart(64, Constants.CHAR_ZERO)
             ).addHexPrefix()
+    }
+
+    /**
+     * Generate a Stark key pair from a L1 wallet.
+     */
+    @Suppress("TooGenericExceptionCaught", "SwallowedException")
+    fun generate(signer: Signer): CompletableFuture<ECKeyPair> {
+        return signer.getAddress()
+            .thenCompose { address ->
+                signer.signMessage(Constants.STARK_MESSAGE).thenApply { address to it }
+            }
+            .thenCompose { (address, signature) ->
+                val keyPairFuture = CompletableFuture<ECKeyPair>()
+                CompletableFuture.runAsync {
+                    try {
+                        val keyPair = getKeyFromRawSignature(signature, address)
+                        if (keyPair == null)
+                            keyPairFuture.completeExceptionally(
+                                ImmutableException.clientError("Failed to generate Stark key pair")
+                            )
+                        else
+                            keyPairFuture.complete(keyPair)
+                    } catch (e: Exception) {
+                        keyPairFuture.completeExceptionally(
+                            ImmutableException.clientError("Failed to generate Stark key pair")
+                        )
+                    }
+                }
+                keyPairFuture
+            }
     }
 
     /**

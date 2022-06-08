@@ -30,6 +30,7 @@ private val SECP_ORDER = BigInteger(
     Constants.HEX_RADIX,
 )
 private const val SHA_256 = "SHA-256"
+private const val GENERATE_ERROR_MESSAGE = "Failed to generate Stark key pair"
 
 object StarkKey {
     /**
@@ -181,13 +182,13 @@ object StarkKey {
                         val keyPair = getKeyFromRawSignature(signature, address)
                         if (keyPair == null)
                             keyPairFuture.completeExceptionally(
-                                ImmutableException.clientError("Failed to generate Stark key pair")
+                                ImmutableException.clientError(GENERATE_ERROR_MESSAGE)
                             )
                         else
                             keyPairFuture.complete(keyPair)
                     } catch (e: Exception) {
                         keyPairFuture.completeExceptionally(
-                            ImmutableException.clientError("Failed to generate Stark key pair")
+                            ImmutableException.clientError(GENERATE_ERROR_MESSAGE)
                         )
                     }
                 }

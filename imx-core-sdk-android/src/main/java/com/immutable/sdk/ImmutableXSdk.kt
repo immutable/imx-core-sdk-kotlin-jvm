@@ -96,8 +96,8 @@ object ImmutableXSdk {
      *
      * @param signer represents the users L1 wallet to get the address and sign the registration
      *
-     * @return a [CompletableFuture] that will provide the Stark key pair if successful. This
-     * key pair needs to be securely stored as exposing this risks the users assets and wallet.
+     * @return a [CompletableFuture] if successful will return [Unit] otherwise there will be a
+     * throwable
      */
     fun registerOffChain(signer: Signer, starkSigner: StarkSigner): CompletableFuture<Unit> =
         com.immutable.sdk.workflows.registerOffChain(signer, starkSigner)

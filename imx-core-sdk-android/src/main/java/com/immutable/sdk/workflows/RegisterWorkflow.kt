@@ -25,7 +25,6 @@ private data class RegisterData(
 
 /**
  * This is a utility function that will register a user to Immutable X if they aren't already
- * and then return their Stark key pair.
  */
 internal fun registerOffChain(
     signer: Signer,

@@ -91,13 +91,12 @@ object ImmutableXSdk {
     }
 
     /**
-     * This is a utility function that will register a user to Immutable X if they aren't already
-     * and then return their Stark key pair.
+     * This is a utility function that will register a user to Immutable X if they aren't already.
      *
      * @param signer represents the users L1 wallet to get the address and sign the registration
      *
-     * @return a [CompletableFuture] if successful will return [Unit] otherwise there will be a
-     * throwable
+     * @return a [CompletableFuture] with the value [Unit] being provided on success. If it failed
+     * a [Throwable] will be given.
      */
     fun registerOffChain(signer: Signer, starkSigner: StarkSigner): CompletableFuture<Unit> =
         com.immutable.sdk.workflows.registerOffChain(signer, starkSigner)

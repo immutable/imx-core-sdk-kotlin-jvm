@@ -18,6 +18,7 @@ import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
+private const val STARK_ADDRESS = "0xb76e3eeb2f7143165618ab8feaabcd395b6fac7f"
 private const val SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
@@ -31,8 +32,12 @@ class RegisterWorkflowTest {
     @MockK
     private lateinit var signer: Signer
 
+    @MockK
+    private lateinit var starkSigner: StarkSigner
+
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var starkSeedFuture: CompletableFuture<String>
+    private lateinit var starkAddressFuture: CompletableFuture<String>
+    private lateinit var starkSignatureFuture: CompletableFuture<String>
     private lateinit var ethSignatureFuture: CompletableFuture<String>
 
     private val signableResponse = GetSignableRegistrationOffchainResponse(
@@ -47,8 +52,11 @@ class RegisterWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        starkSeedFuture = CompletableFuture<String>()
-        every { signer.signMessage(Constants.STARK_MESSAGE) } returns starkSeedFuture
+        starkAddressFuture = CompletableFuture<String>()
+        every { starkSigner.getAddress() } returns starkAddressFuture
+
+        starkSignatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(STARK_PAYLOAD) } returns starkSignatureFuture
 
         ethSignatureFuture = CompletableFuture<String>()
         every { signer.signMessage(ETH_SIGNATURE) } returns ethSignatureFuture
@@ -63,10 +71,10 @@ class RegisterWorkflowTest {
     fun testPreRegisteredUserRegisterOffChainSuccess() {
         every { api.getUsers(ADDRESS) } returns GetUsersApiResponse(listOf("account"))
         addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = registerOffChain(signer, api)
+            future = registerOffChain(signer, starkSigner, api)
         ) { ecKeyPair, throwable ->
             assert(throwable == null)
             assert(ecKeyPair != null)
@@ -80,11 +88,12 @@ class RegisterWorkflowTest {
         every { api.registerUser(any()) } returns RegisterUserResponse("txHash")
 
         addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
+        starkAddressFuture.complete(STARK_ADDRESS)
+        starkSignatureFuture.complete(SIGNATURE)
         ethSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = registerOffChain(signer, api)
+            future = registerOffChain(signer, starkSigner, api)
         ) { ecKeyPair, throwable ->
             assert(throwable == null)
             assert(ecKeyPair != null)
@@ -98,7 +107,7 @@ class RegisterWorkflowTest {
         addressFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -107,29 +116,30 @@ class RegisterWorkflowTest {
     }
 
     @Test
-    fun testRegisterOffChainFailedOnStarkSignature() {
-        addressFuture.complete(ADDRESS)
-        starkSeedFuture.completeExceptionally(TestException())
+    fun testRegisterOffChainFailedOnStarkAddress() {
+        addressFuture.complete(STARK_ADDRESS)
+        starkAddressFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
             expectedError = TestException()
         )
     }
 
     @Test
-    fun testRegisterOffChainFailedOnStarkKeyGenerationException() {
-        // Invalid argument
-        val address = "5"
-        val signature = "5"
-        addressFuture.complete(address)
-        starkSeedFuture.complete(signature)
+    fun testRegisterOffChainFailedOnStarkSignature() {
+        every { api.getUsers(ADDRESS) } throws ClientException(statusCode = 404)
+        every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
+
+        addressFuture.complete(ADDRESS)
+        starkAddressFuture.complete(STARK_ADDRESS)
+        starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
-            expectedError = ImmutableException.clientError("")
+            expectedError = TestException()
         )
     }
 
@@ -137,10 +147,11 @@ class RegisterWorkflowTest {
     fun testRegisterOffChainFailedOnIsRegistered() {
         every { api.getUsers(any()) } throws ClientException()
         addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
+        starkAddressFuture.complete(STARK_ADDRESS)
+        starkSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
@@ -152,11 +163,12 @@ class RegisterWorkflowTest {
             ClientException(statusCode = HttpURLConnection.HTTP_NOT_FOUND)
         every { api.getSignableRegistrationOffchain(any()) } returns signableResponse
         addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
+        starkAddressFuture.complete(STARK_ADDRESS)
+        starkSignatureFuture.complete(SIGNATURE)
         ethSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -169,11 +181,12 @@ class RegisterWorkflowTest {
         every { api.getSignableRegistrationOffchain(any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
+        starkAddressFuture.complete(STARK_ADDRESS)
+        starkSignatureFuture.complete(SIGNATURE)
         ethSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
@@ -187,11 +200,12 @@ class RegisterWorkflowTest {
         every { api.registerUser(any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        starkSeedFuture.complete(SIGNATURE)
+        starkAddressFuture.complete(STARK_ADDRESS)
+        starkSignatureFuture.complete(SIGNATURE)
         ethSignatureFuture.complete(SIGNATURE)
 
         testFuture(
-            future = registerOffChain(signer, api),
+            future = registerOffChain(signer, starkSigner, api),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )

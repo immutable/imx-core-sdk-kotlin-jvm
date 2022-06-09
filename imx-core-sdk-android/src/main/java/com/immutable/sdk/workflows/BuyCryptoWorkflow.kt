@@ -103,7 +103,7 @@ internal fun buyCrypto(
 @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
 private fun isWalletRegistered(address: String, userApi: UsersApi): Boolean {
     return try {
-        userApi.getUsers(address).accounts?.isNotEmpty() == true
+        userApi.getUsers(address).accounts.isNotEmpty()
     } catch (e: Exception) {
         if (e is ClientException && e.statusCode == HttpURLConnection.HTTP_NOT_FOUND) false
         else throw e

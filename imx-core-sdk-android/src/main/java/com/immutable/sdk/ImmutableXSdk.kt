@@ -4,13 +4,12 @@ import android.content.Context
 import android.graphics.Color
 import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
+import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import com.immutable.sdk.api.model.FeeEntry
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
-import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import okhttp3.logging.HttpLoggingInterceptor
-import org.web3j.crypto.ECKeyPair
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -92,16 +91,15 @@ object ImmutableXSdk {
     }
 
     /**
-     * This is a utility function that will register a user to Immutable X if they aren't already
-     * and then return their Stark key pair.
+     * This is a utility function that will register a user to Immutable X if they aren't already.
      *
      * @param signer represents the users L1 wallet to get the address and sign the registration
      *
-     * @return a [CompletableFuture] that will provide the Stark key pair if successful. This
-     * key pair needs to be securely stored as exposing this risks the users assets and wallet.
+     * @return a [CompletableFuture] with the value [Unit] being provided on success. If it failed
+     * a [Throwable] will be given.
      */
-    fun registerOffChain(signer: Signer): CompletableFuture<ECKeyPair> =
-        com.immutable.sdk.workflows.registerOffChain(signer)
+    fun registerOffChain(signer: Signer, starkSigner: StarkSigner): CompletableFuture<Unit> =
+        com.immutable.sdk.workflows.registerOffChain(signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to buy an existing order.

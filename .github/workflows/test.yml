@@ -21,13 +21,13 @@ jobs:
         uses: paambaati/codeclimate-action@v3.0.0
         env:
           CC_TEST_REPORTER_ID: ${{ secrets.CC_TEST_REPORTER_ID }}
-          JACOCO_SOURCE_PATH: "imx-core-sdk-android/src/main/java"
+          JACOCO_SOURCE_PATH: "imx-core-sdk-kotlin-jvm/src/main/java"
         with:
-          coverageCommand: ./gradlew imx-core-sdk-android:testDebugUnitTestCoverage --stacktrace
-          coverageLocations: imx-core-sdk-android/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml:jacoco
+          coverageCommand: ./gradlew imx-core-sdk-kotlin-jvm:testDebugUnitTestCoverage --stacktrace
+          coverageLocations: imx-core-sdk-kotlin-jvm/build/reports/jacoco/testDebugUnitTestCoverage/testDebugUnitTestCoverage.xml:jacoco
 
       - name: Unit tests results
         uses: actions/upload-artifact@v1
         with:
           name: unit-tests-results
-          path: imx-core-sdk-android/build/reports/tests/testDebugUnitTest
+          path: imx-core-sdk-kotlin-jvm/build/reports/tests/testDebugUnitTest

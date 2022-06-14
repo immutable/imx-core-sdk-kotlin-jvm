@@ -1,6 +1,6 @@
-# Module imx-core-sdk-android
+# Module imx-core-sdk-kotlin-jvm
 
-This module is the Immutable X Core SDK for Android.
+This module is the Immutable X Core SDK for Kotlin/JVM.
 
 It contains the API Client for interacting with the platform, workflows for doing standard transactions, and layer 2 signing functions.
 

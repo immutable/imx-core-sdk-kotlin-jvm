@@ -20,7 +20,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        run: ./gradlew imx-core-sdk-android:build
+        run: ./gradlew imx-core-sdk-kotlin-jvm:build
 
       - name: Generate changelog and bump up version
         uses: TriPSs/conventional-changelog-action@v3

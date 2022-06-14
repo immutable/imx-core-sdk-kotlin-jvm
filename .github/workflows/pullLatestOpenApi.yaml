@@ -20,7 +20,7 @@ jobs:
           file-name: 'openapi.json'
 
       - name: Build
-        run: ./gradlew imx-core-sdk-android:build
+        run: ./gradlew imx-core-sdk-kotlin-jvm:build
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v4

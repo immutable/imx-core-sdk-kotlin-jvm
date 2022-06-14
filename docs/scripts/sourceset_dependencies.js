@@ -1,1 +1,0 @@
-sourceset_dependencies='{":imx-core-sdk-android:dokkaHtml/androidTestRelease":[],":imx-core-sdk-android:dokkaHtml/debug":[],":imx-core-sdk-android:dokkaHtml/main":[],":imx-core-sdk-android:dokkaHtml/release":[],":imx-core-sdk-android:dokkaHtml/testFixtures":[],":imx-core-sdk-android:dokkaHtml/testFixturesDebug":[],":imx-core-sdk-android:dokkaHtml/testFixturesRelease":[]}'

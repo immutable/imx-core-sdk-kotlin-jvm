@@ -8,7 +8,6 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
     id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
     id 'jacoco'
-    id "org.jetbrains.dokka"
 }
 
 def getArtifactId = { ->
@@ -115,8 +114,6 @@ android {
 
     preBuild.dependsOn(tasks.ktlintCheck)
     preBuild.dependsOn(tasks.detekt)
-    preBuild.finalizedBy(tasks.dokkaHtml)
-    tasks.dokkaHtml.dependsOn(tasks.cleanDocs)
     tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
 }
 
@@ -190,36 +187,6 @@ detekt {
     allRules = false // activate all available (even unstable) rules.
     config = files("../.github/detekt/config/detekt.yml")
     // point to your custom config defining rules to run, overwriting default behavior
-}
-
-dokkaHtml.configure {
-    outputDirectory.set(file("$rootDir/docs"))
-
-    dokkaSourceSets {
-        configureEach {
-            perPackageOption {
-                matchingRegex.set("org.openapitools.*")
-                suppress.set(true)
-            }
-
-            perPackageOption {
-                matchingRegex.set("com.immutable.sdk.api.*")
-                suppress.set(true)
-            }
-
-            perPackageOption {
-                matchingRegex.set("com.immutable.sdk.api")
-                suppress.set(true)
-            }
-
-            perPackageOption {
-                matchingRegex.set("com.immutable.sdk.crypto")
-                suppress.set(true)
-            }
-
-            includes.from("packages.md")
-        }
-    }
 }
 
 // Start code coverage

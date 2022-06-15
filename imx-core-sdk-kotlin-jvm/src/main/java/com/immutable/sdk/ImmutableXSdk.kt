@@ -1,8 +1,5 @@
 package com.immutable.sdk
 
-import android.content.Context
-import android.graphics.Color
-import androidx.annotation.ColorInt
 import androidx.annotation.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
@@ -193,17 +190,12 @@ object ImmutableXSdk {
      * @throws Throwable if any error occurs
      */
     fun buyCrypto(
-        context: Context,
         signer: Signer,
-        @ColorInt colourInt: Int = Color.parseColor(DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR),
         colourCodeHex: String = DEFAULT_MOONPAY_COLOUR_CODE
-    ) {
+    ): CompletableFuture<String> =
         com.immutable.sdk.workflows.buyCrypto(
             base = base,
-            context = context,
             signer = signer,
-            colourInt = colourInt,
             colourCodeHex = colourCodeHex
         )
-    }
 }

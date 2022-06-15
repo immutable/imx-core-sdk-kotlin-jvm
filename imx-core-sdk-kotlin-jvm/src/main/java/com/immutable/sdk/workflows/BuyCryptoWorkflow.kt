@@ -1,14 +1,6 @@
 package com.immutable.sdk.workflows
 
-import android.content.Context
-import android.content.Intent
-import android.graphics.Color
-import android.net.Uri
-import androidx.annotation.ColorInt
-import androidx.annotation.VisibleForTesting
-import androidx.browser.customtabs.CustomTabColorSchemeParams
-import androidx.browser.customtabs.CustomTabsIntent
-import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
@@ -26,6 +18,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import org.openapitools.client.infrastructure.ClientException
 import java.net.HttpURLConnection
+import java.util.concurrent.CompletableFuture
 
 @VisibleForTesting
 internal const val ID = "id"
@@ -60,44 +53,40 @@ private const val HEADER_CONTENT_TYPE = "Content-Type"
 @Suppress("TooGenericExceptionCaught", "LongParameterList")
 internal fun buyCrypto(
     base: ImmutableXBase,
-    context: Context,
     signer: Signer,
     client: OkHttpClient = OkHttpClient.Builder().build(),
-    @ColorInt colourInt: Int,
     colourCodeHex: String,
     usersApi: UsersApi = UsersApi()
-) {
-    try {
-        // Get connected wallet address
-        val address = signer.getAddress().get()
-        // Check that the wallet is registered
-        val isRegistered = isWalletRegistered(address, usersApi)
-        check(isRegistered) {
-            "Wallet is not registered. Call ImmutableXSdk.registerOffChain() to register your wallet."
+): CompletableFuture<String> {
+    val future = CompletableFuture<String>()
+    CompletableFuture.runAsync {
+        try {
+            val address = signer.getAddress().get()
+            check(isWalletRegistered(address, usersApi)) {
+                "Wallet is not registered. Call ImmutableXSdk.registerOffChain() to register your wallet."
+            }
+
+            val transactionId =
+                getTransactionId(walletAddress = address, base = base, client = client)
+
+            // Get supported fiat to crypto currencies
+            val currencies =
+                getSupportedCurrencies(walletAddress = address, base = base, client = client)
+            future.complete(
+                getBuyCryptoUrl(
+                    walletAddress = address,
+                    transactionId = transactionId,
+                    currencies = currencies,
+                    base = base,
+                    client = client,
+                    colourCodeHex = colourCodeHex
+                )
+            )
+        } catch (e: Exception) {
+            future.completeExceptionally(e.cause ?: e)
         }
-        // Get transaction ID
-        val transactionId = getTransactionId(walletAddress = address, base = base, client = client)
-        // Get supported fiat to crypto currencies
-        val currencies =
-            getSupportedCurrencies(walletAddress = address, base = base, client = client)
-        // Get Moonpay buy crypto URL
-        val url = getBuyCryptoUrl(
-            walletAddress = address,
-            transactionId = transactionId,
-            currencies = currencies,
-            base = base,
-            client = client,
-            colourCodeHex = colourCodeHex
-        )
-        // Launch Chrome Custom Tab with Moonpay buy crypto URL
-        launchCustomTabs(
-            context = context,
-            url = url,
-            toolbarColourInt = colourInt
-        )
-    } catch (e: Exception) {
-        e.cause?.let { throw it } ?: throw e
     }
+    return future
 }
 
 @Suppress("TooGenericExceptionCaught", "InstanceOfCheckForException")
@@ -201,32 +190,6 @@ private fun post(
         .build()
     val response = client.newCall(request).execute()
     return response.getJson() ?: JSONObject()
-}
-
-/**
- * Launches a Chrome Custom Tab with the given [url]
- *
- * @param context the source context
- * @param url the URL to open
- * @param toolbarColourInt (optional) the colour of the Chrome Custom Tab address bar. The default
- * value is [DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR]
- */
-private fun launchCustomTabs(
-    context: Context,
-    url: String,
-    @ColorInt toolbarColourInt: Int = Color.parseColor(
-        DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
-    )
-) {
-    val customTabsIntent = CustomTabsIntent.Builder().setDefaultColorSchemeParams(
-        CustomTabColorSchemeParams.Builder()
-            .setToolbarColor(toolbarColourInt)
-            .build()
-    ).build()
-    customTabsIntent.run {
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        launchUrl(context, Uri.parse(url))
-    }
 }
 
 @JsonClass(generateAdapter = true)

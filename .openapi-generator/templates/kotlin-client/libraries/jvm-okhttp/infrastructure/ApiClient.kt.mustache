@@ -3,9 +3,6 @@ package {{packageName}}.infrastructure
 import com.immutable.sdk.BuildConfig
 import com.immutable.sdk.ImmutableXHttpLoggingLevel
 import com.immutable.sdk.ImmutableXSdk
-{{#supportAndroidApiLevel25AndBelow}}
-import android.os.Build
-{{/supportAndroidApiLevel25AndBelow}}
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 {{#jvm-okhttp3}}
@@ -249,17 +246,7 @@ import okhttp3.logging.HttpLoggingInterceptor
         }
         if (T::class.java == File::class.java) {
             // return tempfile
-            {{^supportAndroidApiLevel25AndBelow}}
             val f = java.nio.file.Files.createTempFile("tmp.{{packageName}}", null).toFile()
-            {{/supportAndroidApiLevel25AndBelow}}
-            {{#supportAndroidApiLevel25AndBelow}}
-            val f = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                java.nio.file.Files.createTempFile("tmp.net.medicineone.teleconsultationandroid.openapi.openapicommon", null).toFile()
-            } else {
-                @Suppress("DEPRECATION")
-                createTempFile("tmp.net.medicineone.teleconsultationandroid.openapi.openapicommon", null)
-            }
-            {{/supportAndroidApiLevel25AndBelow}}
             f.deleteOnExit()
             val out = BufferedWriter(FileWriter(f))
             out.write(bodyContent)

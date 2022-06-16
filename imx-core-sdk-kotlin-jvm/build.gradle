@@ -118,16 +118,18 @@ android {
 }
 
 dependencies {
-    implementation 'androidx.core:core-ktx:1.7.0'
-
-    // Required for the generated SDK code
+    // Required for the generated API client
     implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
     // Web3
-    implementation "org.web3j:core:4.8.7-android"
+    implementation "org.web3j:core:4.8.7"
 
+    // Json
+    implementation 'org.json:json:20220320'
+
+    // Google Common Java
     implementation("com.google.guava:guava:31.1-jre")
 
     testImplementation 'junit:junit:4.13.2'

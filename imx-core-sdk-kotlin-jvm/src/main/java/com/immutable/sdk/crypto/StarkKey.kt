@@ -1,6 +1,6 @@
 package com.immutable.sdk.crypto
 
-import androidx.annotation.VisibleForTesting
+import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer

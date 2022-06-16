@@ -1,7 +1,6 @@
 package com.immutable.sdk
 
-import androidx.annotation.VisibleForTesting
-import com.immutable.sdk.Constants.DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR
+import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import com.immutable.sdk.api.model.FeeEntry
 import com.immutable.sdk.model.AssetModel

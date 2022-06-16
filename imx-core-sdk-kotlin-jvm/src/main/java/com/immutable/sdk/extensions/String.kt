@@ -1,6 +1,6 @@
 package com.immutable.sdk.extensions
 
-import androidx.annotation.VisibleForTesting
+import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants
 import com.immutable.sdk.Constants.CHAR_ZERO
 import com.immutable.sdk.Constants.HEX_PREFIX

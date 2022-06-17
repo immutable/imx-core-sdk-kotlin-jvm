@@ -118,15 +118,13 @@ java {
 }
 
 publishing {
-    publishing {
-        publications {
-            maven(MavenPublication) {
-                artifactId = getArtifactId
-                groupId = group
-                version = version
+    publications {
+        maven(MavenPublication) {
+            artifactId = getArtifactId()
+            groupId = group
+            version = version
 
-                from components.java
-            }
+            from components.java
         }
     }
 

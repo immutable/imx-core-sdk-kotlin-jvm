@@ -7,3 +7,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "ImmutableX Core SDK Kotlin JVM"
 include ':imx-core-sdk-kotlin-jvm'
+include ':sample'

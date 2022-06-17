@@ -1,44 +1,8 @@
 plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-}
-
-android {
-    compileSdk 32
-
-    defaultConfig {
-        applicationId "com.immutable.sdkdemo"
-        minSdk 27
-        targetSdk 32
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+    id 'org.jetbrains.kotlin.jvm' version "1.6.20"
+    id 'application'
 }
 
 dependencies {
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.5.2-native-mt"
-    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.0"
-    implementation 'androidx.core:core-ktx:1.7.0'
-    implementation 'androidx.appcompat:appcompat:1.4.1'
-    implementation 'com.google.android.material:material:1.5.0'
     implementation project(path: ':imx-core-sdk-kotlin-jvm')
-
-    // Web3
-    implementation "org.web3j:core:4.8.7-android"
 }

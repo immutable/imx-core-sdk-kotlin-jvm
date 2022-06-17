@@ -55,7 +55,9 @@ private fun getOrderDetails(
         api.getOrder(
             id = orderId,
             includeFees = true,
-            auxiliaryFeePercentages = fees.joinToString(separator = COMMA) { it.feePercentage?.toString()!! },
+            auxiliaryFeePercentages = fees.joinToString(separator = COMMA) {
+                it.feePercentage?.toString()!!
+            },
             auxiliaryFeeRecipients = fees.joinToString(separator = COMMA) { it.address!! },
         )
     }

@@ -31,7 +31,9 @@ internal fun cancel(
 }
 
 private fun getSignableCancelOrder(orderId: String, api: OrdersApi) = call(SIGNABLE_CANCEL_ORDER) {
-    api.getSignableCancelOrder(GetSignableCancelOrderRequest(orderId = orderId.toInt())).payloadHash!!
+    api.getSignableCancelOrder(
+        GetSignableCancelOrderRequest(orderId = orderId.toInt())
+    ).payloadHash
 }
 
 private fun cancelOrder(

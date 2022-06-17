@@ -1,6 +1,7 @@
 plugins {
-    id 'com.android.library'
-    id 'kotlin-android'
+    id 'org.jetbrains.kotlin.jvm' version "1.6.20"
+    id 'java-library'
+
     // If updating openapi version check the custom templates are still relevant in
     // this directory: .openapi-generator/templates
     id "org.openapi.generator" version "5.3.0"
@@ -15,109 +16,72 @@ def getArtifactId = { ->
 }
 
 def getVersionName = { ->
-    def versionFile = new org.yaml.snakeyaml.Yaml().load( new File("version.yml").newInputStream() )
+    def versionFile = new org.yaml.snakeyaml.Yaml().load(new File("$rootDir/version.yml").newInputStream())
     return versionFile.version
 }
 
-task cleanGeneratedClient() {
+group 'com.immutable.sdk'
+version getVersionName()
+
+tasks.create('cleanGeneratedClient') {
     delete "$project.projectDir/generated"
 }
 
-task cleanDocs() {
-    delete "$rootDir/docs"
+openApiGenerate {
+    generatorName = "kotlin"
+    inputSpec = "$rootDir/openapi.json".toString()
+    outputDir = "$project.projectDir/generated".toString()
+    apiPackage = "com.immutable.sdk.api"
+    invokerPackage = "com.immutable.sdk.invoker"
+    modelPackage = "com.immutable.sdk.api.model"
+    // For version 5.3.0 this override is performed to add null as a default for !required parameters
+    templateDir = "$rootDir/.openapi-generator/templates/kotlin-client/libraries/jvm-okhttp"
+    configOptions = [
+            dateLibrary: "java8"
+    ]
+    languageSpecificPrimitives = ["Double"]
+    typeMappings = [
+            number: "Double"
+    ]
+    importMappings = [
+            // OpenAPI specs sets 'Asset.orders.sell_orders' type to an array of objects (i.e. List<Any>),
+            // this makes it really difficult to cast it to List<SellOrders>. So instead we create an
+            // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
+            OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"
+    ]
 }
 
-android {
-    compileSdk 32
-
-    namespace = "com.immutable.sdk"
-
-    defaultConfig {
-        minSdk 27
-        targetSdk 32
-
-        aarMetadata {
-            minCompileSdk = 27
-        }
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-
-        buildConfigField "String", "VERSION", "\"${getVersionName()}\""
+sourceSets {
+    main {
+        java.srcDirs = ["$project.projectDir/generated/src/main/kotlin"]
     }
-
-    testOptions {
-        unitTests.all {
-            jacoco {
-                includeNoLocationClasses = true
-            }
-        }
-        unitTests.returnDefaultValues = true
-    }
-
-    buildTypes {
-        debug {
-            minifyEnabled false
-        }
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
-
-    openApiGenerate {
-        generatorName = "kotlin"
-        inputSpec = "$rootDir/openapi.json".toString()
-        outputDir = "$project.projectDir/generated".toString()
-        apiPackage = "com.immutable.sdk.api"
-        invokerPackage = "com.immutable.sdk.invoker"
-        modelPackage = "com.immutable.sdk.api.model"
-        // For version 5.3.0 this override is performed to add null as a default for !required parameters
-        templateDir = "$rootDir/.openapi-generator/templates/kotlin-client/libraries/jvm-okhttp"
-        configOptions = [
-                dateLibrary: "java8"
-        ]
-        languageSpecificPrimitives = ["Double"]
-        typeMappings = [
-                number: "Double"
-        ]
-        importMappings = [
-                // OpenAPI specs sets 'Asset.orders.sell_orders' type to an array of objects (i.e. List<Any>),
-                // this makes it really difficult to cast it to List<SellOrders>. So instead we create an
-                // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
-                OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"
-        ]
-    }
-
-    sourceSets {
-        main {
-            java.srcDirs = ["$project.projectDir/generated/src/main/kotlin"]
-        }
-    }
-
-    publishing {
-        singleVariant("release") {
-            withSourcesJar()
-            withJavadocJar()
-        }
-    }
-
-    // Generate all apis before every build
-    preBuild.dependsOn(tasks.openApiGenerate)
-
-    preBuild.dependsOn(tasks.ktlintCheck)
-    preBuild.dependsOn(tasks.detekt)
-    tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
 }
+
+// Used in place of the Android BuildConfig to give the ApiClient access to the version
+tasks.create('generateBuildConfig') {
+    ext.outputDir = "$project.projectDir/generated/src/main/kotlin"
+    inputs.property('version', project.version)
+    outputs.dir outputDir
+    doLast {
+        mkdir "$outputDir/com/immutable/sdk"
+        file("$outputDir/com/immutable/sdk/BuildConfig.java").text =
+                """|package com.immutable.sdk;
+               |public class BuildConfig {
+               |    public static String VERSION = "${project.version}";
+               |}""".stripMargin()
+    }
+}
+
+// Generate all apis before every build
+compileKotlin.dependsOn(tasks.openApiGenerate)
+compileKotlin.dependsOn(tasks.ktlintCheck)
+compileKotlin.dependsOn(tasks.detekt)
+tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
+tasks.openApiGenerate.dependsOn(tasks.generateBuildConfig)
 
 dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
     // Required for the generated API client
     implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
     implementation "com.squareup.okhttp3:okhttp:4.9.3"
@@ -145,15 +109,23 @@ if (githubPropertiesFile.exists()) {
     githubProperties.load(new FileInputStream(githubPropertiesFile))
 }
 
-publishing {
-    publications {
-        release(MavenPublication) {
-            groupId 'com.immutable.sdk' // Replace with group ID
-            artifactId getArtifactId()
-            version getVersionName()
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
 
-            afterEvaluate {
-                from components.release
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publishing {
+        publications {
+            maven(MavenPublication) {
+                artifactId = getArtifactId
+                groupId = group
+                version = version
+
+                from components.java
             }
         }
     }
@@ -190,7 +162,7 @@ detekt {
     // point to your custom config defining rules to run, overwriting default behavior
 }
 
-// Start code coverage
+// ** Start code coverage **
 jacoco {
     toolVersion = "0.8.7"
 }
@@ -202,86 +174,54 @@ tasks.withType(Test) {
 }
 
 // Creates a task for generating the jacoco coverage report
-project.afterEvaluate {
-    (android.hasProperty('applicationVariants')
-            ? android.'applicationVariants'
-            : android.'libraryVariants')
-            .all { variant ->
-                def variantName = variant.name
-                def unitTestTask = "test${variantName.capitalize()}UnitTest"
+tasks.create(name: "testCoverage", type: JacocoReport, dependsOn: ["test"]) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for the test build"
 
-                tasks.create(name: "${unitTestTask}Coverage", type: JacocoReport, dependsOn: [
-                        "$unitTestTask",
-                ]) {
-                    group = "Reporting"
-                    description = "Generate Jacoco coverage reports for the ${variantName.capitalize()} build"
+    reports {
+        html.required = true
+        xml.required = true
+    }
 
-                    reports {
-                        html.required = true
-                        xml.required = true
-                    }
+    def excludes = [
+            // kotlin
+            '**/*MapperImpl*.*',
+            '**/*$ViewInjector*.*',
+            '**/*$ViewBinder*.*',
+            '**/BuildConfig.*',
+            '**/*Component*.*',
+            '**/*BR*.*',
+            '**/Manifest*.*',
+            '**/*$Lambda$*.*',
+            '**/*Companion*.*',
+            '**/*Module*.*',
+            '**/*Dagger*.*',
+            '**/*Hilt*.*',
+            '**/*MembersInjector*.*',
+            '**/*_MembersInjector.class',
+            '**/*_Factory*.*',
+            '**/*_Provide*Factory*.*',
+            '**/*Extensions*.*',
+            // sealed and data classes
+            '**/*$Result.*',
+            '**/*$Result$*.*',
+            // Auto-generated code
+            '**/com/immutable/sdk/api/**',
+            '**/org/openapitools/**',
+            'test/**'
+    ]
 
-                    def excludes = [
-                            // data binding
-                            'android/databinding/**/*.class',
-                            '**/android/databinding/*Binding.class',
-                            '**/android/databinding/*',
-                            '**/androidx/databinding/*',
-                            '**/BR.*',
-                            // android
-                            '**/R.class',
-                            '**/R$*.class',
-                            '**/BuildConfig.*',
-                            '**/Manifest*.*',
-                            '**/*Test*.*',
-                            'android/**/*.*',
-                            // kotlin
-                            '**/*MapperImpl*.*',
-                            '**/*$ViewInjector*.*',
-                            '**/*$ViewBinder*.*',
-                            '**/BuildConfig.*',
-                            '**/*Component*.*',
-                            '**/*BR*.*',
-                            '**/Manifest*.*',
-                            '**/*$Lambda$*.*',
-                            '**/*Companion*.*',
-                            '**/*Module*.*',
-                            '**/*Dagger*.*',
-                            '**/*Hilt*.*',
-                            '**/*MembersInjector*.*',
-                            '**/*_MembersInjector.class',
-                            '**/*_Factory*.*',
-                            '**/*_Provide*Factory*.*',
-                            '**/*Extensions*.*',
-                            // sealed and data classes
-                            '**/*$Result.*',
-                            '**/*$Result$*.*',
-                            '/com/immutable/sdk/api/**',
-                            '/org/openapitools/**',
-                    ]
+    def javaClasses = fileTree(dir: "${buildDir}/classes/java",
+            excludes: excludes)
+    def kotlinClasses = fileTree(dir: "${buildDir}/classes/kotlin",
+            excludes: excludes)
 
-                    def javaClasses = fileTree(dir: variant.javaCompileProvider.get().destinationDir,
-                            excludes: excludes)
-                    def kotlinClasses = fileTree(dir: "${buildDir}/tmp/kotlin-classes/${variantName}",
-                            excludes: excludes)
+    classDirectories.setFrom(files([
+            javaClasses,
+            kotlinClasses
+    ]))
 
-                    classDirectories.setFrom(files([
-                            javaClasses,
-                            kotlinClasses
-                    ]))
-
-                    def variantSourceSets = variant.sourceSets.java.srcDirs.collect { it.path }.flatten()
-                    sourceDirectories.setFrom(project.files(variantSourceSets))
-
-                    def androidTestsData = fileTree(dir: "${buildDir}/outputs/code_coverage/${variantName}AndroidTest/connected/", includes: ["**/*.ec"])
-
-                    executionData(files([
-                            "$project.buildDir/jacoco/${unitTestTask}.exec",
-                            androidTestsData
-                    ]))
-                }
-
-            }
+    executionData(files(["$project.buildDir/jacoco/test.exec"]))
 }
 
 // Kotlin 1.5+ only works with version 0.8.7
@@ -294,4 +234,4 @@ configurations.all {
         }
     }
 }
-// End code coverage
+// ** End code coverage **

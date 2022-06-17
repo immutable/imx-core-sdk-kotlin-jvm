@@ -96,7 +96,7 @@ class BuyCryptoWorkflowTest {
         every { any<JSONObject>().toURLEncodedString() } returns URL_ENCODED_JSON_STRING
 
         mockkStatic(URLEncoder::class)
-        every { URLEncoder.encode(any(), any()) } returns ENCODED_CURRENCIES
+        every { URLEncoder.encode(any(), any<String>()) } returns ENCODED_CURRENCIES
 
         every { jsonObject.getLong(ID) } returns TRANSACTION_ID
         every { jsonObject.getString(SIGNATURE) } returns MOONPAY_SIGNED_REQUEST

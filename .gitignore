@@ -1,13 +1,11 @@
 *.iml
 .gradle
-/local.properties
 /.idea/*
 .DS_Store
 /build
 /captures
 .externalNativeBuild
 .cxx
-local.properties
 github.properties
 
 # jvm-okhttp/api.mustache is the only file we want to keep

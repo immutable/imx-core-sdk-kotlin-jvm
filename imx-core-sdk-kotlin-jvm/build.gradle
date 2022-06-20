@@ -1,0 +1,235 @@
+plugins {
+    id 'org.jetbrains.kotlin.jvm' version "1.6.20"
+    id 'java-library'
+
+    // If updating openapi version check the custom templates are still relevant in
+    // this directory: .openapi-generator/templates
+    id "org.openapi.generator" version "5.3.0"
+    id 'maven-publish'
+    id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
+    id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
+    id 'jacoco'
+}
+
+def getArtifactId = { ->
+    return "imx-core-sdk-kotlin-jvm"
+}
+
+def getVersionName = { ->
+    def versionFile = new org.yaml.snakeyaml.Yaml().load(new File("$rootDir/version.yml").newInputStream())
+    return versionFile.version
+}
+
+group 'com.immutable.sdk'
+version getVersionName()
+
+tasks.create('cleanGeneratedClient') {
+    delete "$project.projectDir/generated"
+}
+
+openApiGenerate {
+    generatorName = "kotlin"
+    inputSpec = "$rootDir/openapi.json".toString()
+    outputDir = "$project.projectDir/generated".toString()
+    apiPackage = "com.immutable.sdk.api"
+    invokerPackage = "com.immutable.sdk.invoker"
+    modelPackage = "com.immutable.sdk.api.model"
+    // For version 5.3.0 this override is performed to add null as a default for !required parameters
+    templateDir = "$rootDir/.openapi-generator/templates/kotlin-client/libraries/jvm-okhttp"
+    configOptions = [
+            dateLibrary: "java8"
+    ]
+    languageSpecificPrimitives = ["Double"]
+    typeMappings = [
+            number: "Double"
+    ]
+    importMappings = [
+            // OpenAPI specs sets 'Asset.orders.sell_orders' type to an array of objects (i.e. List<Any>),
+            // this makes it really difficult to cast it to List<SellOrders>. So instead we create an
+            // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
+            OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"
+    ]
+}
+
+sourceSets {
+    main {
+        java.srcDirs = ["$project.projectDir/generated/src/main/kotlin"]
+    }
+}
+
+// Used in place of the Android BuildConfig to give the ApiClient access to the version
+tasks.create('generateBuildConfig') {
+    ext.outputDir = "$project.projectDir/generated/src/main/kotlin"
+    inputs.property('version', project.version)
+    outputs.dir outputDir
+    doLast {
+        mkdir "$outputDir/com/immutable/sdk"
+        file("$outputDir/com/immutable/sdk/BuildConfig.java").text =
+                """|package com.immutable.sdk;
+               |public class BuildConfig {
+               |    public static String VERSION = "${project.version}";
+               |}""".stripMargin()
+    }
+}
+
+// Generate all apis before every build
+compileKotlin.dependsOn(tasks.openApiGenerate)
+compileKotlin.dependsOn(tasks.ktlintCheck)
+compileKotlin.dependsOn(tasks.detekt)
+tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
+tasks.openApiGenerate.dependsOn(tasks.generateBuildConfig)
+
+dependencies {
+    implementation "org.jetbrains.kotlin:kotlin-stdlib"
+
+    // Required for the generated API client
+    implementation "com.squareup.moshi:moshi-kotlin:1.13.0"
+    implementation "com.squareup.okhttp3:okhttp:4.9.3"
+    implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
+
+    // Web3
+    implementation "org.web3j:core:4.8.7"
+
+    // Json
+    implementation 'org.json:json:20220320'
+
+    // Google Common Java
+    implementation("com.google.guava:guava:31.1-jre")
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "io.mockk:mockk:1.12.3"
+
+    // Detekt
+    detektPlugins "io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0-RC1"
+}
+
+def githubProperties = new Properties()
+def githubPropertiesFile = file("../github.properties")
+if (githubPropertiesFile.exists()) {
+    githubProperties.load(new FileInputStream(githubPropertiesFile))
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+
+    withSourcesJar()
+    withJavadocJar()
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            artifactId = getArtifactId()
+            groupId = group
+            version = version
+
+            from components.java
+        }
+    }
+
+    repositories {
+        maven {
+            name = "imx-core-sdk-kotlin-jvm"
+            url = uri("https://maven.pkg.github.com/immutable/imx-core-sdk-kotlin-jvm")
+            credentials {
+                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
+                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+            }
+        }
+    }
+}
+
+ktlint {
+    debug = true
+    verbose = true
+    android = false
+    outputToConsole = true
+    outputColorName = "RED"
+    enableExperimentalRules = false
+    disabledRules = ["no-wildcard-imports", "import-ordering"]
+    filter {
+        exclude { element -> element.file.path.contains("generated/") }
+    }
+}
+
+detekt {
+    buildUponDefaultConfig = true
+    allRules = false // activate all available (even unstable) rules.
+    config = files("../.github/detekt/config/detekt.yml")
+    // point to your custom config defining rules to run, overwriting default behavior
+}
+
+// ** Start code coverage **
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+// Without this block the build will fail
+tasks.withType(Test) {
+    jacoco.includeNoLocationClasses = true
+    jacoco.excludes = ['jdk.internal.*']
+}
+
+// Creates a task for generating the jacoco coverage report
+tasks.create(name: "testCoverage", type: JacocoReport, dependsOn: ["test"]) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports for the test build"
+
+    reports {
+        html.required = true
+        xml.required = true
+    }
+
+    def excludes = [
+            // kotlin
+            '**/*MapperImpl*.*',
+            '**/*$ViewInjector*.*',
+            '**/*$ViewBinder*.*',
+            '**/BuildConfig.*',
+            '**/*Component*.*',
+            '**/*BR*.*',
+            '**/Manifest*.*',
+            '**/*$Lambda$*.*',
+            '**/*Companion*.*',
+            '**/*Module*.*',
+            '**/*Dagger*.*',
+            '**/*Hilt*.*',
+            '**/*MembersInjector*.*',
+            '**/*_MembersInjector.class',
+            '**/*_Factory*.*',
+            '**/*_Provide*Factory*.*',
+            '**/*Extensions*.*',
+            // sealed and data classes
+            '**/*$Result.*',
+            '**/*$Result$*.*',
+            // Auto-generated code
+            '**/com/immutable/sdk/api/**',
+            '**/org/openapitools/**',
+            'test/**'
+    ]
+
+    def javaClasses = fileTree(dir: "${buildDir}/classes/java",
+            excludes: excludes)
+    def kotlinClasses = fileTree(dir: "${buildDir}/classes/kotlin",
+            excludes: excludes)
+
+    classDirectories.setFrom(files([
+            javaClasses,
+            kotlinClasses
+    ]))
+
+    executionData(files(["$project.buildDir/jacoco/test.exec"]))
+}
+
+// Kotlin 1.5+ only works with version 0.8.7
+configurations.all {
+    resolutionStrategy {
+        eachDependency { details ->
+            if ('org.jacoco' == details.requested.group) {
+                details.useVersion "0.8.7"
+            }
+        }
+    }
+}
+// ** End code coverage **

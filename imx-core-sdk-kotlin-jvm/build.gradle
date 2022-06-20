@@ -12,7 +12,7 @@ plugins {
 }
 
 def getArtifactId = { ->
-    return "imx-core-sdk-android"
+    return "imx-core-sdk-kotlin-jvm"
 }
 
 def getVersionName = { ->
@@ -130,8 +130,8 @@ publishing {
 
     repositories {
         maven {
-            name = "imx-core-sdk-android"
-            url = uri("https://maven.pkg.github.com/immutable/imx-core-sdk-android")
+            name = "imx-core-sdk-kotlin-jvm"
+            url = uri("https://maven.pkg.github.com/immutable/imx-core-sdk-kotlin-jvm")
             credentials {
                 username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
                 password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")

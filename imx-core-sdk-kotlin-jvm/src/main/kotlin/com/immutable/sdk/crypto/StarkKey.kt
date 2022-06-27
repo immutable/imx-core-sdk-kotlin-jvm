@@ -146,6 +146,8 @@ object StarkKey {
     /**
      * Signs the given [msg] with the given [keyPair]
      *
+     * @param msg must be in hex format and 64 characters or less in length (including 0x prefix)
+     *
      * @return Stark signature
      */
     @Suppress("MagicNumber")

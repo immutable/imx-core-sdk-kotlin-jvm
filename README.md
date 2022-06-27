@@ -65,7 +65,7 @@ In order to use any workflow functions, you will need to pass in the connected w
 Once you have a `Signer` instance you can generate the user's Stark key pair and use the result to implement a `StarkSigner`.
 ```kt
 StarkKey.generate(signer).whenComplete { keyPair, error ->
-    StarkKey.sign(keyPair, "Sign some message")
+    StarkKey.sign(keyPair, "0x5369676e2074686973")
 }
 ```
 

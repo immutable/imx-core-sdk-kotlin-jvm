@@ -41,7 +41,7 @@ dependencies {
     implementation 'com.immutable.sdk:imx-core-sdk-kotlin-jvm:$version'
 }
 ```
-2. Set the correct environment (Ropsten or Production/Mainnet)
+4. Set the correct environment (Ropsten or Production/Mainnet)
 ```kt
 ImmutableXSdk.setBase(ImmutableXBase.Ropsten)
 ```

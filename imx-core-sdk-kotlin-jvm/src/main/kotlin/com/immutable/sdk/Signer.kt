@@ -3,8 +3,8 @@ package com.immutable.sdk
 import java.util.concurrent.CompletableFuture
 
 /**
- * This represents an Ethereum Externally Owned Account (EOA). Any wallet provider can be wrapped
- * with this interface so they can be used with this SDK.
+ * This represents an L1 Ethereum wallet. Any wallet provider can be wrapped
+ * with this interface and be used with this SDK.
  */
 interface Signer {
     /**
@@ -27,15 +27,15 @@ interface Signer {
 }
 
 /**
- * This represents the Immutable X Wallet on Layer 2 and will provide the user's Stark key pair to be
- * used for signing L2 transactions.
+ * This represents the Immutable X Wallet on Layer 2 and will have reference to the user's Stark key pair
+ * for signing L2 transactions.
  */
 interface StarkSigner {
     /**
-     * Signs the [message] with the the user's L2 Stark keys.
+     * Signs the [message] with the user's L2 Stark keys.
      *
-     * When implementing this, pass the L2 Stark key pair and [message] to the
-     * [StarkKey.sign(keyPair, msg)][com.immutable.sdk.crypto.StarkKey.sign] function.
+     * When implementing this, make sure [message] is in hex format and pass it and the L2 Stark key pair to the
+     * [com.immutable.sdk.crypto.StarkKey.sign] function.
      */
     fun signMessage(message: String): CompletableFuture<String>
 

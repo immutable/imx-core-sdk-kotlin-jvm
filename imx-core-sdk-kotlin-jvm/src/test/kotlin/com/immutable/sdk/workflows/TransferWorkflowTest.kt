@@ -20,9 +20,12 @@ import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7g"
 private const val RECIPIENT_ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
-private const val SIGNATURE =
+private const val STARK_SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
+private const val ETH_SIGNATURE =
+    "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
+        "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1a"
 private const val SIGNABLE_MESSAGE = "messageForL1"
 
 class TransferWorkflowTest {
@@ -36,7 +39,8 @@ class TransferWorkflowTest {
     private lateinit var starkSigner: StarkSigner
 
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var signatureFuture: CompletableFuture<String>
+    private lateinit var starkSignatureFuture: CompletableFuture<String>
+    private lateinit var ethSignatureFuture: CompletableFuture<String>
 
     private val transferResponse = CreateTransferResponse(
         transferIds = arrayListOf(5)
@@ -49,11 +53,13 @@ class TransferWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        signatureFuture = CompletableFuture<String>()
-        every { starkSigner.signMessage(any()) } returns signatureFuture
+        starkSignatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns starkSignatureFuture
+        ethSignatureFuture = CompletableFuture<String>()
+        every { signer.signMessage(any()) } returns ethSignatureFuture
 
         mockkObject(StarkKey)
-        every { StarkKey.sign(any(), any()) } returns SIGNATURE
+        every { StarkKey.sign(any(), any()) } returns STARK_SIGNATURE
 
         every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
             senderStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
@@ -85,7 +91,7 @@ class TransferWorkflowTest {
                                 "471a7abfcb02",
                             expirationTimestamp = 1_325_907,
                             nonce = 596_252_354,
-                            starkSignature = SIGNATURE,
+                            starkSignature = STARK_SIGNATURE,
                             receiverStarkKey =
                             "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
                             receiverVaultId = 1_502_450_104,
@@ -93,8 +99,8 @@ class TransferWorkflowTest {
                         )
                     )
                 ),
-                xImxEthAddress = null,
-                xImxEthSignature = null
+                xImxEthAddress = ADDRESS,
+                xImxEthSignature = ETH_SIGNATURE
             )
         } returns transferResponse
     }
@@ -107,7 +113,8 @@ class TransferWorkflowTest {
     @Test
     fun testTransferErc20Success() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
             transfer(
@@ -117,7 +124,7 @@ class TransferWorkflowTest {
                 starkSigner = starkSigner,
                 api = api
             ),
-            expectedResult = 5,
+            expectedResult = transferResponse,
             expectedError = null
         )
     }
@@ -125,7 +132,8 @@ class TransferWorkflowTest {
     @Test
     fun testTransferEthSuccess() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
             transfer(
@@ -135,7 +143,7 @@ class TransferWorkflowTest {
                 starkSigner = starkSigner,
                 api = api
             ),
-            expectedResult = 5,
+            expectedResult = transferResponse,
             expectedError = null
         )
     }
@@ -143,7 +151,8 @@ class TransferWorkflowTest {
     @Test
     fun testTransferErc721Success() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
             transfer(
@@ -153,7 +162,7 @@ class TransferWorkflowTest {
                 starkSigner = starkSigner,
                 api = api
             ),
-            expectedResult = 5,
+            expectedResult = transferResponse,
             expectedError = null
         )
     }
@@ -196,7 +205,7 @@ class TransferWorkflowTest {
     @Test
     fun testTransferFailOnGetSignature() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.completeExceptionally(TestException())
+        starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
             transfer(
@@ -219,7 +228,7 @@ class TransferWorkflowTest {
             signableResponses = emptyList()
         )
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
 
         testFuture(
             transfer(
@@ -237,7 +246,8 @@ class TransferWorkflowTest {
     @Test
     fun testTransferFailOnCreateTransfer() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
         every { api.createTransfer(any(), any(), any()) } throws ClientException()
 
         testFuture(

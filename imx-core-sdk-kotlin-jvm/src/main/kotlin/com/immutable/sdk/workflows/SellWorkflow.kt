@@ -3,10 +3,7 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.api.model.CreateOrderRequest
-import com.immutable.sdk.api.model.FeeEntry
-import com.immutable.sdk.api.model.GetSignableOrderRequest
-import com.immutable.sdk.api.model.GetSignableOrderResponse
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.formatQuantity
@@ -23,21 +20,27 @@ internal fun sell(
     signer: Signer,
     starkSigner: StarkSigner,
     ordersApi: OrdersApi = OrdersApi()
-): CompletableFuture<Int> {
-    val future = CompletableFuture<Int>()
+): CompletableFuture<CreateOrderResponse> {
+    val future = CompletableFuture<CreateOrderResponse>()
 
-    signer.getAddress()
-        .thenCompose { address ->
-            getSignableOrder(asset, sellToken, address, fees, ordersApi)
+    signer.getAddress().thenApply { address -> WorkflowSignatures(address) }
+        .thenCompose { signatures ->
+            getSignableOrder(asset, sellToken, signatures.ethAddress, fees, ordersApi)
+                .thenApply { response -> signatures to response }
         }
-        .thenCompose { (payloadHash, response) ->
-            starkSigner.signMessage(payloadHash).thenApply { response to it }
+        .thenCompose { (signatures, response) ->
+            starkSigner.signMessage(response.payloadHash)
+                .thenApply { signature -> signatures.apply { starkSignature = signature } to response }
         }
-        .thenCompose { (response, signature) -> createOrder(response, signature, fees, ordersApi) }
-        .whenComplete { tradeId, error ->
+        .thenCompose { (signatures, response) ->
+            signer.signMessage(response.signableMessage)
+                .thenApply { signature -> signatures.apply { ethSignature = signature } to response }
+        }
+        .thenCompose { (signatures, response) -> createOrder(response, signatures, fees, ordersApi) }
+        .whenComplete { response, error ->
             // Forward any exceptions from the compose chain
             if (error != null) future.completeExceptionally(error)
-            else future.complete(tradeId)
+            else future.complete(response)
         }
 
     return future
@@ -50,7 +53,7 @@ private fun getSignableOrder(
     address: String,
     fees: List<FeeEntry>,
     api: OrdersApi
-): CompletableFuture<Pair<String, GetSignableOrderResponse>> = call(SIGNABLE_ORDER) {
+): CompletableFuture<GetSignableOrderResponse> = call(SIGNABLE_ORDER) {
     val request = GetSignableOrderRequest(
         amountBuy = sellToken.formatQuantity(),
         amountSell = asset.quantity,
@@ -59,9 +62,7 @@ private fun getSignableOrder(
         user = address,
         fees = fees
     )
-    val response = api.getSignableOrder(request)
-    // Unwrapping payload hash here so if it's null, the correct exception is thrown
-    response.payloadHash to response
+    api.getSignableOrder(request)
 }
 
 @Suppress(
@@ -72,10 +73,10 @@ private fun getSignableOrder(
 )
 private fun createOrder(
     response: GetSignableOrderResponse,
-    starkSignature: String,
+    signatures: WorkflowSignatures,
     fees: List<FeeEntry>,
     api: OrdersApi
-): CompletableFuture<Int> = call(CREATE_ORDER) {
+): CompletableFuture<CreateOrderResponse> = call(CREATE_ORDER) {
     api.createOrder(
         CreateOrderRequest(
             amountBuy = response.amountBuy,
@@ -85,14 +86,14 @@ private fun createOrder(
             expirationTimestamp = response.expirationTimestamp,
             nonce = response.nonce,
             starkKey = response.starkKey,
-            starkSignature = starkSignature,
+            starkSignature = signatures.starkSignature,
             vaultIdBuy = response.vaultIdBuy,
             vaultIdSell = response.vaultIdSell,
             fees = fees,
             // Always include fees in order, the 'fees' field will either have fees details or nothing at all
             includeFees = true
         ),
-        xImxEthAddress = null,
-        xImxEthSignature = null
-    ).orderId
+        xImxEthAddress = signatures.ethAddress,
+        xImxEthSignature = signatures.ethSignature
+    )
 }

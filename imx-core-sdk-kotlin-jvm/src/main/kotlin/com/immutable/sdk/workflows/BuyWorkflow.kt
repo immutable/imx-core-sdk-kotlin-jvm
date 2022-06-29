@@ -22,25 +22,33 @@ internal fun buy(
     starkSigner: StarkSigner,
     ordersApi: OrdersApi = OrdersApi(),
     tradesApi: TradesApi = TradesApi()
-): CompletableFuture<Int> {
-    val future = CompletableFuture<Int>()
+): CompletableFuture<CreateTradeResponse> {
+    val future = CompletableFuture<CreateTradeResponse>()
 
-    signer.getAddress()
-        .thenCompose { address ->
-            getOrderDetails(orderId, fees, ordersApi).thenApply { address to it }
+    signer.getAddress().thenApply { address -> WorkflowSignatures(address) }
+        .thenCompose { signatures ->
+            getOrderDetails(orderId, fees, ordersApi).thenApply { order -> signatures to order }
         }
-        .thenCompose { (address, order) -> getSignableTrade(order, address, fees, tradesApi) }
-        .thenCompose { (payloadHash, response) ->
-            starkSigner.signMessage(payloadHash).thenApply { response to it }
+        .thenCompose { (signatures, order) ->
+            getSignableTrade(order, signatures.ethAddress, fees, tradesApi)
+                .thenApply { response -> signatures to response }
         }
-        .thenCompose { (response, signature) ->
-            createTrade(orderId.toInt(), response, fees, signature, tradesApi)
-        }.whenComplete { tradeId, error ->
+        .thenCompose { (signatures, response) ->
+            starkSigner.signMessage(response.payloadHash)
+                .thenApply { signature -> signatures.apply { starkSignature = signature } to response }
+        }
+        .thenCompose { (signatures, response) ->
+            signer.signMessage(response.signableMessage)
+                .thenApply { signature -> signatures.apply { ethSignature = signature } to response }
+        }
+        .thenCompose { (signatures, response) ->
+            createTrade(orderId.toInt(), response, fees, signatures, tradesApi)
+        }.whenComplete { response, error ->
             // Forward any exceptions from the compose chain
             if (error != null)
                 future.completeExceptionally(error)
             else
-                future.complete(tradeId)
+                future.complete(response)
         }
 
     return future
@@ -67,21 +75,19 @@ private fun getSignableTrade(
     address: String,
     fees: List<FeeEntry>,
     api: TradesApi
-): CompletableFuture<Pair<String, GetSignableTradeResponse>> = when {
+): CompletableFuture<GetSignableTradeResponse> = when {
     order.user == address ->
         completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
     order.status != OrderStatus.Active.value ->
         completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
     else -> call(SIGNABLE_TRADE) {
-        val response = api.getSignableTrade(
+        api.getSignableTrade(
             GetSignableTradeRequest(
                 orderId = order.orderId,
                 user = address,
                 fees = fees
             )
         )
-        // Unwrapping payload hash here so if it's null, the correct exception is thrown
-        response.payloadHash to response
     }
 }
 
@@ -90,9 +96,9 @@ private fun createTrade(
     orderId: Int,
     response: GetSignableTradeResponse,
     fees: List<FeeEntry>,
-    starkSignature: String,
+    signatures: WorkflowSignatures,
     api: TradesApi
-): CompletableFuture<Int> = call(CREATE_TRADE) {
+): CompletableFuture<CreateTradeResponse> = call(CREATE_TRADE) {
     api.createTrade(
         CreateTradeRequestV1(
             amountBuy = response.amountBuy,
@@ -103,7 +109,7 @@ private fun createTrade(
             nonce = response.nonce,
             orderId = orderId,
             starkKey = response.starkKey,
-            starkSignature = starkSignature,
+            starkSignature = signatures.starkSignature,
             vaultIdBuy = response.vaultIdBuy,
             vaultIdSell = response.vaultIdSell,
             feeInfo = response.feeInfo,
@@ -111,7 +117,7 @@ private fun createTrade(
             // Always include fees, the 'fees' field will contain fees details or nothing at all
             includeFees = true
         ),
-        xImxEthAddress = null,
-        xImxEthSignature = null
-    ).tradeId
+        xImxEthAddress = signatures.ethAddress,
+        xImxEthSignature = signatures.ethSignature
+    )
 }

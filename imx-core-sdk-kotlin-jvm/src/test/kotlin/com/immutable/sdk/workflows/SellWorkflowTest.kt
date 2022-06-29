@@ -20,13 +20,14 @@ private const val SELL_AMOUNT = "0.0101"
 private const val SELL_TOKEN_ADDRESS = "0x07865c6e87b9f70255377e024ace6630c1eaa37f"
 private const val SELL_TOKEN_DECIMALS = 6
 private const val STARK_KEY = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485"
-private const val SIGNATURE =
+private const val STARK_SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
-private const val ORDER_ID = 8426
+private const val ETH_SIGNATURE =
+    "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
+        "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1a"
 private const val PAYLOAD_HASH = "payloadHash"
 private const val SIGNABLE_MESSAGE = "messageForL1"
-private const val TIME = 9
 
 class SellWorkflowTest {
     @MockK
@@ -38,8 +39,12 @@ class SellWorkflowTest {
     @MockK
     private lateinit var starkSigner: StarkSigner
 
+    @MockK
+    private lateinit var response: CreateOrderResponse
+
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var signatureFuture: CompletableFuture<String>
+    private lateinit var starkSignatureFuture: CompletableFuture<String>
+    private lateinit var ethSignatureFuture: CompletableFuture<String>
 
     @Before
     fun setUp() {
@@ -48,8 +53,10 @@ class SellWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        signatureFuture = CompletableFuture<String>()
-        every { starkSigner.signMessage(any()) } returns signatureFuture
+        starkSignatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns starkSignatureFuture
+        ethSignatureFuture = CompletableFuture<String>()
+        every { signer.signMessage(any()) } returns ethSignatureFuture
 
         every { ordersApi.getSignableOrder(any()) } returns GetSignableOrderResponse(
             assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
@@ -66,14 +73,10 @@ class SellWorkflowTest {
         )
         every {
             ordersApi.createOrder(any(), any(), any())
-        } returns CreateOrderResponse(
-            orderId = ORDER_ID,
-            status = OrderStatus.Active.value,
-            time = TIME
-        )
+        } returns response
 
         mockkObject(StarkKey)
-        every { StarkKey.sign(any(), any()) } returns SIGNATURE
+        every { StarkKey.sign(any(), any()) } returns STARK_SIGNATURE
     }
 
     @After
@@ -93,19 +96,25 @@ class SellWorkflowTest {
     @Test
     fun testSellInEthSuccess() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
             future = createSellFuture(),
-            expectedResult = ORDER_ID,
+            expectedResult = response,
             expectedError = null
         )
+
+        val slot = slot<CreateOrderRequest>()
+        verify { ordersApi.createOrder(capture(slot), ADDRESS, ETH_SIGNATURE) }
+        assert(slot.captured.starkSignature == STARK_SIGNATURE)
     }
 
     @Test
     fun testSellInErc20Success() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
             future = sell(
@@ -116,7 +125,7 @@ class SellWorkflowTest {
                 starkSigner = starkSigner,
                 ordersApi = ordersApi
             ),
-            expectedResult = ORDER_ID,
+            expectedResult = response,
             expectedError = null
         )
 
@@ -150,7 +159,6 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnAddress() {
         addressFuture.completeExceptionally(TestException())
-        signatureFuture.complete(SIGNATURE)
 
         testFuture(
             future = createSellFuture(),
@@ -174,7 +182,20 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.completeExceptionally(TestException())
+        starkSignatureFuture.completeExceptionally(TestException())
+
+        testFuture(
+            future = createSellFuture(),
+            expectedResult = null,
+            expectedError = TestException()
+        )
+    }
+
+    @Test
+    fun testSellFailedOnEthSignature() {
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = createSellFuture(),
@@ -186,7 +207,8 @@ class SellWorkflowTest {
     @Test
     fun testSellFailedOnCreateOrder() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
         every { ordersApi.createOrder(any(), any(), any()) } throws ClientException()
 
         testFuture(

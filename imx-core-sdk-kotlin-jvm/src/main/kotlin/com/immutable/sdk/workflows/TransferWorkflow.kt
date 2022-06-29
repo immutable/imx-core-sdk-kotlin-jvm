@@ -16,19 +16,33 @@ internal fun transfer(
     signer: Signer,
     starkSigner: StarkSigner,
     api: TransfersApi = TransfersApi()
-): CompletableFuture<Int> {
-    val future = CompletableFuture<Int>()
+): CompletableFuture<CreateTransferResponse> {
+    val future = CompletableFuture<CreateTransferResponse>()
 
-    signer.getAddress()
-        .thenCompose { address -> getSignableTransfer(address, token, recipientAddress, api) }
-        .thenCompose { signableResponse -> getTransferRequest(signableResponse, starkSigner) }
-        .thenCompose { request -> createTransfer(request, api) }
+    signer.getAddress().thenApply { address -> WorkflowSignatures(address) }
+        .thenCompose { signatures ->
+            getSignableTransfer(
+                signatures.ethAddress,
+                token,
+                recipientAddress,
+                api
+            ).thenApply { response -> signatures to response }
+        }
+        .thenCompose { (signatures, response) ->
+            getStarkSignature(response, starkSigner)
+                .thenApply { signature -> signatures.apply { starkSignature = signature } to response }
+        }
+        .thenCompose { (signatures, response) ->
+            signer.signMessage(response.signableMessage)
+                .thenApply { signature -> signatures.apply { ethSignature = signature } to response }
+        }
+        .thenCompose { (signatures, response) -> createTransfer(response, signatures, api) }
         .whenComplete { response, error ->
             // Forward any exceptions from the compose chain
             if (error != null)
                 future.completeExceptionally(error)
             else
-                future.complete(response.transferIds.first())
+                future.complete(response)
         }
 
     return future
@@ -56,54 +70,47 @@ private fun getSignableTransfer(
 }
 
 @Suppress("TooGenericExceptionCaught")
-private fun getTransferRequest(
+private fun getStarkSignature(
     response: GetSignableTransferResponse,
     signer: StarkSigner
-): CompletableFuture<CreateTransferRequest> = call(GET_TRANSFER_REQUEST) {
+): CompletableFuture<String> = call(GET_TRANSFER_REQUEST) {
     // Force unwrapping that the NPE gets handled by `call`
     response.signableResponses.firstOrNull()?.payloadHash!!
 }
     .thenCompose { payload -> signer.signMessage(payload) }
-    .thenCompose { signature -> getCreateTransferRequest(response, signature) }
-
-private fun getCreateTransferRequest(
-    response: GetSignableTransferResponse,
-    signature: String?
-): CompletableFuture<CreateTransferRequest> {
-    val signableResponse = response.signableResponses.first()
-    val transferRequest = TransferRequest(
-        amount = signableResponse.amount,
-        assetId = signableResponse.assetId,
-        expirationTimestamp = signableResponse.expirationTimestamp,
-        nonce = signableResponse.nonce,
-        receiverStarkKey = signableResponse.receiverStarkKey,
-        receiverVaultId = signableResponse.receiverVaultId,
-        senderVaultId = signableResponse.senderVaultId,
-        starkSignature = signature!!,
-    )
-    return CompletableFuture.completedFuture(
-        CreateTransferRequest(
-            senderStarkKey = response.senderStarkKey,
-            requests = arrayListOf(transferRequest)
-        )
-    )
-}
 
 @Suppress("TooGenericExceptionCaught")
 private fun createTransfer(
-    request: CreateTransferRequest,
+    response: GetSignableTransferResponse,
+    signatures: WorkflowSignatures,
     api: TransfersApi
 ): CompletableFuture<CreateTransferResponse> {
     val future = CompletableFuture<CreateTransferResponse>()
 
     CompletableFuture.runAsync {
         try {
-            val response = api.createTransfer(
-                request,
-                xImxEthAddress = null,
-                xImxEthSignature = null
+            val signableResponse = response.signableResponses.first()
+            future.complete(
+                api.createTransfer(
+                    CreateTransferRequest(
+                        senderStarkKey = response.senderStarkKey,
+                        requests = arrayListOf(
+                            TransferRequest(
+                                amount = signableResponse.amount,
+                                assetId = signableResponse.assetId,
+                                expirationTimestamp = signableResponse.expirationTimestamp,
+                                nonce = signableResponse.nonce,
+                                receiverStarkKey = signableResponse.receiverStarkKey,
+                                receiverVaultId = signableResponse.receiverVaultId,
+                                senderVaultId = signableResponse.senderVaultId,
+                                starkSignature = signatures.starkSignature,
+                            )
+                        )
+                    ),
+                    xImxEthAddress = signatures.ethAddress,
+                    xImxEthSignature = signatures.ethSignature
+                )
             )
-            future.complete(response)
         } catch (e: Exception) {
             future.completeExceptionally(e)
         }

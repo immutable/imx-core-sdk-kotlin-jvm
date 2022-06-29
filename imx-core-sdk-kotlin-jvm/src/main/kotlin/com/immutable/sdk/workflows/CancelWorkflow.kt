@@ -56,6 +56,6 @@ private fun cancelOrder(
         orderId,
         CancelOrderRequest(orderId.toInt(), signatures.starkSignature),
         xImxEthAddress = signatures.ethAddress,
-        xImxEthSignature = signatures.ethSignature
+        xImxEthSignature = signatures.serialisedEthSignature
     )
 }

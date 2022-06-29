@@ -118,6 +118,6 @@ private fun createTrade(
             includeFees = true
         ),
         xImxEthAddress = signatures.ethAddress,
-        xImxEthSignature = signatures.ethSignature
+        xImxEthSignature = signatures.serialisedEthSignature
     )
 }

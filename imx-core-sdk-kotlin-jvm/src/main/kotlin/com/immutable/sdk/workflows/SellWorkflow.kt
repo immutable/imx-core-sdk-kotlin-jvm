@@ -94,6 +94,6 @@ private fun createOrder(
             includeFees = true
         ),
         xImxEthAddress = signatures.ethAddress,
-        xImxEthSignature = signatures.ethSignature
+        xImxEthSignature = signatures.serialisedEthSignature
     )
 }

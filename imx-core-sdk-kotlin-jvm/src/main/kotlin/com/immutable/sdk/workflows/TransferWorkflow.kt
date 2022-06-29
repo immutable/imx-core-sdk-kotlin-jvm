@@ -108,7 +108,7 @@ private fun createTransfer(
                         )
                     ),
                     xImxEthAddress = signatures.ethAddress,
-                    xImxEthSignature = signatures.ethSignature
+                    xImxEthSignature = signatures.serialisedEthSignature
                 )
             )
         } catch (e: Exception) {

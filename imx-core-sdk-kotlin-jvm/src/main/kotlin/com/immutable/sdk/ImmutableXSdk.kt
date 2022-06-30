@@ -2,7 +2,7 @@ package com.immutable.sdk
 
 import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
-import com.immutable.sdk.api.model.FeeEntry
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import okhttp3.logging.HttpLoggingInterceptor
@@ -112,7 +112,7 @@ object ImmutableXSdk {
         fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
-    ): CompletableFuture<Int> =
+    ): CompletableFuture<CreateTradeResponse> =
         com.immutable.sdk.workflows.buy(orderId, fees, signer, starkSigner)
 
     /**
@@ -133,7 +133,7 @@ object ImmutableXSdk {
         fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
-    ): CompletableFuture<Int> {
+    ): CompletableFuture<CreateOrderResponse> {
         return com.immutable.sdk.workflows.sell(
             asset,
             sellToken,
@@ -154,9 +154,10 @@ object ImmutableXSdk {
     @Suppress("LongParameterList")
     fun cancel(
         orderId: String,
+        signer: Signer,
         starkSigner: StarkSigner
-    ): CompletableFuture<Int> =
-        com.immutable.sdk.workflows.cancel(orderId, starkSigner)
+    ): CompletableFuture<CancelOrderResponse> =
+        com.immutable.sdk.workflows.cancel(orderId, signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.
@@ -174,7 +175,7 @@ object ImmutableXSdk {
         recipientAddress: String,
         signer: Signer,
         starkSigner: StarkSigner,
-    ): CompletableFuture<Int> =
+    ): CompletableFuture<CreateTransferResponse> =
         com.immutable.sdk.workflows.transfer(token, recipientAddress, signer, starkSigner)
 
     /**

@@ -1,6 +1,7 @@
 package com.immutable.sdk.workflows
 
 import com.immutable.sdk.ImmutableException
+import com.immutable.sdk.crypto.Crypto
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -27,3 +28,15 @@ internal fun <T> completeExceptionally(ex: Throwable): CompletableFuture<T> =
     CompletableFuture<T>().apply {
         completeExceptionally(ex)
     }
+
+/**
+ * Data model for workflows to hold the ethAddress and signatures for transactions
+ */
+internal class WorkflowSignatures(val ethAddress: String) {
+    lateinit var ethSignature: String
+    lateinit var starkSignature: String
+
+    // The ethSignature needs to be serialised before being supplied to the API
+    val serialisedEthSignature: String
+        get() { return Crypto.serialiseEthSignature(ethSignature) }
+}

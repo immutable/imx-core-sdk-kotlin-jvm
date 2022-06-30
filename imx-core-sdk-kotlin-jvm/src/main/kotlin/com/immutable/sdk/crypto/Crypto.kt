@@ -20,8 +20,8 @@ object Crypto {
     }
 
     private fun importRecoveryParam(v: BigInteger): String {
-        val comp = BigInteger("27")
-        return if (v.compareTo(comp) != -1)
+        val comp = BigInteger("27") // 1b
+        return if (v.compareTo(comp) != -1) // if recovery param is greater than 27
             v.subtract(comp).toString(HEX_RADIX)
         else
             v.toString(HEX_RADIX)

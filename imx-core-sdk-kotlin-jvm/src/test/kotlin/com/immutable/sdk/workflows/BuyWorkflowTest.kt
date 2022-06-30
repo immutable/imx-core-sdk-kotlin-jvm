@@ -8,11 +8,8 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.OrderStatus
 import com.immutable.sdk.model.TokenType
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -21,9 +18,12 @@ import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7f"
 private const val ASSET_OWNER = "0xa76e3eeb2f7143165618ab8feaabcd395b6fac7d"
-private const val SIGNATURE =
+private const val STARK_SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1b"
+private const val ETH_SIGNATURE =
+    "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
+        "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1a"
 private const val ORDER_ID = "5"
 private const val TRADE_ID = 6
 private const val PAYLOAD_HASH = "tradePayloadHash"
@@ -46,7 +46,8 @@ class BuyWorkflowTest {
     private lateinit var order: Order
 
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var signatureFuture: CompletableFuture<String>
+    private lateinit var starkSignatureFuture: CompletableFuture<String>
+    private lateinit var ethSignatureFuture: CompletableFuture<String>
 
     @Before
     fun setUp() {
@@ -55,11 +56,14 @@ class BuyWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
 
-        signatureFuture = CompletableFuture<String>()
-        every { starkSigner.signMessage(any()) } returns signatureFuture
+        starkSignatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage(any()) } returns starkSignatureFuture
+
+        ethSignatureFuture = CompletableFuture<String>()
+        every { signer.signMessage(any()) } returns ethSignatureFuture
 
         mockkObject(StarkKey)
-        every { StarkKey.sign(any(), any()) } returns SIGNATURE
+        every { StarkKey.sign(any(), any()) } returns STARK_SIGNATURE
 
         every {
             ordersApi.getOrder(ORDER_ID, true, "", "")
@@ -107,21 +111,26 @@ class BuyWorkflowTest {
 
     @Test
     fun testBuySuccess() {
+        val response = CreateTradeResponse(tradeId = TRADE_ID, status = OrderStatus.Filled.value)
+        val slot = slot<CreateTradeRequestV1>()
         every {
             tradesApi.createTrade(
-                any(),
-                any(),
-                any()
+                capture(slot),
+                ADDRESS,
+                ETH_SIGNATURE
             )
-        } returns CreateTradeResponse(tradeId = TRADE_ID, status = OrderStatus.Filled.value)
+        } returns response
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
-            expectedResult = TRADE_ID,
+            expectedResult = response,
             expectedError = null
         )
+
+        assert(slot.captured.starkSignature == STARK_SIGNATURE)
     }
 
     @Test
@@ -185,7 +194,20 @@ class BuyWorkflowTest {
     @Test
     fun testBuyFailedOnStarkSignature() {
         addressFuture.complete(ADDRESS)
-        signatureFuture.completeExceptionally(TestException())
+        starkSignatureFuture.completeExceptionally(TestException())
+
+        testFuture(
+            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            expectedResult = null,
+            expectedError = TestException()
+        )
+    }
+
+    @Test
+    fun testBuyFailedOnEthSignature() {
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
@@ -199,7 +221,8 @@ class BuyWorkflowTest {
         every { tradesApi.createTrade(any(), any(), any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        signatureFuture.complete(SIGNATURE)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(STARK_SIGNATURE)
 
         testFuture(
             future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),

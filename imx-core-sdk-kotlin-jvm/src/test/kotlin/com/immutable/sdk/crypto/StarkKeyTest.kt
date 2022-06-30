@@ -93,7 +93,7 @@ class StarkKeyTest {
         assertEquals("123456789abcdef", StarkKey.fixMessage("0x123456789abcdef"))
 
         assertEquals(
-            "0x074180eaec7e68712b5a0fbf5d63a70c33940c9b02e60565e36f84d705b669e0",
+            "074180eaec7e68712b5a0fbf5d63a70c33940c9b02e60565e36f84d705b669e0",
             StarkKey.fixMessage(
                 "0x074180eaec7e68712b5a0fbf5d63a70c33940c9b02e60565e36f84d705b669e"
             )

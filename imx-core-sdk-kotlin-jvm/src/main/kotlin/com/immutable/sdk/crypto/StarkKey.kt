@@ -209,7 +209,7 @@ object StarkKey {
             message
         } else {
             assert(message.length == 63)
-            "${msg}0"
+            "${message}0"
         }
     }
 }

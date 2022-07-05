@@ -57,7 +57,7 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
  * You can configure the environment or use any of the provided utility workflows which chain
  * the necessary calls to perform standard actions (e.g. buy, sell etc).
  */
-object ImmutableXSdk {
+object ImmutableXCore {
 
     private var base: ImmutableXBase = ImmutableXBase.Ropsten
     internal var httpLoggingLevel = ImmutableXHttpLoggingLevel.None

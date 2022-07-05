@@ -63,7 +63,7 @@ internal fun buyCrypto(
         try {
             val address = signer.getAddress().get()
             check(isWalletRegistered(address, usersApi)) {
-                "Wallet is not registered. Call ImmutableXSdk.registerOffChain() " +
+                "Wallet is not registered. Call ImmutableXCore.registerOffChain() " +
                     "to register your wallet."
             }
 

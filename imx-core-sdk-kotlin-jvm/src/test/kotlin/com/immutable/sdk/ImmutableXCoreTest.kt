@@ -9,12 +9,12 @@ import java.util.*
 
 private const val API_URL = "url"
 
-class ImmutableXSdkTest {
+class ImmutableXCoreTest {
 
     @MockK
     private lateinit var properties: Properties
 
-    private lateinit var sdk: ImmutableXSdk
+    private lateinit var sdk: ImmutableXCore
 
     @Before
     fun setUp() {
@@ -27,7 +27,7 @@ class ImmutableXSdkTest {
         every { System.getProperties() } returns properties
         every { properties.setProperty(any(), any()) } returns mockk()
 
-        sdk = spyk(ImmutableXSdk)
+        sdk = spyk(ImmutableXCore)
     }
 
     @After

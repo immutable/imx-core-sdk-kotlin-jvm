@@ -6,7 +6,7 @@ It contains the API Client for interacting with the platform, workflows for doin
 
 # Package com.immutable.sdk
 
-Contains the Core SDK entry point [ImmutableXSdk].
+Contains the Core SDK entry point [ImmutableXCore].
 
 # Package com.immutable.sdk.api
 

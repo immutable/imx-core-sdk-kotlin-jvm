@@ -1,6 +1,7 @@
 package com.immutable.sdk.crypto
 
 import com.immutable.sdk.*
+import com.immutable.sdk.extensions.getStarkPublicKey
 import com.immutable.sdk.extensions.toHexString
 import com.immutable.sdk.workflows.SIGNATURE
 import io.mockk.MockKAnnotations
@@ -50,6 +51,24 @@ class StarkKeyTest {
         assertNull(StarkKey.getKeyFromRawSignature(null, null))
         assertNull(StarkKey.getKeyFromRawSignature(signature, null))
         assertNull(StarkKey.getKeyFromRawSignature(null, ethAddress))
+    }
+
+    @Test
+    fun testGetKeyFromRawSignatureWithExtraGrinding() {
+        // The signature below requires extra grinding to generate the keys
+        val signature =
+            "0x6d1550458c7a9a1257d73adbcf0fabc12f4497e970d9fa62dd88bf7d9e1271914" +
+                "8c96225c1402d8707fd061b1aae2222bdf13571dfc82b3aa9974039f247f2b81b"
+        val ethAddress = "0xa4864d977b944315389d1765ffa7e66F74ee8cd7"
+        val keypair = StarkKey.getKeyFromRawSignature(
+            signature = signature,
+            ethereumAddress = ethAddress
+        )
+
+        assertEquals(
+            "0x035919acd61e97b3ecdc75ff8beed8d1803f7ea3cad2937926ae59cc3f8070d4",
+            keypair?.getStarkPublicKey()
+        )
     }
 
     @Test

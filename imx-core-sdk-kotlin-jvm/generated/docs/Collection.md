@@ -11,6 +11,7 @@ Name | Type | Description | Notes
 **metadataApiUrl** | **kotlin.String** | URL of the metadata for this collection | 
 **name** | **kotlin.String** | Name of the collection | 
 **projectId** | **kotlin.Int** | The collection&#39;s project ID | 
+**projectOwnerAddress** | **kotlin.String** | Project owner address | 
 
 
 

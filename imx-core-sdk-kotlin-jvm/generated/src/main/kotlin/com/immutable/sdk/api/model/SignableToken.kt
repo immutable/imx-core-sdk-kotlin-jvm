@@ -26,13 +26,13 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param `data` Token data
+ * @param `data` Token data. See https://docs.x.immutable.com/docs/token-data-object\"
  * @param type Type of token
  */
 
 data class SignableToken (
 
-    /* Token data */
+    /* Token data. See https://docs.x.immutable.com/docs/token-data-object\" */
     @Json(name = "data")
     val `data`: kotlin.Any? = null,
 

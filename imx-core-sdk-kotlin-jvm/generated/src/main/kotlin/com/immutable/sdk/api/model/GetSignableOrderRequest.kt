@@ -28,8 +28,8 @@ import com.squareup.moshi.Json
 /**
  * 
  *
- * @param amountBuy Fee-exclusive amount to buy
- * @param amountSell Amount to sell
+ * @param amountBuy Fee-exclusive amount to buy the asset
+ * @param amountSell Amount to sell (quantity)
  * @param tokenBuy 
  * @param tokenSell 
  * @param user Ethereum address of the submitting user
@@ -39,11 +39,11 @@ import com.squareup.moshi.Json
 
 data class GetSignableOrderRequest (
 
-    /* Fee-exclusive amount to buy */
+    /* Fee-exclusive amount to buy the asset */
     @Json(name = "amount_buy")
     val amountBuy: kotlin.String,
 
-    /* Amount to sell */
+    /* Amount to sell (quantity) */
     @Json(name = "amount_sell")
     val amountSell: kotlin.String,
 

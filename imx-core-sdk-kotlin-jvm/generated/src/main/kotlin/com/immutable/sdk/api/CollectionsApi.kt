@@ -50,7 +50,7 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     /**
     * Create collection
     * Create collection
-    * @param imXSignature String created by signing wallet address and timestamp 
+    * @param imXSignature String created by signing wallet address and timestamp. See https://docs.x.immutable.com/docs/generate-imx-signature 
     * @param imXTimestamp Unix Epoc timestamp 
     * @param createCollectionRequest create a collection 
     * @return Collection
@@ -87,7 +87,7 @@ class CollectionsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(base
     /**
     * To obtain the request config of the operation createCollection
     *
-    * @param imXSignature String created by signing wallet address and timestamp 
+    * @param imXSignature String created by signing wallet address and timestamp. See https://docs.x.immutable.com/docs/generate-imx-signature 
     * @param imXTimestamp Unix Epoc timestamp 
     * @param createCollectionRequest create a collection 
     * @return RequestConfig

@@ -180,8 +180,8 @@ val pageSize : kotlin.Int = 56 // kotlin.Int | Page size of the result
 val cursor : kotlin.String = cursor_example // kotlin.String | Cursor
 val orderBy : kotlin.String = orderBy_example // kotlin.String | Property to sort by
 val direction : kotlin.String = direction_example // kotlin.String | Direction to sort (asc/desc)
-val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this trade
-val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this trade
+val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this trade, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this trade, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
 try {
     val result : ListTradesResponse = apiInstance.listTrades(partyATokenType, partyATokenAddress, partyATokenId, partyBTokenType, partyBTokenAddress, partyBTokenId, pageSize, cursor, orderBy, direction, minTimestamp, maxTimestamp)
     println(result)
@@ -208,8 +208,8 @@ Name | Type | Description  | Notes
  **cursor** | **kotlin.String**| Cursor | [optional]
  **orderBy** | **kotlin.String**| Property to sort by | [optional]
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
- **minTimestamp** | **kotlin.String**| Minimum timestamp for this trade | [optional]
- **maxTimestamp** | **kotlin.String**| Maximum timestamp for this trade | [optional]
+ **minTimestamp** | **kotlin.String**| Minimum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **maxTimestamp** | **kotlin.String**| Maximum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
 
 ### Return type
 

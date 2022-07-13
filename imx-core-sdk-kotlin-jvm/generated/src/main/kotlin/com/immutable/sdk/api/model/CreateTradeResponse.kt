@@ -28,6 +28,7 @@ import com.squareup.moshi.Json
  *
  * @param status Current status of trade
  * @param tradeId ID of trade within Immutable X
+ * @param requestId Request ID that returns when a trade initiated through risk-manager
  */
 
 data class CreateTradeResponse (
@@ -38,7 +39,11 @@ data class CreateTradeResponse (
 
     /* ID of trade within Immutable X */
     @Json(name = "trade_id")
-    val tradeId: kotlin.Int
+    val tradeId: kotlin.Int,
+
+    /* Request ID that returns when a trade initiated through risk-manager */
+    @Json(name = "request_id")
+    val requestId: kotlin.String? = null
 
 )
 

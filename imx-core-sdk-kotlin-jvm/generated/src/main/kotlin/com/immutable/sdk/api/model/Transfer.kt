@@ -20,26 +20,22 @@
 
 package com.immutable.sdk.api.model
 
-import com.immutable.sdk.api.model.TokenData
+import com.immutable.sdk.api.model.Token
 
 import com.squareup.moshi.Json
 
 /**
  * 
  *
- * @param `data` 
  * @param `receiver` Ethereum address of the user who received this transfer
  * @param status Status of the transaction
  * @param timestamp Timestamp of the transfer
+ * @param token 
  * @param transactionId Sequential transaction ID
- * @param type Type of this asset (ETH/ERC20/ERC721)
  * @param user Ethereum address of the user  who submitted this transfer
  */
 
 data class Transfer (
-
-    @Json(name = "data")
-    val `data`: TokenData,
 
     /* Ethereum address of the user who received this transfer */
     @Json(name = "receiver")
@@ -53,13 +49,12 @@ data class Transfer (
     @Json(name = "timestamp")
     val timestamp: kotlin.String?,
 
+    @Json(name = "token")
+    val token: Token,
+
     /* Sequential transaction ID */
     @Json(name = "transaction_id")
     val transactionId: kotlin.Int,
-
-    /* Type of this asset (ETH/ERC20/ERC721) */
-    @Json(name = "type")
-    val type: kotlin.String,
 
     /* Ethereum address of the user  who submitted this transfer */
     @Json(name = "user")

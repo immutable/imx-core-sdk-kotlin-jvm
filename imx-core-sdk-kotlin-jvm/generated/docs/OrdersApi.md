@@ -8,7 +8,7 @@ Method | HTTP request | Description
 [**createOrder**](OrdersApi.md#createOrder) | **POST** /v1/orders | Create an order
 [**getOrder**](OrdersApi.md#getOrder) | **GET** /v1/orders/{id} | Get details of an order with the given ID
 [**getSignableCancelOrder**](OrdersApi.md#getSignableCancelOrder) | **POST** /v1/signable-cancel-order-details | Get details a signable cancel order
-[**getSignableOrder**](OrdersApi.md#getSignableOrder) | **POST** /v3/signable-order-details | Get details a signable order V3
+[**getSignableOrder**](OrdersApi.md#getSignableOrder) | **POST** /v3/signable-order-details | Get a signable order request (V3)
 [**listOrders**](OrdersApi.md#listOrders) | **GET** /v1/orders | Get a list of orders
 
 
@@ -220,9 +220,9 @@ No authorization required
 # **getSignableOrder**
 > GetSignableOrderResponse getSignableOrder(getSignableOrderRequestV3)
 
-Get details a signable order V3
+Get a signable order request (V3)
 
-Get details a signable order V3
+Get a signable order request (V3)
 
 ### Example
 ```kotlin
@@ -265,7 +265,7 @@ No authorization required
 
 <a name="listOrders"></a>
 # **listOrders**
-> ListOrdersResponse listOrders(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, updatedMinTimestamp, updatedMaxTimestamp, buyTokenType, buyTokenId, buyAssetId, buyTokenAddress, buyTokenName, buyMinQuantity, buyMaxQuantity, buyMetadata, sellTokenType, sellTokenId, sellAssetId, sellTokenAddress, sellTokenName, sellMinQuantity, sellMaxQuantity, sellMetadata, auxiliaryFeePercentages, auxiliaryFeeRecipients)
+> ListOrdersResponse listOrders(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, updatedMinTimestamp, updatedMaxTimestamp, buyTokenType, buyTokenId, buyAssetId, buyTokenAddress, buyTokenName, buyMinQuantity, buyMaxQuantity, buyMetadata, sellTokenType, sellTokenId, sellAssetId, sellTokenAddress, sellTokenName, sellMinQuantity, sellMaxQuantity, sellMetadata, auxiliaryFeePercentages, auxiliaryFeeRecipients, includeFees)
 
 Get a list of orders
 
@@ -284,10 +284,10 @@ val orderBy : kotlin.String = orderBy_example // kotlin.String | Property to sor
 val direction : kotlin.String = direction_example // kotlin.String | Direction to sort (asc/desc)
 val user : kotlin.String = user_example // kotlin.String | Ethereum address of the user who submitted this order
 val status : kotlin.String = status_example // kotlin.String | Status of this order
-val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum created at timestamp for this order
-val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum created at timestamp for this order
-val updatedMinTimestamp : kotlin.String = updatedMinTimestamp_example // kotlin.String | Minimum updated at timestamp for this order
-val updatedMaxTimestamp : kotlin.String = updatedMaxTimestamp_example // kotlin.String | Maximum updated at timestamp for this order
+val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum created at timestamp for this order, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum created at timestamp for this order, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val updatedMinTimestamp : kotlin.String = updatedMinTimestamp_example // kotlin.String | Minimum updated at timestamp for this order, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val updatedMaxTimestamp : kotlin.String = updatedMaxTimestamp_example // kotlin.String | Maximum updated at timestamp for this order, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
 val buyTokenType : kotlin.String = buyTokenType_example // kotlin.String | Token type of the asset this order buys
 val buyTokenId : kotlin.String = buyTokenId_example // kotlin.String | ERC721 Token ID of the asset this order buys
 val buyAssetId : kotlin.String = buyAssetId_example // kotlin.String | Internal IMX ID of the asset this order buys
@@ -306,8 +306,9 @@ val sellMaxQuantity : kotlin.String = sellMaxQuantity_example // kotlin.String |
 val sellMetadata : kotlin.String = sellMetadata_example // kotlin.String | JSON-encoded metadata filters for the asset this order sells
 val auxiliaryFeePercentages : kotlin.String = auxiliaryFeePercentages_example // kotlin.String | Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients
 val auxiliaryFeeRecipients : kotlin.String = auxiliaryFeeRecipients_example // kotlin.String | Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages
+val includeFees : kotlin.Boolean = true // kotlin.Boolean | Set flag to true to include fee object for orders
 try {
-    val result : ListOrdersResponse = apiInstance.listOrders(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, updatedMinTimestamp, updatedMaxTimestamp, buyTokenType, buyTokenId, buyAssetId, buyTokenAddress, buyTokenName, buyMinQuantity, buyMaxQuantity, buyMetadata, sellTokenType, sellTokenId, sellAssetId, sellTokenAddress, sellTokenName, sellMinQuantity, sellMaxQuantity, sellMetadata, auxiliaryFeePercentages, auxiliaryFeeRecipients)
+    val result : ListOrdersResponse = apiInstance.listOrders(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, updatedMinTimestamp, updatedMaxTimestamp, buyTokenType, buyTokenId, buyAssetId, buyTokenAddress, buyTokenName, buyMinQuantity, buyMaxQuantity, buyMetadata, sellTokenType, sellTokenId, sellAssetId, sellTokenAddress, sellTokenName, sellMinQuantity, sellMaxQuantity, sellMetadata, auxiliaryFeePercentages, auxiliaryFeeRecipients, includeFees)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling OrdersApi#listOrders")
@@ -328,10 +329,10 @@ Name | Type | Description  | Notes
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
  **user** | **kotlin.String**| Ethereum address of the user who submitted this order | [optional]
  **status** | **kotlin.String**| Status of this order | [optional] [enum: active, filled, cancelled, expired, inactive]
- **minTimestamp** | **kotlin.String**| Minimum created at timestamp for this order | [optional]
- **maxTimestamp** | **kotlin.String**| Maximum created at timestamp for this order | [optional]
- **updatedMinTimestamp** | **kotlin.String**| Minimum updated at timestamp for this order | [optional]
- **updatedMaxTimestamp** | **kotlin.String**| Maximum updated at timestamp for this order | [optional]
+ **minTimestamp** | **kotlin.String**| Minimum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **maxTimestamp** | **kotlin.String**| Maximum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **updatedMinTimestamp** | **kotlin.String**| Minimum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **updatedMaxTimestamp** | **kotlin.String**| Maximum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
  **buyTokenType** | **kotlin.String**| Token type of the asset this order buys | [optional]
  **buyTokenId** | **kotlin.String**| ERC721 Token ID of the asset this order buys | [optional]
  **buyAssetId** | **kotlin.String**| Internal IMX ID of the asset this order buys | [optional]
@@ -350,6 +351,7 @@ Name | Type | Description  | Notes
  **sellMetadata** | **kotlin.String**| JSON-encoded metadata filters for the asset this order sells | [optional]
  **auxiliaryFeePercentages** | **kotlin.String**| Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients | [optional]
  **auxiliaryFeeRecipients** | **kotlin.String**| Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages | [optional]
+ **includeFees** | **kotlin.Boolean**| Set flag to true to include fee object for orders | [optional]
 
 ### Return type
 

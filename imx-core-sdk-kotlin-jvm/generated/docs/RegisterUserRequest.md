@@ -8,6 +8,7 @@ Name | Type | Description | Notes
 **etherKey** | **kotlin.String** | The ether key of the user | 
 **starkKey** | **kotlin.String** | Public stark key of the user | 
 **starkSignature** | **kotlin.String** | Payload signature | 
+**email** | **kotlin.String** | User email |  [optional]
 
 
 

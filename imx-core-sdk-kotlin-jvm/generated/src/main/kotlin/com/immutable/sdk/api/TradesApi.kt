@@ -232,8 +232,8 @@ class TradesApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     * @param cursor Cursor (optional)
     * @param orderBy Property to sort by (optional)
     * @param direction Direction to sort (asc/desc) (optional)
-    * @param minTimestamp Minimum timestamp for this trade (optional)
-    * @param maxTimestamp Maximum timestamp for this trade (optional)
+    * @param minTimestamp Minimum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param maxTimestamp Maximum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
     * @return ListTradesResponse
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
@@ -278,8 +278,8 @@ class TradesApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     * @param cursor Cursor (optional)
     * @param orderBy Property to sort by (optional)
     * @param direction Direction to sort (asc/desc) (optional)
-    * @param minTimestamp Minimum timestamp for this trade (optional)
-    * @param maxTimestamp Maximum timestamp for this trade (optional)
+    * @param minTimestamp Minimum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param maxTimestamp Maximum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
     * @return RequestConfig
     */
     fun listTradesRequestConfig(partyATokenType: kotlin.String?, partyATokenAddress: kotlin.String?, partyATokenId: kotlin.String?, partyBTokenType: kotlin.String?, partyBTokenAddress: kotlin.String?, partyBTokenId: kotlin.String?, pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?) : RequestConfig<Unit> {

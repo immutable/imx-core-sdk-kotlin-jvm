@@ -105,7 +105,7 @@ No authorization required
 
 <a name="listDeposits"></a>
 # **listDeposits**
-> ListDepositsResponse listDeposits(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
+> ListDepositsResponse listDeposits(pageSize, cursor, orderBy, direction, user, status, updatedMinTimestamp, updatedMaxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
 
 Get a list of deposits
 
@@ -124,8 +124,8 @@ val orderBy : kotlin.String = orderBy_example // kotlin.String | Property to sor
 val direction : kotlin.String = direction_example // kotlin.String | Direction to sort (asc/desc)
 val user : kotlin.String = user_example // kotlin.String | Ethereum address of the user who submitted this deposit
 val status : kotlin.String = status_example // kotlin.String | Status of this deposit
-val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this deposit
-val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this deposit
+val updatedMinTimestamp : kotlin.String = updatedMinTimestamp_example // kotlin.String | Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val updatedMaxTimestamp : kotlin.String = updatedMaxTimestamp_example // kotlin.String | Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
 val tokenType : kotlin.String = tokenType_example // kotlin.String | Token type of the deposited asset
 val tokenId : kotlin.String = tokenId_example // kotlin.String | ERC721 Token ID of the minted asset
 val assetId : kotlin.String = assetId_example // kotlin.String | Internal IMX ID of the minted asset
@@ -135,7 +135,7 @@ val minQuantity : kotlin.String = minQuantity_example // kotlin.String | Min qua
 val maxQuantity : kotlin.String = maxQuantity_example // kotlin.String | Max quantity for the deposited asset
 val metadata : kotlin.String = metadata_example // kotlin.String | JSON-encoded metadata filters for the deposited asset
 try {
-    val result : ListDepositsResponse = apiInstance.listDeposits(pageSize, cursor, orderBy, direction, user, status, minTimestamp, maxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
+    val result : ListDepositsResponse = apiInstance.listDeposits(pageSize, cursor, orderBy, direction, user, status, updatedMinTimestamp, updatedMaxTimestamp, tokenType, tokenId, assetId, tokenAddress, tokenName, minQuantity, maxQuantity, metadata)
     println(result)
 } catch (e: ClientException) {
     println("4xx response calling DepositsApi#listDeposits")
@@ -156,8 +156,8 @@ Name | Type | Description  | Notes
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
  **user** | **kotlin.String**| Ethereum address of the user who submitted this deposit | [optional]
  **status** | **kotlin.String**| Status of this deposit | [optional]
- **minTimestamp** | **kotlin.String**| Minimum timestamp for this deposit | [optional]
- **maxTimestamp** | **kotlin.String**| Maximum timestamp for this deposit | [optional]
+ **updatedMinTimestamp** | **kotlin.String**| Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **updatedMaxTimestamp** | **kotlin.String**| Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
  **tokenType** | **kotlin.String**| Token type of the deposited asset | [optional]
  **tokenId** | **kotlin.String**| ERC721 Token ID of the minted asset | [optional]
  **assetId** | **kotlin.String**| Internal IMX ID of the minted asset | [optional]

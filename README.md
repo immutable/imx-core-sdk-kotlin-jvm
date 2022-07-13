@@ -98,6 +98,39 @@ When updating the `org.openapi.generator` plugin ensure that any custom template
 
 The generation always happens on preBuild so triggering a project build will regenerate them.
 
+## Wrapping CompletableFuture
+
+### RxJava
+Rx provides a `fromFuture` method that will trigger `future.get()` which is a blocking call so it must be moved off the main thread.
+
+Disposing the resulting observable will not cancel the future so that needs to be done manually using `doOnDispose`.
+```
+val future = ImmutableWallet.cancel(orderId)
+Observable.fromFuture(future)
+    .subscribeOn(Schedulers.io())
+    .doOnDispose { future.cancel(true) }
+    .subscribe({ handleSuccess() }, { handleError() })
+```
+
+### Coroutines
+The Kotlin team has a set of packages for jdk8 that provide an easy extension for using CompletableFuture.
+
+First add this import to your project:
+```
+implementation "org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:$coroutines_version"
+```
+
+Then simply call `.await()` on the workflow `CompletableFuture` and wrap it with a try/catch to handle any exceptions.
+```
+launch(Dispatchers.Default) {
+    try {
+        val id = ImmutableWallet.cancel(orderId).await()
+    } catch (e: Exception) {
+        handleError(e)
+    }
+}
+```
+
 ## Contributing
 
 If you would like to contribute, please read the following:

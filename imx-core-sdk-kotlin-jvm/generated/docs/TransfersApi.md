@@ -277,8 +277,8 @@ val direction : kotlin.String = direction_example // kotlin.String | Direction t
 val user : kotlin.String = user_example // kotlin.String | Ethereum address of the user who submitted this transfer
 val `receiver` : kotlin.String = `receiver`_example // kotlin.String | Ethereum address of the user who received this transfer
 val status : kotlin.String = status_example // kotlin.String | Status of this transfer
-val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this transfer
-val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this transfer
+val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this transfer, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this transfer, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
 val tokenType : kotlin.String = tokenType_example // kotlin.String | Token type of the transferred asset
 val tokenId : kotlin.String = tokenId_example // kotlin.String | ERC721 Token ID of the minted asset
 val assetId : kotlin.String = assetId_example // kotlin.String | Internal IMX ID of the minted asset
@@ -310,8 +310,8 @@ Name | Type | Description  | Notes
  **user** | **kotlin.String**| Ethereum address of the user who submitted this transfer | [optional]
  **&#x60;receiver&#x60;** | **kotlin.String**| Ethereum address of the user who received this transfer | [optional]
  **status** | **kotlin.String**| Status of this transfer | [optional] [enum: success, failure]
- **minTimestamp** | **kotlin.String**| Minimum timestamp for this transfer | [optional]
- **maxTimestamp** | **kotlin.String**| Maximum timestamp for this transfer | [optional]
+ **minTimestamp** | **kotlin.String**| Minimum timestamp for this transfer, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **maxTimestamp** | **kotlin.String**| Maximum timestamp for this transfer, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
  **tokenType** | **kotlin.String**| Token type of the transferred asset | [optional]
  **tokenId** | **kotlin.String**| ERC721 Token ID of the minted asset | [optional]
  **assetId** | **kotlin.String**| Internal IMX ID of the minted asset | [optional]

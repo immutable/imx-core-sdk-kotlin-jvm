@@ -29,6 +29,7 @@ import com.squareup.moshi.Json
  * @param balance Amount which is currently inside the exchange
  * @param preparingWithdrawal Amount which is currently preparing withdrawal from the exchange
  * @param symbol Symbol of the token (e.g. ETH, IMX)
+ * @param tokenAddress Address of the contract that represents this ERC20 token or empty for ETH
  * @param withdrawable Amount which is currently withdrawable from the exchange
  */
 
@@ -45,6 +46,10 @@ data class Balance (
     /* Symbol of the token (e.g. ETH, IMX) */
     @Json(name = "symbol")
     val symbol: kotlin.String,
+
+    /* Address of the contract that represents this ERC20 token or empty for ETH */
+    @Json(name = "token_address")
+    val tokenAddress: kotlin.String,
 
     /* Amount which is currently withdrawable from the exchange */
     @Json(name = "withdrawable")

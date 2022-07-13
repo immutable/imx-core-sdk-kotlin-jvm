@@ -26,7 +26,7 @@ Create collection
 //import com.immutable.sdk.api.model.*
 
 val apiInstance = CollectionsApi()
-val imXSignature : kotlin.String = imXSignature_example // kotlin.String | String created by signing wallet address and timestamp
+val imXSignature : kotlin.String = imXSignature_example // kotlin.String | String created by signing wallet address and timestamp. See https://docs.x.immutable.com/docs/generate-imx-signature
 val imXTimestamp : kotlin.String = imXTimestamp_example // kotlin.String | Unix Epoc timestamp
 val createCollectionRequest : CreateCollectionRequest =  // CreateCollectionRequest | create a collection
 try {
@@ -45,7 +45,7 @@ try {
 
 Name | Type | Description  | Notes
 ------------- | ------------- | ------------- | -------------
- **imXSignature** | **kotlin.String**| String created by signing wallet address and timestamp |
+ **imXSignature** | **kotlin.String**| String created by signing wallet address and timestamp. See https://docs.x.immutable.com/docs/generate-imx-signature |
  **imXTimestamp** | **kotlin.String**| Unix Epoc timestamp |
  **createCollectionRequest** | [**CreateCollectionRequest**](CreateCollectionRequest.md)| create a collection |
 

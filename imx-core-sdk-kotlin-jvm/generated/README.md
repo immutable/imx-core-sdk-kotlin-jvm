@@ -59,7 +59,7 @@ Class | Method | HTTP request | Description
 *OrdersApi* | [**createOrder**](docs/OrdersApi.md#createorder) | **POST** /v1/orders | Create an order
 *OrdersApi* | [**getOrder**](docs/OrdersApi.md#getorder) | **GET** /v1/orders/{id} | Get details of an order with the given ID
 *OrdersApi* | [**getSignableCancelOrder**](docs/OrdersApi.md#getsignablecancelorder) | **POST** /v1/signable-cancel-order-details | Get details a signable cancel order
-*OrdersApi* | [**getSignableOrder**](docs/OrdersApi.md#getsignableorder) | **POST** /v3/signable-order-details | Get details a signable order V3
+*OrdersApi* | [**getSignableOrder**](docs/OrdersApi.md#getsignableorder) | **POST** /v3/signable-order-details | Get a signable order request (V3)
 *OrdersApi* | [**listOrders**](docs/OrdersApi.md#listorders) | **GET** /v1/orders | Get a list of orders
 *ProjectsApi* | [**createProject**](docs/ProjectsApi.md#createproject) | **POST** /v1/projects | Create a project
 *ProjectsApi* | [**getProject**](docs/ProjectsApi.md#getproject) | **GET** /v1/projects/{id} | Get a project

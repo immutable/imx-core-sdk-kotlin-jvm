@@ -30,6 +30,7 @@ import com.squareup.moshi.Json
  * @param etherKey The ether key of the user
  * @param starkKey Public stark key of the user
  * @param starkSignature Payload signature
+ * @param email User email
  */
 
 data class RegisterUserRequest (
@@ -48,7 +49,11 @@ data class RegisterUserRequest (
 
     /* Payload signature */
     @Json(name = "stark_signature")
-    val starkSignature: kotlin.String
+    val starkSignature: kotlin.String,
+
+    /* User email */
+    @Json(name = "email")
+    val email: kotlin.String? = null
 
 )
 

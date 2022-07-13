@@ -168,8 +168,8 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     * @param direction Direction to sort (asc/desc) (optional)
     * @param user Ethereum address of the user who submitted this mint (optional)
     * @param status Status of this mint (optional)
-    * @param minTimestamp Minimum timestamp for this mint (optional)
-    * @param maxTimestamp Maximum timestamp for this mint (optional)
+    * @param updatedMinTimestamp Minimum timestamp for this mint, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param updatedMaxTimestamp Maximum timestamp for this mint, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
     * @param tokenType Token type of the minted asset (optional)
     * @param tokenId ERC721 Token ID of the minted asset (optional)
     * @param assetId Internal IMX ID of the minted asset (optional)
@@ -185,8 +185,8 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listMints(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenName: kotlin.String? = null, tokenAddress: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListMintsResponse {
-        val localVariableConfig = listMintsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenName = tokenName, tokenAddress = tokenAddress, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
+    fun listMints(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, tokenType: kotlin.String? = null, tokenId: kotlin.String? = null, assetId: kotlin.String? = null, tokenName: kotlin.String? = null, tokenAddress: kotlin.String? = null, minQuantity: kotlin.String? = null, maxQuantity: kotlin.String? = null, metadata: kotlin.String? = null) : ListMintsResponse {
+        val localVariableConfig = listMintsRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, tokenType = tokenType, tokenId = tokenId, assetId = assetId, tokenName = tokenName, tokenAddress = tokenAddress, minQuantity = minQuantity, maxQuantity = maxQuantity, metadata = metadata)
 
         val localVarResponse = request<Unit, ListMintsResponse>(
             localVariableConfig
@@ -218,8 +218,8 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     * @param direction Direction to sort (asc/desc) (optional)
     * @param user Ethereum address of the user who submitted this mint (optional)
     * @param status Status of this mint (optional)
-    * @param minTimestamp Minimum timestamp for this mint (optional)
-    * @param maxTimestamp Maximum timestamp for this mint (optional)
+    * @param updatedMinTimestamp Minimum timestamp for this mint, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param updatedMaxTimestamp Maximum timestamp for this mint, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
     * @param tokenType Token type of the minted asset (optional)
     * @param tokenId ERC721 Token ID of the minted asset (optional)
     * @param assetId Internal IMX ID of the minted asset (optional)
@@ -230,7 +230,7 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
     * @param metadata JSON-encoded metadata filters for the minted asset (optional)
     * @return RequestConfig
     */
-    fun listMintsRequestConfig(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenName: kotlin.String?, tokenAddress: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : RequestConfig<Unit> {
+    fun listMintsRequestConfig(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, tokenType: kotlin.String?, tokenId: kotlin.String?, assetId: kotlin.String?, tokenName: kotlin.String?, tokenAddress: kotlin.String?, minQuantity: kotlin.String?, maxQuantity: kotlin.String?, metadata: kotlin.String?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, List<kotlin.String>>()
             .apply {
@@ -252,11 +252,11 @@ class MintsApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath) 
                 if (status != null) {
                     put("status", listOf(status.toString()))
                 }
-                if (minTimestamp != null) {
-                    put("min_timestamp", listOf(minTimestamp.toString()))
+                if (updatedMinTimestamp != null) {
+                    put("updated_min_timestamp", listOf(updatedMinTimestamp.toString()))
                 }
-                if (maxTimestamp != null) {
-                    put("max_timestamp", listOf(maxTimestamp.toString()))
+                if (updatedMaxTimestamp != null) {
+                    put("updated_max_timestamp", listOf(updatedMaxTimestamp.toString()))
                 }
                 if (tokenType != null) {
                     put("token_type", listOf(tokenType.toString()))

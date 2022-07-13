@@ -29,6 +29,7 @@ import com.squareup.moshi.Json
  * @param contractAddress Ethereum address of the ERC721 contract
  * @param name Name of the collection
  * @param ownerPublicKey Owner Public Key: The public key of the owner of the contract
+ * @param projectId The collection's project ID
  * @param collectionImageUrl URL of the tile image for this collection
  * @param description Description of the collection
  * @param iconUrl URL of the icon for this collection
@@ -48,6 +49,10 @@ data class CreateCollectionRequest (
     /* Owner Public Key: The public key of the owner of the contract */
     @Json(name = "owner_public_key")
     val ownerPublicKey: kotlin.String,
+
+    /* The collection's project ID */
+    @Json(name = "project_id")
+    val projectId: kotlin.Int,
 
     /* URL of the tile image for this collection */
     @Json(name = "collection_image_url")

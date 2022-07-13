@@ -33,6 +33,7 @@ import com.squareup.moshi.Json
  * @param metadataApiUrl URL of the metadata for this collection
  * @param name Name of the collection
  * @param projectId The collection's project ID
+ * @param projectOwnerAddress Project owner address
  */
 
 data class Collection (
@@ -63,7 +64,11 @@ data class Collection (
 
     /* The collection's project ID */
     @Json(name = "project_id")
-    val projectId: kotlin.Int
+    val projectId: kotlin.Int,
+
+    /* Project owner address */
+    @Json(name = "project_owner_address")
+    val projectOwnerAddress: kotlin.String
 
 )
 

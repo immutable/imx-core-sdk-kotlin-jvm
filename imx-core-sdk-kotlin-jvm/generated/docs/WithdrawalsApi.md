@@ -178,8 +178,8 @@ val orderBy : kotlin.String = orderBy_example // kotlin.String | Property to sor
 val direction : kotlin.String = direction_example // kotlin.String | Direction to sort (asc/desc)
 val user : kotlin.String = user_example // kotlin.String | Ethereum address of the user who submitted this withdrawal
 val status : kotlin.String = status_example // kotlin.String | Status of this withdrawal
-val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this deposit
-val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this deposit
+val minTimestamp : kotlin.String = minTimestamp_example // kotlin.String | Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val maxTimestamp : kotlin.String = maxTimestamp_example // kotlin.String | Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
 val tokenType : kotlin.String = tokenType_example // kotlin.String | Token type of the withdrawn asset
 val tokenId : kotlin.String = tokenId_example // kotlin.String | ERC721 Token ID of the minted asset
 val assetId : kotlin.String = assetId_example // kotlin.String | Internal IMX ID of the minted asset
@@ -212,8 +212,8 @@ Name | Type | Description  | Notes
  **direction** | **kotlin.String**| Direction to sort (asc/desc) | [optional]
  **user** | **kotlin.String**| Ethereum address of the user who submitted this withdrawal | [optional]
  **status** | **kotlin.String**| Status of this withdrawal | [optional]
- **minTimestamp** | **kotlin.String**| Minimum timestamp for this deposit | [optional]
- **maxTimestamp** | **kotlin.String**| Maximum timestamp for this deposit | [optional]
+ **minTimestamp** | **kotlin.String**| Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **maxTimestamp** | **kotlin.String**| Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
  **tokenType** | **kotlin.String**| Token type of the withdrawn asset | [optional]
  **tokenId** | **kotlin.String**| ERC721 Token ID of the minted asset | [optional]
  **assetId** | **kotlin.String**| Internal IMX ID of the minted asset | [optional]

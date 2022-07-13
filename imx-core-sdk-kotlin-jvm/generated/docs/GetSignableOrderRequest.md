@@ -4,8 +4,8 @@
 ## Properties
 Name | Type | Description | Notes
 ------------ | ------------- | ------------- | -------------
-**amountBuy** | **kotlin.String** | Fee-exclusive amount to buy | 
-**amountSell** | **kotlin.String** | Amount to sell | 
+**amountBuy** | **kotlin.String** | Fee-exclusive amount to buy the asset | 
+**amountSell** | **kotlin.String** | Amount to sell (quantity) | 
 **tokenBuy** | [**SignableToken**](SignableToken.md) |  | 
 **tokenSell** | [**SignableToken**](SignableToken.md) |  | 
 **user** | **kotlin.String** | Ethereum address of the submitting user | 

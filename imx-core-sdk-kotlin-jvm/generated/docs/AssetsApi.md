@@ -86,8 +86,8 @@ val sellOrders : kotlin.Boolean = true // kotlin.Boolean | Set flag to true to f
 val buyOrders : kotlin.Boolean = true // kotlin.Boolean | Set flag to true to fetch an array of buy order details  with accepted status associated with the asset
 val includeFees : kotlin.Boolean = true // kotlin.Boolean | Set flag to include fees associated with the asset
 val collection : kotlin.String = collection_example // kotlin.String | Collection contract address
-val updatedMinTimestamp : kotlin.String = updatedMinTimestamp_example // kotlin.String | Minimum timestamp for when these assets were last updated
-val updatedMaxTimestamp : kotlin.String = updatedMaxTimestamp_example // kotlin.String | Maximum timestamp for when these assets were last updated
+val updatedMinTimestamp : kotlin.String = updatedMinTimestamp_example // kotlin.String | Minimum timestamp for when these assets were last updated, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
+val updatedMaxTimestamp : kotlin.String = updatedMaxTimestamp_example // kotlin.String | Maximum timestamp for when these assets were last updated, in ISO 8601 UTC format. Example: '2022-05-27T00:10:22Z'
 val auxiliaryFeePercentages : kotlin.String = auxiliaryFeePercentages_example // kotlin.String | Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients
 val auxiliaryFeeRecipients : kotlin.String = auxiliaryFeeRecipients_example // kotlin.String | Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages
 try {
@@ -118,8 +118,8 @@ Name | Type | Description  | Notes
  **buyOrders** | **kotlin.Boolean**| Set flag to true to fetch an array of buy order details  with accepted status associated with the asset | [optional]
  **includeFees** | **kotlin.Boolean**| Set flag to include fees associated with the asset | [optional]
  **collection** | **kotlin.String**| Collection contract address | [optional]
- **updatedMinTimestamp** | **kotlin.String**| Minimum timestamp for when these assets were last updated | [optional]
- **updatedMaxTimestamp** | **kotlin.String**| Maximum timestamp for when these assets were last updated | [optional]
+ **updatedMinTimestamp** | **kotlin.String**| Minimum timestamp for when these assets were last updated, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
+ **updatedMaxTimestamp** | **kotlin.String**| Maximum timestamp for when these assets were last updated, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; | [optional]
  **auxiliaryFeePercentages** | **kotlin.String**| Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients | [optional]
  **auxiliaryFeeRecipients** | **kotlin.String**| Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages | [optional]
 

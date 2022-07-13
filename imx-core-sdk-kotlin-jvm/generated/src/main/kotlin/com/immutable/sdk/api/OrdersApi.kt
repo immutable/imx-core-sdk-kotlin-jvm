@@ -304,8 +304,8 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     }
 
     /**
-    * Get details a signable order V3
-    * Get details a signable order V3
+    * Get a signable order request (V3)
+    * Get a signable order request (V3)
     * @param getSignableOrderRequestV3 get a signable order 
     * @return GetSignableOrderResponse
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
@@ -367,10 +367,10 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     * @param direction Direction to sort (asc/desc) (optional)
     * @param user Ethereum address of the user who submitted this order (optional)
     * @param status Status of this order (optional)
-    * @param minTimestamp Minimum created at timestamp for this order (optional)
-    * @param maxTimestamp Maximum created at timestamp for this order (optional)
-    * @param updatedMinTimestamp Minimum updated at timestamp for this order (optional)
-    * @param updatedMaxTimestamp Maximum updated at timestamp for this order (optional)
+    * @param minTimestamp Minimum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param maxTimestamp Maximum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param updatedMinTimestamp Minimum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param updatedMaxTimestamp Maximum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
     * @param buyTokenType Token type of the asset this order buys (optional)
     * @param buyTokenId ERC721 Token ID of the asset this order buys (optional)
     * @param buyAssetId Internal IMX ID of the asset this order buys (optional)
@@ -389,6 +389,7 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     * @param sellMetadata JSON-encoded metadata filters for the asset this order sells (optional)
     * @param auxiliaryFeePercentages Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients (optional)
     * @param auxiliaryFeeRecipients Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages (optional)
+    * @param includeFees Set flag to true to include fee object for orders (optional)
     * @return ListOrdersResponse
     * @throws UnsupportedOperationException If the API returns an informational or redirection response
     * @throws ClientException If the API returns a client error response
@@ -396,8 +397,8 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     */
     @Suppress("UNCHECKED_CAST")
     @Throws(UnsupportedOperationException::class, ClientException::class, ServerException::class)
-    fun listOrders(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, buyTokenType: kotlin.String? = null, buyTokenId: kotlin.String? = null, buyAssetId: kotlin.String? = null, buyTokenAddress: kotlin.String? = null, buyTokenName: kotlin.String? = null, buyMinQuantity: kotlin.String? = null, buyMaxQuantity: kotlin.String? = null, buyMetadata: kotlin.String? = null, sellTokenType: kotlin.String? = null, sellTokenId: kotlin.String? = null, sellAssetId: kotlin.String? = null, sellTokenAddress: kotlin.String? = null, sellTokenName: kotlin.String? = null, sellMinQuantity: kotlin.String? = null, sellMaxQuantity: kotlin.String? = null, sellMetadata: kotlin.String? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null) : ListOrdersResponse {
-        val localVariableConfig = listOrdersRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, buyTokenType = buyTokenType, buyTokenId = buyTokenId, buyAssetId = buyAssetId, buyTokenAddress = buyTokenAddress, buyTokenName = buyTokenName, buyMinQuantity = buyMinQuantity, buyMaxQuantity = buyMaxQuantity, buyMetadata = buyMetadata, sellTokenType = sellTokenType, sellTokenId = sellTokenId, sellAssetId = sellAssetId, sellTokenAddress = sellTokenAddress, sellTokenName = sellTokenName, sellMinQuantity = sellMinQuantity, sellMaxQuantity = sellMaxQuantity, sellMetadata = sellMetadata, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients)
+    fun listOrders(pageSize: kotlin.Int? = null, cursor: kotlin.String? = null, orderBy: kotlin.String? = null, direction: kotlin.String? = null, user: kotlin.String? = null, status: kotlin.String? = null, minTimestamp: kotlin.String? = null, maxTimestamp: kotlin.String? = null, updatedMinTimestamp: kotlin.String? = null, updatedMaxTimestamp: kotlin.String? = null, buyTokenType: kotlin.String? = null, buyTokenId: kotlin.String? = null, buyAssetId: kotlin.String? = null, buyTokenAddress: kotlin.String? = null, buyTokenName: kotlin.String? = null, buyMinQuantity: kotlin.String? = null, buyMaxQuantity: kotlin.String? = null, buyMetadata: kotlin.String? = null, sellTokenType: kotlin.String? = null, sellTokenId: kotlin.String? = null, sellAssetId: kotlin.String? = null, sellTokenAddress: kotlin.String? = null, sellTokenName: kotlin.String? = null, sellMinQuantity: kotlin.String? = null, sellMaxQuantity: kotlin.String? = null, sellMetadata: kotlin.String? = null, auxiliaryFeePercentages: kotlin.String? = null, auxiliaryFeeRecipients: kotlin.String? = null, includeFees: kotlin.Boolean? = null) : ListOrdersResponse {
+        val localVariableConfig = listOrdersRequestConfig(pageSize = pageSize, cursor = cursor, orderBy = orderBy, direction = direction, user = user, status = status, minTimestamp = minTimestamp, maxTimestamp = maxTimestamp, updatedMinTimestamp = updatedMinTimestamp, updatedMaxTimestamp = updatedMaxTimestamp, buyTokenType = buyTokenType, buyTokenId = buyTokenId, buyAssetId = buyAssetId, buyTokenAddress = buyTokenAddress, buyTokenName = buyTokenName, buyMinQuantity = buyMinQuantity, buyMaxQuantity = buyMaxQuantity, buyMetadata = buyMetadata, sellTokenType = sellTokenType, sellTokenId = sellTokenId, sellAssetId = sellAssetId, sellTokenAddress = sellTokenAddress, sellTokenName = sellTokenName, sellMinQuantity = sellMinQuantity, sellMaxQuantity = sellMaxQuantity, sellMetadata = sellMetadata, auxiliaryFeePercentages = auxiliaryFeePercentages, auxiliaryFeeRecipients = auxiliaryFeeRecipients, includeFees = includeFees)
 
         val localVarResponse = request<Unit, ListOrdersResponse>(
             localVariableConfig
@@ -429,10 +430,10 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     * @param direction Direction to sort (asc/desc) (optional)
     * @param user Ethereum address of the user who submitted this order (optional)
     * @param status Status of this order (optional)
-    * @param minTimestamp Minimum created at timestamp for this order (optional)
-    * @param maxTimestamp Maximum created at timestamp for this order (optional)
-    * @param updatedMinTimestamp Minimum updated at timestamp for this order (optional)
-    * @param updatedMaxTimestamp Maximum updated at timestamp for this order (optional)
+    * @param minTimestamp Minimum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param maxTimestamp Maximum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param updatedMinTimestamp Minimum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+    * @param updatedMaxTimestamp Maximum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
     * @param buyTokenType Token type of the asset this order buys (optional)
     * @param buyTokenId ERC721 Token ID of the asset this order buys (optional)
     * @param buyAssetId Internal IMX ID of the asset this order buys (optional)
@@ -451,9 +452,10 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
     * @param sellMetadata JSON-encoded metadata filters for the asset this order sells (optional)
     * @param auxiliaryFeePercentages Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients (optional)
     * @param auxiliaryFeeRecipients Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages (optional)
+    * @param includeFees Set flag to true to include fee object for orders (optional)
     * @return RequestConfig
     */
-    fun listOrdersRequestConfig(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, buyTokenType: kotlin.String?, buyTokenId: kotlin.String?, buyAssetId: kotlin.String?, buyTokenAddress: kotlin.String?, buyTokenName: kotlin.String?, buyMinQuantity: kotlin.String?, buyMaxQuantity: kotlin.String?, buyMetadata: kotlin.String?, sellTokenType: kotlin.String?, sellTokenId: kotlin.String?, sellAssetId: kotlin.String?, sellTokenAddress: kotlin.String?, sellTokenName: kotlin.String?, sellMinQuantity: kotlin.String?, sellMaxQuantity: kotlin.String?, sellMetadata: kotlin.String?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?) : RequestConfig<Unit> {
+    fun listOrdersRequestConfig(pageSize: kotlin.Int?, cursor: kotlin.String?, orderBy: kotlin.String?, direction: kotlin.String?, user: kotlin.String?, status: kotlin.String?, minTimestamp: kotlin.String?, maxTimestamp: kotlin.String?, updatedMinTimestamp: kotlin.String?, updatedMaxTimestamp: kotlin.String?, buyTokenType: kotlin.String?, buyTokenId: kotlin.String?, buyAssetId: kotlin.String?, buyTokenAddress: kotlin.String?, buyTokenName: kotlin.String?, buyMinQuantity: kotlin.String?, buyMaxQuantity: kotlin.String?, buyMetadata: kotlin.String?, sellTokenType: kotlin.String?, sellTokenId: kotlin.String?, sellAssetId: kotlin.String?, sellTokenAddress: kotlin.String?, sellTokenName: kotlin.String?, sellMinQuantity: kotlin.String?, sellMaxQuantity: kotlin.String?, sellMetadata: kotlin.String?, auxiliaryFeePercentages: kotlin.String?, auxiliaryFeeRecipients: kotlin.String?, includeFees: kotlin.Boolean?) : RequestConfig<Unit> {
         val localVariableBody = null
         val localVariableQuery: MultiValueMap = mutableMapOf<kotlin.String, List<kotlin.String>>()
             .apply {
@@ -540,6 +542,9 @@ class OrdersApi(basePath: kotlin.String = defaultBasePath) : ApiClient(basePath)
                 }
                 if (auxiliaryFeeRecipients != null) {
                     put("auxiliary_fee_recipients", listOf(auxiliaryFeeRecipients.toString()))
+                }
+                if (includeFees != null) {
+                    put("include_fees", listOf(includeFees.toString()))
                 }
             }
         val localVariableHeaders: MutableMap<String, String> = mutableMapOf()

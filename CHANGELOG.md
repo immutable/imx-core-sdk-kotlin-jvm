@@ -13,7 +13,8 @@ for new features.
 
 ### Changed
 
-for changes in existing functionality.
+* Updated OpenAPI spec which includes breaking change to the `Transfer` object, replacing `data` and `type` with `token` field.
+* Renamed `cancel` workflow to `cancelOrder`  
 
 ### Deprecated
 

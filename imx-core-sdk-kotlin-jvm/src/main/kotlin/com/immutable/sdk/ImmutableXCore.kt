@@ -124,7 +124,7 @@ object ImmutableXCore {
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
-     * @return a [CompletableFuture] that will provide the cancelled Order id if successful.
+     * @return a [CompletableFuture] that will provide the Order id if successful.
      */
     @Suppress("LongParameterList")
     fun sell(
@@ -149,10 +149,10 @@ object ImmutableXCore {
      * @param orderId the id of an existing order to be bought
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
-     * @return a [CompletableFuture] that will provide the Order id if successful.
+     * @return a [CompletableFuture] that will provide the cancelled Order id if successful.
      */
     @Suppress("LongParameterList")
-    fun cancel(
+    fun cancelOrder(
         orderId: String,
         signer: Signer,
         starkSigner: StarkSigner

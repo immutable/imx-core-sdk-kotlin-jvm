@@ -179,12 +179,11 @@ object ImmutableXCore {
         com.immutable.sdk.workflows.transfer(token, recipientAddress, signer, starkSigner)
 
     /**
-     * Launches a Chrome Custom Tab to buy cryptocurrencies via Moonpay
+     * Gets a URL to MoonPay that provides a service for buying crypto directly on Immutable in exchange for fiat.
      *
-     * @param context the context for launching the Custom Tabs activity
+     * It is recommended to open this URL in a Chrome Custom Tab.
+     *
      * @param signer represents the users L1 wallet to get the address
-     * @param colourInt (optional) the colour of the Chrome Custom Tab address bar. The default
-     * value is [DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR]
      * @param colourCodeHex The color code in hex (e.g. #00818e) for the Moon pay widget main color. It is used for buttons,
      * links and highlighted text.
      * @throws Throwable if any error occurs

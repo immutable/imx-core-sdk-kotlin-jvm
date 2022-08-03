@@ -46,7 +46,7 @@ private const val HEADER_ACCEPT = "Accept"
 private const val HEADER_CONTENT_TYPE = "Content-Type"
 
 /**
- * Launches a Chrome Custom Tab to buy cryptocurrencies via Moonpay
+ * Gets a URL to MoonPay that provides a service for buying crypto directly on Immutable in exchange for fiat.
  *
  * @throws Exception if anything error occurs
  */

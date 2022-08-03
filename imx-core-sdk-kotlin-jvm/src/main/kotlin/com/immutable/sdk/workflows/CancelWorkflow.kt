@@ -11,7 +11,7 @@ import java.util.concurrent.CompletableFuture
 private const val SIGNABLE_CANCEL_ORDER = "Signable cancel order"
 private const val CANCEL_ORDER = "Cancel order"
 
-internal fun cancel(
+internal fun cancelOrder(
     orderId: String,
     signer: Signer,
     starkSigner: StarkSigner,

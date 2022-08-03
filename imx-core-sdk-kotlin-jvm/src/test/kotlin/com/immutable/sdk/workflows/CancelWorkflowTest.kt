@@ -71,7 +71,7 @@ class CancelWorkflowTest {
         unmockkAll()
     }
 
-    private fun createCancelFuture() = cancel(
+    private fun createCancelFuture() = cancelOrder(
         orderId = ORDER_ID.toString(),
         signer = signer,
         starkSigner = starkSigner,

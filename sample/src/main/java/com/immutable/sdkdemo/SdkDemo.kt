@@ -1,3 +1,5 @@
+package com.immutable.sdkdemo
+
 import com.immutable.sdk.api.CollectionsApi
 
 fun main() {

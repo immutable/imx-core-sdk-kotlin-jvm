@@ -9,12 +9,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-for new features.
+* Added `StandardStarkSigner` as the generic implementation of `StarkSigner`
 
 ### Changed
 
 * Updated OpenAPI spec which includes breaking change to the `Transfer` object, replacing `data` and `type` with `token` field.
 * Renamed `cancel` workflow to `cancelOrder`  
+* `StarkKey.sign` was made private, use `StandardStarkSigner` to handle this case
 
 ### Deprecated
 

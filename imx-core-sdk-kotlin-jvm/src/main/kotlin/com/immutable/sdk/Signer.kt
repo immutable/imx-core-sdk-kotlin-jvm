@@ -29,18 +29,20 @@ interface Signer {
 /**
  * This represents the Immutable X Wallet on Layer 2 and will have reference to the user's Stark key pair
  * for signing L2 transactions.
+ *
+ * See [StandardStarkSigner] as the implementation of this.
  */
 interface StarkSigner {
     /**
      * Signs the [message] with the user's L2 Stark keys.
      *
-     * When implementing this, make sure [message] is in hex format and pass it and the L2 Stark key pair to the
-     * [com.immutable.sdk.crypto.StarkKey.sign] function.
+     * When implementing this, make sure [message] is in hex format.
      */
     fun signMessage(message: String): CompletableFuture<String>
 
     /**
-     * Returns a CompletableFuture that resolves to the account address.
+     * Returns a CompletableFuture that resolves to the account address, must be in a Stark friendly format which can
+     * be gotten using the extension ECKeyPair.getStarkPublicKey().
      *
      * This is a CompletableFuture so that a Signer can be designed around an asynchronous source,
      * such as hardware wallets.

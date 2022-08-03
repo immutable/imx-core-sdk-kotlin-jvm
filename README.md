@@ -8,9 +8,9 @@
 
 ---
 
-# ImmutableX Core SDK Kotlin/JVM
+# Immutable X Core SDK Kotlin/JVM
 
-The Immutable Core SDK Kotlin/JVM provides convenient access to the Immutable API's for applications written on the Immutable X platform.
+The Immutable X Core SDK Kotlin/JVM provides convenient access to the Immutable API's for applications written on the Immutable X platform.
 
 ## Documentation
 
@@ -66,21 +66,21 @@ View the [OpenAPI spec](openapi.json) for a full list of API requests available 
 
 Utility functions that will chain necessary API calls to complete a process or perform a transaction.
 
-* Register a user with ImmutableX and returns the Stark key pair
+* Register a user with Immutable X
 * Buy cryptocurrency via Moonpay
 * Buy ERC721
 * Sell ERC721
-* Cancel listing
+* Cancel order
 * Transfer ERC20/ERC721/ETH
 
 ### Wallet Connection
 
-In order to use any workflow functions, you will need to pass in the connected wallet provider. This means you will need to implement your own Wallet L1 [Signer](https://github.com/immutable/imx-core-sdk-kotlin-jvm/blob/main/imx-core-sdk-kotlin-jvm/src/main/kotlin/com/immutable/sdk/Signer.kt) and L2 [StarkSigner](https://github.com/immutable/imx-core-sdk-kotlin-jvm/blob/main/imx-core-sdk-kotlin-jvm/src/main/kotlin/com/immutable/sdk/Signer.kt).
+In order to use any workflow functions, you will need to pass in the connected wallet provider. This means you will need to implement your own Wallet L1 [Signer](https://github.com/immutable/imx-core-sdk-kotlin-jvm/blob/main/imx-core-sdk-kotlin-jvm/src/main/kotlin/com/immutable/sdk/Signer.kt).
 
-Once you have a `Signer` instance you can generate the user's Stark key pair and use the result to implement a `StarkSigner`.
+Once you have created a `Signer` instance you can generate the user's Stark key pair and use it to create an instance of `StandardStarkSigner`, an implementation of `StarkSigner`.
 ```kt
 StarkKey.generate(signer).whenComplete { keyPair, error ->
-    StarkKey.sign(keyPair, "0x5369676e2074686973")
+    val starkSigner = StandardStarkSigner(keyPair)
 }
 ```
 

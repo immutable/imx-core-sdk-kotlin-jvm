@@ -151,7 +151,7 @@ object StarkKey {
      * @return Stark signature
      */
     @Suppress("MagicNumber")
-    fun sign(keyPair: ECKeyPair, msg: String): String {
+    internal fun sign(keyPair: ECKeyPair, msg: String): String {
         val fixMessage = fixMessage(msg)
         val signer = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
 

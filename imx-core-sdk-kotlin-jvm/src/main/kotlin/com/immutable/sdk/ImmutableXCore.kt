@@ -157,7 +157,7 @@ object ImmutableXCore {
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<CancelOrderResponse> =
-        com.immutable.sdk.workflows.cancel(orderId, signer, starkSigner)
+        com.immutable.sdk.workflows.cancelOrder(orderId, signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.

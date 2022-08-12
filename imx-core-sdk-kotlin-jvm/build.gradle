@@ -6,6 +6,7 @@ plugins {
     // this directory: .openapi-generator/templates
     id "org.openapi.generator" version "5.3.0"
     id 'maven-publish'
+    id 'signing'
     id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
     id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
     id 'jacoco'
@@ -88,7 +89,7 @@ dependencies {
     implementation "com.squareup.okhttp3:logging-interceptor:4.9.3"
 
     // Web3
-    implementation "org.web3j:core:4.8.7"
+    api "org.web3j:core:4.8.7"
 
     // Json
     implementation 'org.json:json:20220320'
@@ -125,16 +126,54 @@ publishing {
             version = version
 
             from components.java
+
+            pom {
+                name = POM_NAME
+                description = POM_DESCRIPTION
+                url = POM_URL
+                licenses {
+                    license {
+                        name = POM_LICENSE_NAME
+                        url = POM_LICENSE_URL
+                    }
+                }
+                developers {
+                    developer {
+                        id = POM_DEVELOPER_ID
+                        name = POM_DEVELOPER_NAME
+                        url = POM_DEVELOPER_URL
+                    }
+                }
+                scm {
+                    connection = POM_SCM_CONNECTION
+                    developerConnection = POM_SCM_DEV_CONNECTION
+                    url = POM_URL
+                }
+            }
+
+            signing {
+                required !version.endsWith('SNAPSHOT')
+                if (!version.endsWith('SNAPSHOT')) {
+                    useInMemoryPgpKeys(
+                            findProperty("signing.keyId"),
+                            findProperty("signing.key"),
+                            findProperty("signing.password"),
+                    )
+                    sign publishing.publications
+                }
+            }
         }
     }
 
     repositories {
         maven {
-            name = "imx-core-sdk-kotlin-jvm"
-            url = uri("https://maven.pkg.github.com/immutable/imx-core-sdk-kotlin-jvm")
+            def releasesRepoUrl = 'https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/'
+            def snapshotsRepoUrl = 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+            url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+
             credentials {
-                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
-                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
+                username project.findProperty('mavenCentralUsername')
+                password project.findProperty('mavenCentralPassword')
             }
         }
     }

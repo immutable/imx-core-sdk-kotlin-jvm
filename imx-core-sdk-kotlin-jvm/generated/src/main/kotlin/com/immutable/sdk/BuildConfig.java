@@ -1,4 +1,4 @@
 package com.immutable.sdk;
 public class BuildConfig {
-    public static String VERSION = "0.5.2";
+    public static String VERSION = "0.6.0";
 }

@@ -9,13 +9,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-* Added `StandardStarkSigner` as the generic implementation of `StarkSigner`
+for new features.
 
 ### Changed
 
-* Updated OpenAPI spec which includes breaking change to the `Transfer` object, replacing `data` and `type` with `token` field.
-* Renamed `cancel` workflow to `cancelOrder`  
-* `StarkKey.sign` was made private, use `StandardStarkSigner` to handle this case
+for changes in existing functionality.
 
 ### Deprecated
 
@@ -29,7 +27,19 @@ for now removed features.
 
 for any bug fixes.
 
-# [0.5.2] - 2022-07-05
+## [0.6.0] - 2022-08-12
+
+### Added
+
+* Added `StandardStarkSigner` as the generic implementation of `StarkSigner`
+
+### Changed
+
+* Updated OpenAPI spec which includes breaking change to the `Transfer` object, replacing `data` and `type` with `token` field.
+* Renamed `cancel` workflow to `cancelOrder`
+* `StarkKey.sign` was made private, use `StandardStarkSigner` to handle this case
+
+## [0.5.2] - 2022-07-05
 
 ### Added
 
@@ -39,7 +49,7 @@ for any bug fixes.
 
 * `StarkKey.fixMessage` not stripping hex
 
-# [0.5.1] - 2022-06-20
+## [0.5.1] - 2022-06-20
 Initial release with a client for the public API and the following workflows:
 * Buy
 * Sell

@@ -20,28 +20,19 @@ See the [API reference documentation](https://docs.x.immutable.com/reference) fo
 
 ## Installation
 
-1. Create an Access Token [(see here)](https://docs.github.com/en/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token) with `read:packages` enabled.
-2. Add the GitHub package as a repository either in your `build.gradle` file or `settings.gradle` if you have one:
+1. Add Maven Central to your repositories
 ```gradle
 repositories {
-    maven {
-        name = "imx-core-sdk-kotlin-jvm"
-        url = uri("https://maven.pkg.github.com/immutable/imx-core-sdk-kotlin-jvm")
-        credentials {
-            username = "<github username>"
-            password = "<access token>"
-        }
-    }
+    mavenCentral()
 }
 ```
-Note: will look to have this accessible directly via the `mavenCentral()` repository in the future.
-3. Add dependency to your app `build.gradle` file:
+2. Add dependency to your app `build.gradle` file
 ```gradle
 dependencies {
     implementation 'com.immutable.sdk:imx-core-sdk-kotlin-jvm:$version'
 }
 ```
-4. Set the correct environment (Ropsten or Production/Mainnet)
+3. Set the correct environment (defaults to Production)
 ```kt
 ImmutableXCore.setBase(ImmutableXBase.Ropsten)
 ```
@@ -54,7 +45,7 @@ The Core SDK includes classes that interact with the Immutable X APIs.
 
 e.g. Get a list of collections ordered by name in ascending order
 ```kt
-val response = CollectionsApi().getCollections(
+val response = CollectionsApi().listCollections(
     pageSize = 20,
     orderBy = "name",
     direction = "asc"

@@ -6,7 +6,7 @@ import com.immutable.sdk.Constants
 import com.immutable.sdk.Constants.HEX_RADIX
 import java.math.BigInteger
 
-object Crypto {
+internal object Crypto {
     @Suppress("MagicNumber")
     fun serialiseEthSignature(signature: String, size: Int = 64): String {
         val sig = signature.hexRemovePrefix()

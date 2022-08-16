@@ -1,21 +1,23 @@
 # Module imx-core-sdk-kotlin-jvm
 
-This module is the Immutable X Core SDK for Kotlin/JVM.
-
-It contains the API Client for interacting with the platform, workflows for doing standard transactions, and layer 2 signing functions.
+The Immutable X Core SDK Kotlin/JVM provides convenient access to the Immutable API's for applications written on the Immutable X platform.
 
 # Package com.immutable.sdk
 
-Contains the Core SDK entry point [ImmutableXCore].
+All SDK specific classes and types
 
 # Package com.immutable.sdk.api
 
-Contains the generated API client.
+The auto-generated API clients
 
 # Package com.immutable.sdk.api.model
 
-Contains the generated API models used by the client.
+The auto-generated models used with the API clients
 
 # Package com.immutable.sdk.model
 
-Contains some convenient models to make using workflows more user friendly.
+User friendly models for [ImmutableXCore] utility functions
+
+# Package com.immutable.sdk.crypto
+
+Stark key pair generation

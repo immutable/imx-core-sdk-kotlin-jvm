@@ -6,7 +6,7 @@ import org.web3j.crypto.ECKeyPair
 /**
  * Utility to convert the public key into a Stark friendly hex address
  */
-fun ECKeyPair.getStarkPublicKey() =
+internal fun ECKeyPair.getStarkPublicKey() =
     publicKey.toString(Constants.HEX_RADIX)
         .sanitizeBytes()
         .hexToByteArray()

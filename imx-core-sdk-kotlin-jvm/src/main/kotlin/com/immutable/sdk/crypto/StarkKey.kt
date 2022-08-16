@@ -32,6 +32,9 @@ private val SECP_ORDER = BigInteger(
 private const val SHA_256 = "SHA-256"
 private const val GENERATE_ERROR_MESSAGE = "Failed to generate Stark key pair"
 
+/**
+ * An object to generate a Stark key pair from a given Ethereum signer
+ */
 object StarkKey {
     /**
      * Hashes the given [input] using SHA-256

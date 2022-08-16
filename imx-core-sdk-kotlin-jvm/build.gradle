@@ -1,5 +1,5 @@
 plugins {
-    id 'org.jetbrains.kotlin.jvm' version "1.6.20"
+    id 'org.jetbrains.kotlin.jvm'
     id 'java-library'
 
     // If updating openapi version check the custom templates are still relevant in
@@ -10,6 +10,7 @@ plugins {
     id "org.jlleitschuh.gradle.ktlint" version "10.2.1"
     id "io.gitlab.arturbosch.detekt" version "1.20.0-RC1"
     id 'jacoco'
+    id 'org.jetbrains.dokka'
 }
 
 def getArtifactId = { ->
@@ -74,11 +75,9 @@ tasks.create('generateBuildConfig') {
 }
 
 // Generate all apis before every build
-compileKotlin.dependsOn(tasks.openApiGenerate)
-compileKotlin.dependsOn(tasks.ktlintCheck)
-compileKotlin.dependsOn(tasks.detekt)
-tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient)
-tasks.openApiGenerate.dependsOn(tasks.generateBuildConfig)
+compileKotlin.dependsOn(tasks.openApiGenerate, tasks.ktlintCheck, tasks.detekt)
+tasks.openApiGenerate.dependsOn(tasks.cleanGeneratedClient, tasks.generateBuildConfig)
+tasks.dokkaHtml.dependsOn(tasks.openApiGenerate)
 
 dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib"
@@ -197,6 +196,19 @@ detekt {
     allRules = false // activate all available (even unstable) rules.
     config = files("../.github/detekt/config/detekt.yml")
     // point to your custom config defining rules to run, overwriting default behavior
+}
+
+dokkaHtml {
+    dokkaSourceSets {
+        configureEach {
+            perPackageOption {
+                matchingRegex.set("org.openapitools.*")
+                suppress.set(true)
+            }
+
+            includes.from("packages.md")
+        }
+    }
 }
 
 // ** Start code coverage **

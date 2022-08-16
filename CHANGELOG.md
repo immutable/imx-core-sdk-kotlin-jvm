@@ -13,7 +13,8 @@ for new features.
 
 ### Changed
 
-for changes in existing functionality.
+* Changed `Crypto` object to internal
+* Changed `ECKeyPair.getStarkPublicKey()` extension to internal
 
 ### Deprecated
 

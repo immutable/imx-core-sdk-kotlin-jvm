@@ -12,7 +12,7 @@ import java.util.concurrent.CompletableFuture
  * An enum for defining the environment the SDK will communicate with
  */
 enum class ImmutableXBase {
-    Production, Ropsten
+    Production, Ropsten, Sandbox
 }
 
 /**

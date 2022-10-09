@@ -37,6 +37,14 @@ dependencies {
 ImmutableXCore.setBase(ImmutableXBase.Ropsten)
 ```
 
+### Environments
+
+| Environment | Description |
+| -- | -- |
+| `ImmutableXBase.Sandbox` | The default test network (currently, it is Goërli) |
+| `ImmutableXBase.Ropsten` | Ropsten test network (to be deprecated soon) |
+| `ImmutableXBase.Production` | Ethereum network |
+
 ## Usage
 
 ### Standard API Requests

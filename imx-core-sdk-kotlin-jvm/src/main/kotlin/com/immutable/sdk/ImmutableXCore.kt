@@ -2,6 +2,7 @@ package com.immutable.sdk
 
 import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
+import com.immutable.sdk.api.DepositsApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
@@ -56,21 +57,15 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
  *
  * You can configure the environment or use any of the provided utility workflows which chain
  * the necessary calls to perform standard actions (e.g. buy, sell etc).
+ *
+ * @param base the environment the SDK will communicate with
  */
-object ImmutableXCore {
-
-    private var base: ImmutableXBase = ImmutableXBase.Ropsten
-    internal var httpLoggingLevel = ImmutableXHttpLoggingLevel.None
+class ImmutableXCore(
+    private val base: ImmutableXBase = ImmutableXBase.Ropsten,
+) {
+    private val depositsApi: DepositsApi = DepositsApi(ImmutableConfig.getPublicApiUrl(base))
 
     init {
-        setBaseUrl()
-    }
-
-    /**
-     * Sets the environment the SDK will communicate with
-     */
-    fun setBase(base: ImmutableXBase) {
-        this.base = base
         setBaseUrl()
     }
 
@@ -84,6 +79,15 @@ object ImmutableXCore {
      */
     fun setHttpLoggingLevel(level: ImmutableXHttpLoggingLevel) {
         httpLoggingLevel = level
+    }
+
+    /**
+     * Get details of a Deposit with the given ID
+     * @parem the deposit ID
+     * @throws [ImmutableException.apiError]
+     */
+    fun getDeposit(id: String): Deposit = apiCall("getDeposit") {
+        depositsApi.getDeposit(id)
     }
 
     /**
@@ -197,4 +201,17 @@ object ImmutableXCore {
             signer = signer,
             colourCodeHex = colourCodeHex
         )
+
+    @Suppress("TooGenericExceptionCaught")
+    private fun <T> apiCall(callName: String, call: () -> T): T {
+        try {
+            return call()
+        } catch (e: Exception) {
+            throw ImmutableException.apiError(callName, e)
+        }
+    }
+
+    companion object {
+        internal var httpLoggingLevel = ImmutableXHttpLoggingLevel.None
+    }
 }

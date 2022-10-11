@@ -2,7 +2,7 @@ package org.openapitools.client.infrastructure
 
 import com.immutable.sdk.BuildConfig
 import com.immutable.sdk.ImmutableXHttpLoggingLevel
-import com.immutable.sdk.ImmutableXCore
+import com.immutable.sdk.ImmutableX
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -60,7 +60,7 @@ open class ApiClient(val baseUrl: String) {
                     )
                 }
                 .addInterceptor(HttpLoggingInterceptor().apply {
-                    level = when (ImmutableXCore.httpLoggingLevel) {
+                    level = when (ImmutableX.httpLoggingLevel) {
                         ImmutableXHttpLoggingLevel.None -> HttpLoggingInterceptor.Level.NONE
                         ImmutableXHttpLoggingLevel.Basic -> HttpLoggingInterceptor.Level.BASIC
                         ImmutableXHttpLoggingLevel.Headers -> HttpLoggingInterceptor.Level.HEADERS

@@ -3,6 +3,7 @@ package com.immutable.sdk
 import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import com.immutable.sdk.api.DepositsApi
+import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
@@ -60,10 +61,12 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
  *
  * @param base the environment the SDK will communicate with
  */
-class ImmutableXCore(
+@Suppress("TooManyFunctions")
+class ImmutableX(
     private val base: ImmutableXBase = ImmutableXBase.Production
 ) {
-    private val depositsApi: DepositsApi = DepositsApi(ImmutableConfig.getPublicApiUrl(base))
+    private val depositsApi: DepositsApi by lazy { DepositsApi() }
+    private val usersApi: UsersApi by lazy { UsersApi() }
 
     init {
         setBaseUrl()
@@ -100,6 +103,16 @@ class ImmutableXCore(
      */
     fun registerOffChain(signer: Signer, starkSigner: StarkSigner): CompletableFuture<Unit> =
         com.immutable.sdk.workflows.registerOffChain(signer, starkSigner)
+
+    /**
+     * Get stark keys for a registered user
+     * @param ethAddress The user's Ethereum address
+     * @return GetUsersApiResponse
+     * @throws [ImmutableException.apiError]
+     */
+    fun getUser(ethAddress: String) = apiCall("getUser") {
+        usersApi.getUsers(ethAddress)
+    }
 
     /**
      * This is a utility function that will chain the necessary calls to buy an existing order.

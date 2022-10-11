@@ -20,7 +20,7 @@ import java.util.concurrent.CompletableFuture
 
 private const val API_URL = "url"
 
-class ImmutableXCoreTest {
+class ImmutableXTest {
 
     @MockK
     private lateinit var properties: Properties
@@ -31,7 +31,7 @@ class ImmutableXCoreTest {
     @MockK
     private lateinit var starkSigner: StarkSigner
 
-    private lateinit var sdk: ImmutableXCore
+    private lateinit var sdk: ImmutableX
 
     @Before
     fun setUp() {
@@ -45,7 +45,7 @@ class ImmutableXCoreTest {
         every { properties.setProperty(any(), any()) } returns mockk()
         every { properties.getProperty(any(), any()) } returns ""
 
-        sdk = spyk(ImmutableXCore(ImmutableXBase.Ropsten))
+        sdk = spyk(ImmutableX(ImmutableXBase.Ropsten))
     }
 
     @After
@@ -61,9 +61,9 @@ class ImmutableXCoreTest {
 
     @Test
     fun testSetHttpLoggingLevel() {
-        assertEquals(ImmutableXHttpLoggingLevel.None, ImmutableXCore.httpLoggingLevel)
+        assertEquals(ImmutableXHttpLoggingLevel.None, ImmutableX.httpLoggingLevel)
         sdk.setHttpLoggingLevel(ImmutableXHttpLoggingLevel.Body)
-        assertEquals(ImmutableXHttpLoggingLevel.Body, ImmutableXCore.httpLoggingLevel)
+        assertEquals(ImmutableXHttpLoggingLevel.Body, ImmutableX.httpLoggingLevel)
     }
 
     @Test

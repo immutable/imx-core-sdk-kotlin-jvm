@@ -34,7 +34,7 @@ dependencies {
 ```
 3. Set the correct environment (defaults to Production)
 ```kt
-ImmutableXCore.setBase(ImmutableXBase.Ropsten)
+ImmutableXCore.setBase(ImmutableXBase.Sandbox)
 ```
 
 ### Environments

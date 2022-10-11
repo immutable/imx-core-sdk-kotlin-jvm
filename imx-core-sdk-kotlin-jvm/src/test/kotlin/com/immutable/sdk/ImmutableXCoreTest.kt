@@ -45,7 +45,7 @@ class ImmutableXCoreTest {
         every { properties.setProperty(any(), any()) } returns mockk()
         every { properties.getProperty(any(), any()) } returns ""
 
-        sdk = spyk(ImmutableXCore)
+        sdk = spyk(ImmutableXCore(ImmutableXBase.Ropsten))
     }
 
     @After
@@ -55,17 +55,15 @@ class ImmutableXCoreTest {
 
     @Test
     fun testInit() {
-        sdk.setBase(ImmutableXBase.Ropsten)
-
         verify { ImmutableConfig.getPublicApiUrl(ImmutableXBase.Ropsten) }
         verify { properties.setProperty(KEY_BASE_URL, API_URL) }
     }
 
     @Test
     fun testSetHttpLoggingLevel() {
-        assertEquals(ImmutableXHttpLoggingLevel.None, sdk.httpLoggingLevel)
+        assertEquals(ImmutableXHttpLoggingLevel.None, ImmutableXCore.httpLoggingLevel)
         sdk.setHttpLoggingLevel(ImmutableXHttpLoggingLevel.Body)
-        assertEquals(ImmutableXHttpLoggingLevel.Body, sdk.httpLoggingLevel)
+        assertEquals(ImmutableXHttpLoggingLevel.Body, ImmutableXCore.httpLoggingLevel)
     }
 
     @Test
@@ -73,7 +71,7 @@ class ImmutableXCoreTest {
         val future = CompletableFuture<Unit>()
         mockkStatic(::registerOffChain)
         every { registerOffChain(signer, starkSigner, any()) } returns future
-        assertEquals(future, ImmutableXCore.registerOffChain(signer, starkSigner))
+        assertEquals(future, sdk.registerOffChain(signer, starkSigner))
     }
 
     @Test
@@ -81,7 +79,7 @@ class ImmutableXCoreTest {
         val future = CompletableFuture<CreateTradeResponse>()
         mockkStatic(::buy)
         every { buy("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner, any(), any()) } returns future
-        assertEquals(future, ImmutableXCore.buy("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
+        assertEquals(future, sdk.buy("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
     }
 
     @Test
@@ -102,7 +100,7 @@ class ImmutableXCoreTest {
         } returns future
         assertEquals(
             future,
-            ImmutableXCore.sell(
+            sdk.sell(
                 asset,
                 sellToken,
                 listOf(FeeEntry("address", 5.0)),
@@ -117,7 +115,7 @@ class ImmutableXCoreTest {
         val future = CompletableFuture<CancelOrderResponse>()
         mockkStatic(::cancelOrder)
         every { cancelOrder("orderId", signer, starkSigner, any()) } returns future
-        assertEquals(future, ImmutableXCore.cancelOrder("orderId", signer, starkSigner))
+        assertEquals(future, sdk.cancelOrder("orderId", signer, starkSigner))
     }
 
     @Test
@@ -128,7 +126,7 @@ class ImmutableXCoreTest {
         every { transfer(asset, "recipientAddress", signer, starkSigner, any()) } returns future
         assertEquals(
             future,
-            ImmutableXCore.transfer(asset, "recipientAddress", signer, starkSigner)
+            sdk.transfer(asset, "recipientAddress", signer, starkSigner)
         )
     }
 
@@ -137,6 +135,6 @@ class ImmutableXCoreTest {
         val future = CompletableFuture<String>()
         mockkStatic(::buyCrypto)
         every { buyCrypto(any(), signer, any(), "colorCode", any()) } returns future
-        assertEquals(future, ImmutableXCore.buyCrypto(signer, "colorCode"))
+        assertEquals(future, sdk.buyCrypto(signer, "colorCode"))
     }
 }

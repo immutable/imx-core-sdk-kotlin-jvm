@@ -61,7 +61,7 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
  * @param base the environment the SDK will communicate with
  */
 class ImmutableXCore(
-    private val base: ImmutableXBase = ImmutableXBase.Ropsten,
+    private val base: ImmutableXBase = ImmutableXBase.Production
 ) {
     private val depositsApi: DepositsApi = DepositsApi(ImmutableConfig.getPublicApiUrl(base))
 

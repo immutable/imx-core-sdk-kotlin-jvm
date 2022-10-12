@@ -37,7 +37,7 @@ openApiGenerate {
     invokerPackage = "com.immutable.sdk.invoker"
     modelPackage = "com.immutable.sdk.api.model"
     // For version 5.3.0 this override is performed to add null as a default for !required parameters
-    templateDir = "$rootDir/.openapi-generator/templates/kotlin-client/libraries/jvm-okhttp"
+    templateDir = "$rootDir/.openapi-generator/templates/kotlin-client/"
     configOptions = [
             dateLibrary: "java8"
     ]
@@ -50,6 +50,9 @@ openApiGenerate {
             // this makes it really difficult to cast it to List<SellOrders>. So instead we create an
             // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
             OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"
+    ]
+    additionalProperties = [
+            nonPublicApi: true
     ]
 }
 

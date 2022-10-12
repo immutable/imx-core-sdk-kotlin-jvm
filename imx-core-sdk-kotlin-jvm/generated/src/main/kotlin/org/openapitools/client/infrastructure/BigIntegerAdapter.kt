@@ -4,7 +4,7 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 import java.math.BigInteger
 
-class BigIntegerAdapter {
+internal class BigIntegerAdapter {
     @ToJson
     fun toJson(value: BigInteger): String {
         return value.toString()

@@ -4,7 +4,7 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.ToJson
 import java.net.URI
 
-class URIAdapter {
+internal class URIAdapter {
     @ToJson
     fun toJson(uri: URI) = uri.toString()
 

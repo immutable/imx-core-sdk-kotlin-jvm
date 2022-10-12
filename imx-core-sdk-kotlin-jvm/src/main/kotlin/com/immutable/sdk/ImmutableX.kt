@@ -2,11 +2,15 @@ package com.immutable.sdk
 
 import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
+import com.immutable.sdk.api.CollectionsApi
 import com.immutable.sdk.api.DepositsApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.*
+import com.immutable.sdk.api.model.Collection
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.workflows.call
+import com.immutable.sdk.workflows.imxTimestampRequest
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.CompletableFuture
 
@@ -67,6 +71,7 @@ class ImmutableX(
 ) {
     private val depositsApi: DepositsApi by lazy { DepositsApi() }
     private val usersApi: UsersApi by lazy { UsersApi() }
+    private val collectionsApi: CollectionsApi by lazy { CollectionsApi() }
 
     init {
         setBaseUrl()
@@ -113,6 +118,96 @@ class ImmutableX(
     fun getUser(ethAddress: String) = apiCall("getUser") {
         usersApi.getUsers(ethAddress)
     }
+
+    /**
+     * Create collection
+     *
+     * @param createCollectionRequest create a collection
+     * @param signer represents the users L1 wallet to get the address and sign the registration
+     * @return Collection
+     */
+    fun createCollection(request: CreateCollectionRequest, signer: Signer): CompletableFuture<Collection> =
+        imxTimestampRequest(signer) { timestamp ->
+            call("createCollection") {
+                collectionsApi.createCollection(timestamp.signature, timestamp.timestamp, request)
+            }
+        }
+
+    /**
+     * Get details of a collection at the given address
+     *
+     * @param address Collection contract address
+     * @return Collection
+     * @throws [ImmutableException.apiError]
+     */
+    fun getCollection(address: String) = apiCall("getCollection") { collectionsApi.getCollection(address) }
+
+    /**
+     * Get a list of collection filters
+     *
+     * @param address Collection contract address
+     * @param pageSize Page size of the result (optional)
+     * @param nextPageToken Next page token (optional)
+     * @return CollectionFilter
+     * @throws [ImmutableException.apiError]
+     */
+    fun listCollectionFilters(
+        address: String,
+        pageSize: Int? = null,
+        nextPageToken: String? = null
+    ) = apiCall("listCollectionFilters") {
+        collectionsApi.listCollectionFilters(address, pageSize, nextPageToken)
+    }
+
+    /**
+     * Get a list of collections
+     *
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param blacklist List of collections not to be included, separated by commas (optional)
+     * @param whitelist List of collections to be included, separated by commas (optional)
+     * @param keyword Keyword to search in collection name and description (optional)
+     * @return ListCollectionsResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listCollections(
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        blacklist: String? = null,
+        whitelist: String? = null,
+        keyword: String? = null
+    ) = apiCall("listCollections") {
+        collectionsApi.listCollections(pageSize, cursor, orderBy, direction, blacklist, whitelist, keyword)
+    }
+
+    /**
+     * Update collection
+     *
+     * @param address Collection contract address
+     * @param updateCollectionRequest update a collection
+     * @param signer represents the users L1 wallet to get the address and sign the registration
+     * @return Collection
+     */
+    fun updateCollection(
+        address: String,
+        updateCollectionRequest: UpdateCollectionRequest,
+        signer: Signer
+    ) =
+        imxTimestampRequest(signer) { timestamp ->
+            call("updateCollection") {
+                collectionsApi.updateCollection(
+                    address,
+                    timestamp.signature,
+                    timestamp.timestamp,
+                    updateCollectionRequest
+                )
+            }
+        }
 
     /**
      * This is a utility function that will chain the necessary calls to buy an existing order.

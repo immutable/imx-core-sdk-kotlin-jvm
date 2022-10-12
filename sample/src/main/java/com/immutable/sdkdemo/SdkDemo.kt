@@ -1,5 +1,9 @@
 package com.immutable.sdkdemo
 
+import com.immutable.sdk.ImmutableX
+import com.immutable.sdk.ImmutableXBase
+
 fun main() {
-    // Todo: print list of collections
+    val immutableX = ImmutableX(ImmutableXBase.Sandbox)
+    println(immutableX.listCollections().result.joinToString { it.name })
 }

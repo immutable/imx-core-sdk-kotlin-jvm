@@ -33,7 +33,7 @@ internal fun transfer(
                 .thenApply { signature -> signatures.apply { starkSignature = signature } to response }
         }
         .thenCompose { (signatures, response) ->
-            signer.signMessage(response.signableMessage)
+            signer.signPrefixedMessage(response.signableMessage)
                 .thenApply { signature -> signatures.apply { ethSignature = signature } to response }
         }
         .thenCompose { (signatures, response) -> createTransfer(response, signatures, api) }

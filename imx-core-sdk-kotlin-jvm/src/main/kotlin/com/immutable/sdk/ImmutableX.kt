@@ -3,10 +3,12 @@ package com.immutable.sdk
 import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import com.immutable.sdk.api.DepositsApi
+import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.EthAsset
 import okhttp3.logging.HttpLoggingInterceptor
 import java.util.concurrent.CompletableFuture
 
@@ -67,6 +69,7 @@ class ImmutableX(
 ) {
     private val depositsApi: DepositsApi by lazy { DepositsApi() }
     private val usersApi: UsersApi by lazy { UsersApi() }
+    private val encodingApi: EncodingApi by lazy { EncodingApi() }
 
     init {
         setBaseUrl()
@@ -82,6 +85,19 @@ class ImmutableX(
      */
     fun setHttpLoggingLevel(level: ImmutableXHttpLoggingLevel) {
         httpLoggingLevel = level
+    }
+
+    fun deposit(signer: Signer): CompletableFuture<Unit> {
+        println("deposit")
+        return com.immutable.sdk.workflows.deposit(
+            base,
+            "https://eth-goerli.g.alchemy.com/v2/WmzAboIrYGOEDnuUJnxQ8ucuu3jfoR_q",
+            EthAsset("0.0001"),
+            signer,
+            depositsApi,
+            usersApi,
+            encodingApi
+        )
     }
 
     /**

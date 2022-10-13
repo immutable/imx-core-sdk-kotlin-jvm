@@ -1,5 +1,6 @@
 package com.immutable.sdk
 
+import org.web3j.crypto.Sign
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -23,7 +24,14 @@ interface Signer {
      * Sub-classes must implement this, however they may throw if signing a message is not
      * supported, such as in a Contract-based Wallet or Meta-Transaction-based Wallet.
      */
-    fun signMessage(message: String): CompletableFuture<String>
+    fun signPrefixedMessage(message: String): CompletableFuture<String>
+
+    /**
+     * Signs the [message]
+     *
+     * @param message the message to sign in hex format
+     */
+    fun signMessage(message: String): CompletableFuture<Sign.SignatureData>
 }
 
 /**

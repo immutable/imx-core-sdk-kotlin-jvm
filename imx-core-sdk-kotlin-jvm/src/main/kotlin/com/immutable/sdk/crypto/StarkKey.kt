@@ -178,7 +178,7 @@ object StarkKey {
     fun generate(signer: Signer): CompletableFuture<ECKeyPair> {
         return signer.getAddress()
             .thenCompose { address ->
-                signer.signMessage(Constants.STARK_MESSAGE).thenApply { address to it }
+                signer.signPrefixedMessage(Constants.STARK_MESSAGE).thenApply { address to it }
             }
             .thenCompose { (address, signature) ->
                 val keyPairFuture = CompletableFuture<ECKeyPair>()

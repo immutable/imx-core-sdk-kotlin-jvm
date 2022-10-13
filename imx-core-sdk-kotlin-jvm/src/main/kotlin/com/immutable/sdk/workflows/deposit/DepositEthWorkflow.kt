@@ -15,20 +15,17 @@ import com.immutable.sdk.api.model.GetSignableDepositRequest
 import com.immutable.sdk.api.model.GetSignableDepositResponse
 import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.Registration_sol_Registration
+import com.immutable.sdk.extensions.getNonce
 import com.immutable.sdk.extensions.hexToByteArray
-import com.immutable.sdk.extensions.toHexString
+import com.immutable.sdk.extensions.signTransaction
 import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.workflows.call
 import com.immutable.sdk.workflows.getSignableRegistrationOnChain
 import com.immutable.sdk.workflows.isRegisteredOnChain
 import org.web3j.crypto.RawTransaction
-import org.web3j.crypto.TransactionEncoder
 import org.web3j.protocol.Web3j
-import org.web3j.protocol.core.DefaultBlockParameterName
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
-import org.web3j.rlp.RlpEncoder
-import org.web3j.rlp.RlpList
 import org.web3j.tx.ClientTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
 import java.math.BigDecimal
@@ -171,7 +168,7 @@ private fun registerAndDepositEth(
             ).encodeFunctionCall()
 
             val rawTransaction = RawTransaction.createTransaction(
-                getNonce(web3j, address),
+                web3j.getNonce(address),
                 gasProvider.gasPrice,
                 gasProvider.getGasLimit(Core_sol_Core.FUNC_REGISTERANDDEPOSITETH),
                 contract.contractAddress,
@@ -179,7 +176,7 @@ private fun registerAndDepositEth(
                 data
             )
 
-            val signedTransaction = signTransaction(rawTransaction, signer)
+            val signedTransaction = signer.signTransaction(rawTransaction)
 
             val result = web3j.ethSendRawTransaction(signedTransaction).sendAsync().get()
 
@@ -193,20 +190,4 @@ private fun registerAndDepositEth(
             }
         }
     return future
-}
-
-private fun getNonce(web3j: Web3j, address: String): BigInteger {
-    val ethGetTransactionCount = web3j.ethGetTransactionCount(
-        address, DefaultBlockParameterName.PENDING
-    ).sendAsync().get()
-    return ethGetTransactionCount.transactionCount
-}
-
-private fun signTransaction(rawTransaction: RawTransaction, signer: Signer): String {
-    val encodedTransaction = TransactionEncoder.encode(rawTransaction)
-    val signatureData = signer.signMessage(encodedTransaction.toHexString()).get()
-    val values = TransactionEncoder.asRlpValues(rawTransaction, signatureData)
-    val rlpList = RlpList(values)
-    val signedData = RlpEncoder.encode(rlpList)
-    return signedData.toHexString()
 }

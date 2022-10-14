@@ -1,19 +1,28 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.ImmutableException
-import com.immutable.sdk.Signer
-import com.immutable.sdk.StarkSigner
+import com.immutable.sdk.*
+import com.immutable.sdk.Constants.HEX_PREFIX
+import com.immutable.sdk.Constants.HEX_RADIX
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
+import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.api.model.RegisterUserRequest
+import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.crypto.Crypto
 import org.openapitools.client.infrastructure.ClientException
+import org.web3j.protocol.Web3j
+import org.web3j.protocol.http.HttpService
+import org.web3j.tx.ClientTransactionManager
+import org.web3j.tx.gas.DefaultGasProvider
+import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
 private const val GET_USER = "Get user"
 private const val REGISTER_USER = "Register user"
 private const val SIGNABLE_REGISTRATION = "Signable registration"
+private const val SIGNABLE_REGISTRATION_ON_CHAIN = "Get signable registration on-chain"
+private const val GET_STARK_KEY = "Get stark key"
 
 private data class RegisterData(
     val address: String = "",
@@ -120,4 +129,54 @@ else {
         api.registerUser(body)
         Unit
     }
+}
+
+@Suppress("TooGenericExceptionCaught")
+internal fun isRegisteredOnChain(
+    base: ImmutableXBase,
+    nodeUrl: String,
+    signer: Signer,
+    api: UsersApi
+): CompletableFuture<Boolean> {
+    val future = CompletableFuture<Boolean>()
+
+    signer.getAddress()
+        .thenCompose { address ->
+            // Get user's stark key from user's L1 address
+            call(GET_STARK_KEY) { api.getUsers(address).accounts.first() }
+                .thenApply { starkPublicKey -> address to starkPublicKey }
+        }
+        .thenCompose { (address, starkPublicKey) ->
+            val web3j = Web3j.build(HttpService(nodeUrl))
+            val contract = Registration_sol_Registration.load(
+                ImmutableConfig.getRegistrationContractAddress(base),
+                web3j,
+                ClientTransactionManager(web3j, address),
+                DefaultGasProvider()
+            )
+            contract.isRegistered(BigInteger(starkPublicKey.removePrefix(HEX_PREFIX), HEX_RADIX))
+                .sendAsync()
+        }
+        .whenComplete { response, error ->
+            if (error?.message?.contains("USER_UNREGISTERED") == true)
+                future.complete(false)
+            else if (error != null) // Forward exceptions
+                future.completeExceptionally(error)
+            else future.complete(response)
+        }
+
+    return future
+}
+
+internal fun getSignableRegistrationOnChain(
+    address: String,
+    starkPublicKey: String,
+    api: UsersApi
+): CompletableFuture<GetSignableRegistrationResponse> = call(SIGNABLE_REGISTRATION_ON_CHAIN) {
+    api.getSignableRegistration(
+        GetSignableRegistrationRequest(
+            etherKey = address,
+            starkKey = starkPublicKey
+        )
+    )
 }

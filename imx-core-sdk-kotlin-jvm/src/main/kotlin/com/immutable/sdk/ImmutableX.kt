@@ -9,6 +9,7 @@ import com.immutable.sdk.api.DepositsApi
 import com.immutable.sdk.api.MetadataApi
 import com.immutable.sdk.api.MintsApi
 import com.immutable.sdk.api.ProjectsApi
+import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.WithdrawalsApi
 import com.immutable.sdk.api.model.Collection
@@ -27,6 +28,7 @@ import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.workflows.call
 import com.immutable.sdk.workflows.imxTimestampRequest
+import com.immutable.sdk.workflows.isRegisteredOnChain
 import okhttp3.logging.HttpLoggingInterceptor
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
@@ -82,10 +84,12 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
  * the necessary calls to perform standard actions (e.g. buy, sell etc).
  *
  * @param base the environment the SDK will communicate with
+ * @param nodeUrl (optional) Ethereum node URL. This is only required for smart contract interactions.
  */
 @Suppress("TooManyFunctions")
 class ImmutableX(
-    private val base: ImmutableXBase = ImmutableXBase.Production
+    private val base: ImmutableXBase = ImmutableXBase.Production,
+    private val nodeUrl: String? = null
 ) {
     private val assetsApi: AssetsApi by lazy { AssetsApi() }
     private val balancesApi: BalancesApi by lazy { BalancesApi() }
@@ -96,6 +100,7 @@ class ImmutableX(
     private val projectsApi: ProjectsApi by lazy { ProjectsApi() }
     private val usersApi: UsersApi by lazy { UsersApi() }
     private val withdrawalsApi: WithdrawalsApi by lazy { WithdrawalsApi() }
+    private val encodingApi: EncodingApi by lazy { EncodingApi() }
 
     init {
         setBaseUrl()
@@ -111,6 +116,27 @@ class ImmutableX(
      */
     fun setHttpLoggingLevel(level: ImmutableXHttpLoggingLevel) {
         httpLoggingLevel = level
+    }
+
+    /**
+     * Deposit based on a token type.
+     * For unregistered users, the deposit will be combined with a registration in order to
+     * register the user first.
+     * @param signer the L1 signer
+     * @param token the token type amount in its corresponding unit
+     * @returns a [CompletableFuture] that will provide the transaction hash if successful.
+     */
+    fun deposit(signer: Signer, token: AssetModel): CompletableFuture<String> {
+        checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
+        return com.immutable.sdk.workflows.deposit(
+            base,
+            nodeUrl,
+            token,
+            signer,
+            depositsApi,
+            usersApi,
+            encodingApi
+        )
     }
 
     /**
@@ -132,6 +158,18 @@ class ImmutableX(
      */
     fun registerOffChain(signer: Signer, starkSigner: StarkSigner): CompletableFuture<Unit> =
         com.immutable.sdk.workflows.registerOffChain(signer, starkSigner)
+
+    /**
+     * Checks if a user is registered on on-chain
+     *
+     * @param signer represents the users L1 wallet to get the address
+     *
+     * @returns a [CompletableFuture] with the the value true if the user is registered.
+     */
+    fun isRegisteredOnChain(signer: Signer): CompletableFuture<Boolean> {
+        checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
+        return isRegisteredOnChain(base, nodeUrl, signer, usersApi)
+    }
 
     /**
      * Get stark keys for a registered user

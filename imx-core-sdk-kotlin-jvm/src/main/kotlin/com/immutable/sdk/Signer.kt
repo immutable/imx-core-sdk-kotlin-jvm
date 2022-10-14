@@ -1,5 +1,6 @@
 package com.immutable.sdk
 
+import org.web3j.crypto.RawTransaction
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -24,6 +25,13 @@ interface Signer {
      * supported, such as in a Contract-based Wallet or Meta-Transaction-based Wallet.
      */
     fun signMessage(message: String): CompletableFuture<String>
+
+    /**
+     * Signs the [rawTransaction]
+     *
+     * @return a [CompletableFuture] with the signed transaction in hex format.
+     */
+    fun signTransaction(rawTransaction: RawTransaction): CompletableFuture<String>
 }
 
 /**

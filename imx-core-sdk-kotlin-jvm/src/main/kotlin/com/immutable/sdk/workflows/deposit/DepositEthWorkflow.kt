@@ -9,7 +9,6 @@ import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.contracts.Core_sol_Core
-import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.getNonce
 import com.immutable.sdk.extensions.hexRemovePrefix
 import com.immutable.sdk.extensions.hexToByteArray
@@ -30,7 +29,6 @@ import java.util.concurrent.CompletableFuture
 private const val GET_SIGNABLE_DEPOSIT = "Get signable deposit"
 private const val ENCODE_ASSET = "Encode asset"
 private const val ASSET_TYPE = "asset"
-private const val IS_USER_REGISTERED_ON_CHAIN = "Is user registered on chain"
 
 @Suppress("LongParameterList", "LongMethod")
 internal fun depositEth(
@@ -59,7 +57,7 @@ internal fun depositEth(
                 }
         }
         .thenCompose { params ->
-            isUserRegisteredOnChain(base, web3j, params)
+            isRegisteredOnChain(base, nodeUrl, signer, usersApi)
                 .thenApply { isRegistered -> isRegistered to params }
         }.thenCompose { (isRegistered, params) ->
             executeDeposit(base, web3j, signer, amount, isRegistered, params, usersApi)
@@ -91,22 +89,6 @@ private fun encodeAsset(api: EncodingApi) = call(ENCODE_ASSET) {
     val request =
         EncodeAssetRequest(token = EncodeAssetRequestToken(type = EncodeAssetRequestToken.Type.eTH))
     api.encodeAsset(ASSET_TYPE, request)
-}
-
-private fun isUserRegisteredOnChain(
-    base: ImmutableXBase,
-    web3j: Web3j,
-    params: Params
-): CompletableFuture<Boolean> = call(IS_USER_REGISTERED_ON_CHAIN) {
-    val registrationContract = Registration_sol_Registration.load(
-        ImmutableConfig.getRegistrationContractAddress(base),
-        web3j,
-        ClientTransactionManager(web3j, params.address),
-        DefaultGasProvider()
-    )
-
-    // Checks whether the user is registered on chain
-    isRegisteredOnChain(params.signableDepositResponse.starkKey, registrationContract).get()
 }
 
 @Suppress("LongParameterList")

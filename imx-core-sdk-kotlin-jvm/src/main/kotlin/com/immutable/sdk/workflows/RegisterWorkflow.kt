@@ -1,19 +1,25 @@
 package com.immutable.sdk.workflows
 
+import com.immutable.sdk.Constants.HEX_PREFIX
+import com.immutable.sdk.Constants.HEX_RADIX
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
+import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.api.model.RegisterUserRequest
+import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.crypto.Crypto
 import org.openapitools.client.infrastructure.ClientException
+import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
 private const val GET_USER = "Get user"
 private const val REGISTER_USER = "Register user"
 private const val SIGNABLE_REGISTRATION = "Signable registration"
+private const val SIGNABLE_REGISTRATION_ON_CHAIN = "Get signable registration on-chain"
 
 private data class RegisterData(
     val address: String = "",
@@ -120,4 +126,36 @@ else {
         api.registerUser(body)
         Unit
     }
+}
+
+@Suppress("TooGenericExceptionCaught")
+internal fun isRegisteredOnChain(
+    starkPublicKey: String,
+    contract: Registration_sol_Registration
+): CompletableFuture<Boolean> {
+    val future = CompletableFuture<Boolean>()
+
+    contract.isRegistered(BigInteger(starkPublicKey.removePrefix(HEX_PREFIX), HEX_RADIX)).sendAsync()
+        .whenComplete { response, error ->
+            if (error?.message?.contains("USER_UNREGISTERED") == true)
+                future.complete(false)
+            else if (error != null) // Forward exceptions
+                future.completeExceptionally(error)
+            else future.complete(response)
+        }
+
+    return future
+}
+
+internal fun getSignableRegistrationOnChain(
+    address: String,
+    starkPublicKey: String,
+    api: UsersApi
+): CompletableFuture<GetSignableRegistrationResponse> = call(SIGNABLE_REGISTRATION_ON_CHAIN) {
+    api.getSignableRegistration(
+        GetSignableRegistrationRequest(
+            etherKey = address,
+            starkKey = starkPublicKey
+        )
+    )
 }

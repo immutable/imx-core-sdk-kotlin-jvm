@@ -12,3 +12,5 @@ github.properties
 .openapi-generator/templates/kotlin-client/*
 !.openapi-generator/templates/kotlin-client/libraries
 !.openapi-generator/templates/kotlin-client/data_class.mustache
+
+local.properties

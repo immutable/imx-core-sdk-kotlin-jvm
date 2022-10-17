@@ -1,36 +1,31 @@
 package com.immutable.sdk.workflows
 
-import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
 import com.immutable.sdk.api.OrdersApi
-import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.*
-import com.immutable.sdk.model.OrderStatus
+import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.formatQuantity
 import java.util.concurrent.CompletableFuture
 
-private const val SIGNABLE_TRADE = "Signable trade"
-private const val ORDER_DETAILS = "Order details"
-private const val CREATE_TRADE = "Create trade"
-private const val COMMA = ","
+private const val CREATE_ORDER = "Create order"
+private const val SIGNABLE_ORDER = "Signable order"
 
 @Suppress("LongParameterList")
 internal fun createOrder(
-    orderId: String,
+    asset: Erc721Asset,
+    sellToken: AssetModel,
     fees: List<FeeEntry>,
     signer: Signer,
     starkSigner: StarkSigner,
-    ordersApi: OrdersApi = OrdersApi(),
-    tradesApi: TradesApi = TradesApi()
-): CompletableFuture<CreateTradeResponse> {
-    val future = CompletableFuture<CreateTradeResponse>()
+    ordersApi: OrdersApi = OrdersApi()
+): CompletableFuture<CreateOrderResponse> {
+    val future = CompletableFuture<CreateOrderResponse>()
 
     signer.getAddress().thenApply { address -> WorkflowSignatures(address) }
         .thenCompose { signatures ->
-            getOrderDetails(orderId, fees, ordersApi).thenApply { order -> signatures to order }
-        }
-        .thenCompose { (signatures, order) ->
-            getSignableTrade(order, signatures.ethAddress, fees, tradesApi)
+            getSignableOrder(asset, sellToken, signatures.ethAddress, fees, ordersApi)
                 .thenApply { response -> signatures to response }
         }
         .thenCompose { (signatures, response) ->
@@ -41,80 +36,61 @@ internal fun createOrder(
             signer.signMessage(response.signableMessage)
                 .thenApply { signature -> signatures.apply { ethSignature = signature } to response }
         }
-        .thenCompose { (signatures, response) ->
-            createTrade(orderId.toInt(), response, fees, signatures, tradesApi)
-        }.whenComplete { response, error ->
+        .thenCompose { (signatures, response) -> createOrder(response, signatures, fees, ordersApi) }
+        .whenComplete { response, error ->
             // Forward any exceptions from the compose chain
-            if (error != null)
-                future.completeExceptionally(error)
-            else
-                future.complete(response)
+            if (error != null) future.completeExceptionally(error)
+            else future.complete(response)
         }
 
     return future
 }
 
-private fun getOrderDetails(
-    orderId: String,
-    fees: List<FeeEntry>,
-    api: OrdersApi
-): CompletableFuture<Order> =
-    call(ORDER_DETAILS) {
-        api.getOrder(
-            id = orderId,
-            includeFees = true,
-            auxiliaryFeePercentages = fees.joinToString(separator = COMMA) {
-                it.feePercentage?.toString()!!
-            },
-            auxiliaryFeeRecipients = fees.joinToString(separator = COMMA) { it.address!! },
-        )
-    }
-
-private fun getSignableTrade(
-    order: Order,
+@Suppress("LongParameterList")
+private fun getSignableOrder(
+    asset: Erc721Asset,
+    sellToken: AssetModel,
     address: String,
     fees: List<FeeEntry>,
-    api: TradesApi
-): CompletableFuture<GetSignableTradeResponse> = when {
-    order.user == address ->
-        completeExceptionally(ImmutableException.invalidRequest("Cannot purchase own order"))
-    order.status != OrderStatus.Active.value ->
-        completeExceptionally(ImmutableException.invalidRequest("Order not available for purchase"))
-    else -> call(SIGNABLE_TRADE) {
-        api.getSignableTrade(
-            GetSignableTradeRequest(
-                orderId = order.orderId,
-                user = address,
-                fees = fees
-            )
-        )
-    }
+    api: OrdersApi
+): CompletableFuture<GetSignableOrderResponse> = call(SIGNABLE_ORDER) {
+    val request = GetSignableOrderRequest(
+        amountBuy = sellToken.formatQuantity(),
+        amountSell = asset.quantity,
+        tokenBuy = sellToken.toSignableToken(),
+        tokenSell = asset.toSignableToken(),
+        user = address,
+        fees = fees
+    )
+    api.getSignableOrder(request)
 }
 
-@Suppress("TooGenericExceptionCaught", "SwallowedException", "InstanceOfCheckForException")
-private fun createTrade(
-    orderId: Int,
-    response: GetSignableTradeResponse,
-    fees: List<FeeEntry>,
+@Suppress(
+    "TooGenericExceptionCaught",
+    "SwallowedException",
+    "InstanceOfCheckForException",
+    "LongParameterList"
+)
+private fun createOrder(
+    response: GetSignableOrderResponse,
     signatures: WorkflowSignatures,
-    api: TradesApi
-): CompletableFuture<CreateTradeResponse> = call(CREATE_TRADE) {
-    api.createTrade(
-        CreateTradeRequestV1(
+    fees: List<FeeEntry>,
+    api: OrdersApi
+): CompletableFuture<CreateOrderResponse> = call(CREATE_ORDER) {
+    api.createOrder(
+        CreateOrderRequest(
             amountBuy = response.amountBuy,
             amountSell = response.amountSell,
             assetIdBuy = response.assetIdBuy,
             assetIdSell = response.assetIdSell,
             expirationTimestamp = response.expirationTimestamp,
             nonce = response.nonce,
-            orderId = orderId,
             starkKey = response.starkKey,
             starkSignature = signatures.starkSignature,
             vaultIdBuy = response.vaultIdBuy,
             vaultIdSell = response.vaultIdSell,
-            feeInfo = response.feeInfo,
             fees = fees,
-            // Always include fees, the 'fees' field will contain fees details or nothing at all
+            // Always include fees in order, the 'fees' field will either have fees details or nothing at all
             includeFees = true
         ),
         xImxEthAddress = signatures.ethAddress,

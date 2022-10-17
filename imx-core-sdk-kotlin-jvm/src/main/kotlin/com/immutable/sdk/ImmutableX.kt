@@ -12,6 +12,8 @@ import com.immutable.sdk.api.ProjectsApi
 import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.WithdrawalsApi
+import com.immutable.sdk.api.OrdersApi
+import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.model.Collection
 import com.immutable.sdk.api.model.CreateCollectionRequest
 import com.immutable.sdk.api.model.CreateTransferResponse
@@ -97,7 +99,9 @@ class ImmutableX(
     private val depositsApi: DepositsApi by lazy { DepositsApi() }
     private val metadataApi: MetadataApi by lazy { MetadataApi() }
     private val mintsApi: MintsApi by lazy { MintsApi() }
+    private val ordersApi: OrdersApi by lazy { OrdersApi() }
     private val projectsApi: ProjectsApi by lazy { ProjectsApi() }
+    private val tradesApi: TradesApi by lazy { TradesApi() }
     private val usersApi: UsersApi by lazy { UsersApi() }
     private val withdrawalsApi: WithdrawalsApi by lazy { WithdrawalsApi() }
     private val encodingApi: EncodingApi by lazy { EncodingApi() }
@@ -780,22 +784,32 @@ class ImmutableX(
     }
 
     /**
-     * This is a utility function that will chain the necessary calls to fulfill an existing order.
+     * This is a utility function that will chain the necessary calls to create an order for an ERC721 asset.
      *
-     * @param orderId the id of an existing order to be bought
-     * @param fees taker fees information to be used in the buy order.
+     * @param asset the ERC721 asset to sell
+     * @param sellToken the type of token and how much of it to sell the ERC721 asset for
+     * @param fees maker fees information to be used in the sell order.
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
-     * @return a [CompletableFuture] that will provide the Trade id if successful.
+     * @return a [CompletableFuture] that will provide the Order id if successful.
      */
+    @Suppress("LongParameterList")
     fun createOrder(
-        orderId: String,
+        asset: Erc721Asset,
+        sellToken: AssetModel,
         fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
-    ): CompletableFuture<CreateTradeResponse> =
-        com.immutable.sdk.workflows.createOrder(orderId, fees, signer, starkSigner)
+    ): CompletableFuture<CreateOrderResponse> {
+        return com.immutable.sdk.workflows.createOrder(
+            asset,
+            sellToken,
+            fees,
+            signer,
+            starkSigner
+        )
+    }
 
     /**
      * This is a utility function that will chain the necessary calls to cancel an existing order.
@@ -814,32 +828,82 @@ class ImmutableX(
         com.immutable.sdk.workflows.cancelOrder(orderId, signer, starkSigner)
 
     /**
-     * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
+     * Get details of a trade with the given ID
      *
-     * @param asset the ERC721 asset to sell
-     * @param sellToken the type of token and how much of it to sell the ERC721 asset for
-     * @param fees maker fees information to be used in the sell order.
+     * @param id Trade ID
+     * @return Trade
+     * @throws [ImmutableException.apiError]
+     */
+    fun getTrade(id: String) = apiCall("getTrade") {
+        tradesApi.getTrade(id)
+    }
+
+    /**
+     * Get a list of trades
+     *
+     * @param partyATokenType Party A&#39;s sell token type (optional)
+     * @param partyATokenAddress Party A&#39;s sell token address (optional)
+     * @param partyATokenId Party A&#39;s sell token id (optional)
+     * @param partyBTokenType Party B&#39;s sell token type (optional)
+     * @param partyBTokenAddress Party B&#39;s sell token address (optional)
+     * @param partyBTokenId Party B&#39;s sell token id (optional)
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param minTimestamp Minimum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param maxTimestamp Maximum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @return ListTradesResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listTrades(
+        partyATokenType: String? = null,
+        partyATokenAddress: String? = null,
+        partyATokenId: String? = null,
+        partyBTokenType: String? = null,
+        partyBTokenAddress: String? = null,
+        partyBTokenId: String? = null,
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        minTimestamp: String? = null,
+        maxTimestamp: String? = null
+    ) = apiCall("listTrades") {
+        tradesApi.listTrades(
+            partyATokenType,
+            partyATokenAddress,
+            partyATokenId,
+            partyBTokenType,
+            partyBTokenAddress,
+            partyBTokenId,
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            minTimestamp,
+            maxTimestamp
+        )
+    }
+
+    /**
+     * This is a utility function that will chain the necessary calls to fulfill an existing order.
+     *
+     * @param orderId the id of an existing order to be bought
+     * @param fees taker fees information to be used in the buy order.
      * @param signer represents the users L1 wallet to get the address
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      *
-     * @return a [CompletableFuture] that will provide the Order id if successful.
+     * @return a [CompletableFuture] that will provide the Trade id if successful.
      */
-    @Suppress("LongParameterList")
-    fun sell(
-        asset: Erc721Asset,
-        sellToken: AssetModel,
+    fun createTrade(
+        orderId: String,
         fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
-    ): CompletableFuture<CreateOrderResponse> {
-        return com.immutable.sdk.workflows.sell(
-            asset,
-            sellToken,
-            fees,
-            signer,
-            starkSigner
-        )
-    }
+    ): CompletableFuture<CreateTradeResponse> =
+        com.immutable.sdk.workflows.createTrade(orderId, fees, signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.

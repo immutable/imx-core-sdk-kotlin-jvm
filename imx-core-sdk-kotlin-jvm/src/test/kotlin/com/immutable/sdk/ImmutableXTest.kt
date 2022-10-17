@@ -3,11 +3,11 @@ package com.immutable.sdk
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.workflows.createOrder
+import com.immutable.sdk.workflows.createTrade
 import com.immutable.sdk.workflows.buyCrypto
 import com.immutable.sdk.workflows.cancelOrder
 import com.immutable.sdk.workflows.registerOffChain
-import com.immutable.sdk.workflows.sell
+import com.immutable.sdk.workflows.createOrder
 import com.immutable.sdk.workflows.transfer
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -77,9 +77,9 @@ class ImmutableXTest {
     @Test
     fun testBuy() {
         val future = CompletableFuture<CreateTradeResponse>()
-        mockkStatic(::createOrder)
-        every { createOrder("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner, any(), any()) } returns future
-        assertEquals(future, sdk.createOrder("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
+        mockkStatic(::createTrade)
+        every { createTrade("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner, any(), any()) } returns future
+        assertEquals(future, sdk.createTrade("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
     }
 
     @Test
@@ -87,9 +87,9 @@ class ImmutableXTest {
         val future = CompletableFuture<CreateOrderResponse>()
         val asset = Erc721Asset("address", "id")
         val sellToken = EthAsset("1")
-        mockkStatic(::sell)
+        mockkStatic(::createOrder)
         every {
-            sell(
+            createOrder(
                 asset,
                 sellToken,
                 listOf(FeeEntry("address", 5.0)),
@@ -100,7 +100,7 @@ class ImmutableXTest {
         } returns future
         assertEquals(
             future,
-            sdk.sell(
+            sdk.createOrder(
                 asset,
                 sellToken,
                 listOf(FeeEntry("address", 5.0)),

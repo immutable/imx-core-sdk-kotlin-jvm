@@ -14,6 +14,7 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.WithdrawalsApi
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
+import com.immutable.sdk.api.TokensApi
 import com.immutable.sdk.api.model.Collection
 import com.immutable.sdk.api.model.CreateCollectionRequest
 import com.immutable.sdk.api.model.CreateTransferResponse
@@ -101,6 +102,7 @@ class ImmutableX(
     private val mintsApi: MintsApi by lazy { MintsApi() }
     private val ordersApi: OrdersApi by lazy { OrdersApi() }
     private val projectsApi: ProjectsApi by lazy { ProjectsApi() }
+    private val tokensApi: TokensApi by lazy { TokensApi() }
     private val tradesApi: TradesApi by lazy { TradesApi() }
     private val usersApi: UsersApi by lazy { UsersApi() }
     private val withdrawalsApi: WithdrawalsApi by lazy { WithdrawalsApi() }
@@ -904,6 +906,29 @@ class ImmutableX(
         starkSigner: StarkSigner
     ): CompletableFuture<CreateTradeResponse> =
         com.immutable.sdk.workflows.createTrade(orderId, fees, signer, starkSigner)
+
+    /**
+     * Get details of a token
+     *
+     * @param address Token Contract Address
+     * @return TokenDetails
+     * @throws [ImmutableException.apiError]
+     */
+    fun getToken(address: String) = apiCall("getToken") {
+        tokensApi.getToken(address)
+    }
+
+    /**
+     * Get a list of tokens
+     *
+     * @param address Contract address of the token (optional)
+     * @param symbols Token symbols for the token, e.g. ?symbols&#x3D;IMX,ETH (optional)
+     * @return ListTokensResponse
+     * @throws [ImmutableException.apiError]
+     */
+    fun listTokens(address: String? = null, symbols: String? = null) = apiCall("listTokens") {
+        tokensApi.listTokens(address, symbols)
+    }
 
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.

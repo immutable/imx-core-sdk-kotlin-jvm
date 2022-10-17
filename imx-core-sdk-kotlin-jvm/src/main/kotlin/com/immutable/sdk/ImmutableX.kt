@@ -15,6 +15,7 @@ import com.immutable.sdk.api.WithdrawalsApi
 import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.TokensApi
+import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.Collection
 import com.immutable.sdk.api.model.CreateCollectionRequest
 import com.immutable.sdk.api.model.CreateTransferResponse
@@ -94,19 +95,20 @@ class ImmutableX(
     private val base: ImmutableXBase = ImmutableXBase.Production,
     private val nodeUrl: String? = null
 ) {
-    private val assetsApi: AssetsApi by lazy { AssetsApi() }
-    private val balancesApi: BalancesApi by lazy { BalancesApi() }
-    private val collectionsApi: CollectionsApi by lazy { CollectionsApi() }
-    private val depositsApi: DepositsApi by lazy { DepositsApi() }
-    private val metadataApi: MetadataApi by lazy { MetadataApi() }
-    private val mintsApi: MintsApi by lazy { MintsApi() }
-    private val ordersApi: OrdersApi by lazy { OrdersApi() }
-    private val projectsApi: ProjectsApi by lazy { ProjectsApi() }
-    private val tokensApi: TokensApi by lazy { TokensApi() }
-    private val tradesApi: TradesApi by lazy { TradesApi() }
-    private val usersApi: UsersApi by lazy { UsersApi() }
-    private val withdrawalsApi: WithdrawalsApi by lazy { WithdrawalsApi() }
-    private val encodingApi: EncodingApi by lazy { EncodingApi() }
+    private val assetsApi by lazy { AssetsApi() }
+    private val balancesApi by lazy { BalancesApi() }
+    private val collectionsApi by lazy { CollectionsApi() }
+    private val depositsApi by lazy { DepositsApi() }
+    private val metadataApi by lazy { MetadataApi() }
+    private val mintsApi by lazy { MintsApi() }
+    private val ordersApi by lazy { OrdersApi() }
+    private val projectsApi by lazy { ProjectsApi() }
+    private val tokensApi by lazy { TokensApi() }
+    private val tradesApi by lazy { TradesApi() }
+    private val transfersApi by lazy { TransfersApi() }
+    private val usersApi by lazy { UsersApi() }
+    private val withdrawalsApi by lazy { WithdrawalsApi() }
+    private val encodingApi by lazy { EncodingApi() }
 
     init {
         setBaseUrl()
@@ -928,6 +930,81 @@ class ImmutableX(
      */
     fun listTokens(address: String? = null, symbols: String? = null) = apiCall("listTokens") {
         tokensApi.listTokens(address, symbols)
+    }
+
+    /**
+     * Get details of a transfer with the given ID
+     *
+     * @param id Transfer ID
+     * @return Transfer
+     * @throws [ImmutableException.apiError]
+     */
+    fun getTransfer(id: String) = apiCall("getTransfer") {
+        transfersApi.getTransfer(id)
+    }
+
+    /**
+     * Get a list of transfers
+     *
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param user Ethereum address of the user who submitted this transfer (optional)
+     * @param `receiver` Ethereum address of the user who received this transfer (optional)
+     * @param status Status of this transfer (optional)
+     * @param minTimestamp Minimum timestamp for this transfer, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param maxTimestamp Maximum timestamp for this transfer, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param tokenType Token type of the transferred asset (optional)
+     * @param tokenId ERC721 Token ID of the minted asset (optional)
+     * @param assetId Internal IMX ID of the minted asset (optional)
+     * @param tokenAddress Token address of the transferred asset (optional)
+     * @param tokenName Token name of the transferred asset (optional)
+     * @param minQuantity Max quantity for the transferred asset (optional)
+     * @param maxQuantity Max quantity for the transferred asset (optional)
+     * @param metadata JSON-encoded metadata filters for the transferred asset (optional)
+     * @return ListTransfersResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listTransfers(
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        user: String? = null,
+        receiver: String? = null,
+        status: String? = null,
+        minTimestamp: String? = null,
+        maxTimestamp: String? = null,
+        tokenType: String? = null,
+        tokenId: String? = null,
+        assetId: String? = null,
+        tokenAddress: String? = null,
+        tokenName: String? = null,
+        minQuantity: String? = null,
+        maxQuantity: String? = null,
+        metadata: String? = null
+    ) = apiCall("listTransfers") {
+        transfersApi.listTransfers(
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            user,
+            receiver,
+            status,
+            minTimestamp,
+            maxTimestamp,
+            tokenType,
+            tokenId,
+            assetId,
+            tokenAddress,
+            tokenName,
+            minQuantity,
+            maxQuantity,
+            metadata
+        )
     }
 
     /**

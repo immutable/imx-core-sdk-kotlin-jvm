@@ -12,6 +12,10 @@ import com.immutable.sdk.api.ProjectsApi
 import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.WithdrawalsApi
+import com.immutable.sdk.api.OrdersApi
+import com.immutable.sdk.api.TradesApi
+import com.immutable.sdk.api.TokensApi
+import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.Collection
 import com.immutable.sdk.api.model.CreateCollectionRequest
 import com.immutable.sdk.api.model.CreateTransferResponse
@@ -91,16 +95,20 @@ class ImmutableX(
     private val base: ImmutableXBase = ImmutableXBase.Production,
     private val nodeUrl: String? = null
 ) {
-    private val assetsApi: AssetsApi by lazy { AssetsApi() }
-    private val balancesApi: BalancesApi by lazy { BalancesApi() }
-    private val collectionsApi: CollectionsApi by lazy { CollectionsApi() }
-    private val depositsApi: DepositsApi by lazy { DepositsApi() }
-    private val metadataApi: MetadataApi by lazy { MetadataApi() }
-    private val mintsApi: MintsApi by lazy { MintsApi() }
-    private val projectsApi: ProjectsApi by lazy { ProjectsApi() }
-    private val usersApi: UsersApi by lazy { UsersApi() }
-    private val withdrawalsApi: WithdrawalsApi by lazy { WithdrawalsApi() }
-    private val encodingApi: EncodingApi by lazy { EncodingApi() }
+    private val assetsApi by lazy { AssetsApi() }
+    private val balancesApi by lazy { BalancesApi() }
+    private val collectionsApi by lazy { CollectionsApi() }
+    private val depositsApi by lazy { DepositsApi() }
+    private val metadataApi by lazy { MetadataApi() }
+    private val mintsApi by lazy { MintsApi() }
+    private val ordersApi by lazy { OrdersApi() }
+    private val projectsApi by lazy { ProjectsApi() }
+    private val tokensApi by lazy { TokensApi() }
+    private val tradesApi by lazy { TradesApi() }
+    private val transfersApi by lazy { TransfersApi() }
+    private val usersApi by lazy { UsersApi() }
+    private val withdrawalsApi by lazy { WithdrawalsApi() }
+    private val encodingApi by lazy { EncodingApi() }
 
     init {
         setBaseUrl()
@@ -661,25 +669,126 @@ class ImmutableX(
     }
 
     /**
-     * This is a utility function that will chain the necessary calls to buy an existing order.
+     * Get details of an order with the given ID
      *
-     * @param orderId the id of an existing order to be bought
-     * @param fees taker fees information to be used in the buy order.
-     * @param signer represents the users L1 wallet to get the address
-     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
-     *
-     * @return a [CompletableFuture] that will provide the Trade id if successful.
+     * @param id Order ID
+     * @param includeFees Set flag to true to include fee body for the order (optional)
+     * @param auxiliaryFeePercentages Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients (optional)
+     * @param auxiliaryFeeRecipients Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages (optional)
+     * @return Order
+     * @throws [ImmutableException.apiError]
      */
-    fun buy(
-        orderId: String,
-        fees: List<FeeEntry> = emptyList(),
-        signer: Signer,
-        starkSigner: StarkSigner
-    ): CompletableFuture<CreateTradeResponse> =
-        com.immutable.sdk.workflows.buy(orderId, fees, signer, starkSigner)
+    fun getOrder(
+        id: String,
+        includeFees: Boolean? = null,
+        auxiliaryFeePercentages: String? = null,
+        auxiliaryFeeRecipients: String? = null
+    ) = apiCall("getOrder") {
+        ordersApi.getOrder(id, includeFees, auxiliaryFeePercentages, auxiliaryFeeRecipients)
+    }
 
     /**
-     * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
+     * Get a list of orders
+     *
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param user Ethereum address of the user who submitted this order (optional)
+     * @param status Status of this order (optional)
+     * @param minTimestamp Minimum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param maxTimestamp Maximum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param updatedMinTimestamp Minimum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param updatedMaxTimestamp Maximum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param buyTokenType Token type of the asset this order buys (optional)
+     * @param buyTokenId ERC721 Token ID of the asset this order buys (optional)
+     * @param buyAssetId Internal IMX ID of the asset this order buys (optional)
+     * @param buyTokenAddress Comma separated string of token addresses of the asset this order buys (optional)
+     * @param buyTokenName Token name of the asset this order buys (optional)
+     * @param buyMinQuantity Min quantity for the asset this order buys (optional)
+     * @param buyMaxQuantity Max quantity for the asset this order buys (optional)
+     * @param buyMetadata JSON-encoded metadata filters for the asset this order buys (optional)
+     * @param sellTokenType Token type of the asset this order sells (optional)
+     * @param sellTokenId ERC721 Token ID of the asset this order sells (optional)
+     * @param sellAssetId Internal IMX ID of the asset this order sells (optional)
+     * @param sellTokenAddress Comma separated string of token addresses of the asset this order sells (optional)
+     * @param sellTokenName Token name of the asset this order sells (optional)
+     * @param sellMinQuantity Min quantity for the asset this order sells (optional)
+     * @param sellMaxQuantity Max quantity for the asset this order sells (optional)
+     * @param sellMetadata JSON-encoded metadata filters for the asset this order sells (optional)
+     * @param auxiliaryFeePercentages Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients (optional)
+     * @param auxiliaryFeeRecipients Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages (optional)
+     * @param includeFees Set flag to true to include fee object for orders (optional)
+     * @return ListOrdersResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listOrders(
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        user: String? = null,
+        status: String? = null,
+        minTimestamp: String? = null,
+        maxTimestamp: String? = null,
+        updatedMinTimestamp: String? = null,
+        updatedMaxTimestamp: String? = null,
+        buyTokenType: String? = null,
+        buyTokenId: String? = null,
+        buyAssetId: String? = null,
+        buyTokenAddress: String? = null,
+        buyTokenName: String? = null,
+        buyMinQuantity: String? = null,
+        buyMaxQuantity: String? = null,
+        buyMetadata: String? = null,
+        sellTokenType: String? = null,
+        sellTokenId: String? = null,
+        sellAssetId: String? = null,
+        sellTokenAddress: String? = null,
+        sellTokenName: String? = null,
+        sellMinQuantity: String? = null,
+        sellMaxQuantity: String? = null,
+        sellMetadata: String? = null,
+        auxiliaryFeePercentages: String? = null,
+        auxiliaryFeeRecipients: String? = null,
+        includeFees: Boolean? = null
+    ) = apiCall("listOrders") {
+        ordersApi.listOrders(
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            user,
+            status,
+            minTimestamp,
+            maxTimestamp,
+            updatedMinTimestamp,
+            updatedMaxTimestamp,
+            buyTokenType,
+            buyTokenId,
+            buyAssetId,
+            buyTokenAddress,
+            buyTokenName,
+            buyMinQuantity,
+            buyMaxQuantity,
+            buyMetadata,
+            sellTokenType,
+            sellTokenId,
+            sellAssetId,
+            sellTokenAddress,
+            sellTokenName,
+            sellMinQuantity,
+            sellMaxQuantity,
+            sellMetadata,
+            auxiliaryFeePercentages,
+            auxiliaryFeeRecipients,
+            includeFees
+        )
+    }
+
+    /**
+     * This is a utility function that will chain the necessary calls to create an order for an ERC721 asset.
      *
      * @param asset the ERC721 asset to sell
      * @param sellToken the type of token and how much of it to sell the ERC721 asset for
@@ -690,14 +799,14 @@ class ImmutableX(
      * @return a [CompletableFuture] that will provide the Order id if successful.
      */
     @Suppress("LongParameterList")
-    fun sell(
+    fun createOrder(
         asset: Erc721Asset,
         sellToken: AssetModel,
         fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<CreateOrderResponse> {
-        return com.immutable.sdk.workflows.sell(
+        return com.immutable.sdk.workflows.createOrder(
             asset,
             sellToken,
             fees,
@@ -721,6 +830,182 @@ class ImmutableX(
         starkSigner: StarkSigner
     ): CompletableFuture<CancelOrderResponse> =
         com.immutable.sdk.workflows.cancelOrder(orderId, signer, starkSigner)
+
+    /**
+     * Get details of a trade with the given ID
+     *
+     * @param id Trade ID
+     * @return Trade
+     * @throws [ImmutableException.apiError]
+     */
+    fun getTrade(id: String) = apiCall("getTrade") {
+        tradesApi.getTrade(id)
+    }
+
+    /**
+     * Get a list of trades
+     *
+     * @param partyATokenType Party A&#39;s sell token type (optional)
+     * @param partyATokenAddress Party A&#39;s sell token address (optional)
+     * @param partyATokenId Party A&#39;s sell token id (optional)
+     * @param partyBTokenType Party B&#39;s sell token type (optional)
+     * @param partyBTokenAddress Party B&#39;s sell token address (optional)
+     * @param partyBTokenId Party B&#39;s sell token id (optional)
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param minTimestamp Minimum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param maxTimestamp Maximum timestamp for this trade, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @return ListTradesResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listTrades(
+        partyATokenType: String? = null,
+        partyATokenAddress: String? = null,
+        partyATokenId: String? = null,
+        partyBTokenType: String? = null,
+        partyBTokenAddress: String? = null,
+        partyBTokenId: String? = null,
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        minTimestamp: String? = null,
+        maxTimestamp: String? = null
+    ) = apiCall("listTrades") {
+        tradesApi.listTrades(
+            partyATokenType,
+            partyATokenAddress,
+            partyATokenId,
+            partyBTokenType,
+            partyBTokenAddress,
+            partyBTokenId,
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            minTimestamp,
+            maxTimestamp
+        )
+    }
+
+    /**
+     * This is a utility function that will chain the necessary calls to fulfill an existing order.
+     *
+     * @param orderId the id of an existing order to be bought
+     * @param fees taker fees information to be used in the buy order.
+     * @param signer represents the users L1 wallet to get the address
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     *
+     * @return a [CompletableFuture] that will provide the Trade id if successful.
+     */
+    fun createTrade(
+        orderId: String,
+        fees: List<FeeEntry> = emptyList(),
+        signer: Signer,
+        starkSigner: StarkSigner
+    ): CompletableFuture<CreateTradeResponse> =
+        com.immutable.sdk.workflows.createTrade(orderId, fees, signer, starkSigner)
+
+    /**
+     * Get details of a token
+     *
+     * @param address Token Contract Address
+     * @return TokenDetails
+     * @throws [ImmutableException.apiError]
+     */
+    fun getToken(address: String) = apiCall("getToken") {
+        tokensApi.getToken(address)
+    }
+
+    /**
+     * Get a list of tokens
+     *
+     * @param address Contract address of the token (optional)
+     * @param symbols Token symbols for the token, e.g. ?symbols&#x3D;IMX,ETH (optional)
+     * @return ListTokensResponse
+     * @throws [ImmutableException.apiError]
+     */
+    fun listTokens(address: String? = null, symbols: String? = null) = apiCall("listTokens") {
+        tokensApi.listTokens(address, symbols)
+    }
+
+    /**
+     * Get details of a transfer with the given ID
+     *
+     * @param id Transfer ID
+     * @return Transfer
+     * @throws [ImmutableException.apiError]
+     */
+    fun getTransfer(id: String) = apiCall("getTransfer") {
+        transfersApi.getTransfer(id)
+    }
+
+    /**
+     * Get a list of transfers
+     *
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param user Ethereum address of the user who submitted this transfer (optional)
+     * @param `receiver` Ethereum address of the user who received this transfer (optional)
+     * @param status Status of this transfer (optional)
+     * @param minTimestamp Minimum timestamp for this transfer, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param maxTimestamp Maximum timestamp for this transfer, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param tokenType Token type of the transferred asset (optional)
+     * @param tokenId ERC721 Token ID of the minted asset (optional)
+     * @param assetId Internal IMX ID of the minted asset (optional)
+     * @param tokenAddress Token address of the transferred asset (optional)
+     * @param tokenName Token name of the transferred asset (optional)
+     * @param minQuantity Max quantity for the transferred asset (optional)
+     * @param maxQuantity Max quantity for the transferred asset (optional)
+     * @param metadata JSON-encoded metadata filters for the transferred asset (optional)
+     * @return ListTransfersResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listTransfers(
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        user: String? = null,
+        receiver: String? = null,
+        status: String? = null,
+        minTimestamp: String? = null,
+        maxTimestamp: String? = null,
+        tokenType: String? = null,
+        tokenId: String? = null,
+        assetId: String? = null,
+        tokenAddress: String? = null,
+        tokenName: String? = null,
+        minQuantity: String? = null,
+        maxQuantity: String? = null,
+        metadata: String? = null
+    ) = apiCall("listTransfers") {
+        transfersApi.listTransfers(
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            user,
+            receiver,
+            status,
+            minTimestamp,
+            maxTimestamp,
+            tokenType,
+            tokenId,
+            assetId,
+            tokenAddress,
+            tokenName,
+            minQuantity,
+            maxQuantity,
+            metadata
+        )
+    }
 
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.

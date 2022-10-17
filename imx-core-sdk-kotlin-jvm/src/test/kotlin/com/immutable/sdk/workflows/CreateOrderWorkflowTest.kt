@@ -29,7 +29,7 @@ private const val ETH_SIGNATURE =
 private const val PAYLOAD_HASH = "payloadHash"
 private const val SIGNABLE_MESSAGE = "messageForL1"
 
-class SellWorkflowTest {
+class CreateOrderWorkflowTest {
     @MockK
     private lateinit var ordersApi: OrdersApi
 
@@ -84,7 +84,7 @@ class SellWorkflowTest {
         unmockkAll()
     }
 
-    private fun createSellFuture() = sell(
+    private fun createSellFuture() = createOrder(
         asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
         sellToken = EthAsset(SELL_AMOUNT),
         fees = emptyList(),
@@ -117,7 +117,7 @@ class SellWorkflowTest {
         ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
-            future = sell(
+            future = createOrder(
                 asset = Erc721Asset(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
                 sellToken = Erc20Asset(SELL_TOKEN_ADDRESS, SELL_TOKEN_DECIMALS, SELL_AMOUNT),
                 fees = emptyList(),

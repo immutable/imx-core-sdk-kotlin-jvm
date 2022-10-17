@@ -13,7 +13,7 @@ private const val CREATE_ORDER = "Create order"
 private const val SIGNABLE_ORDER = "Signable order"
 
 @Suppress("LongParameterList")
-internal fun sell(
+internal fun createOrder(
     asset: Erc721Asset,
     sellToken: AssetModel,
     fees: List<FeeEntry>,

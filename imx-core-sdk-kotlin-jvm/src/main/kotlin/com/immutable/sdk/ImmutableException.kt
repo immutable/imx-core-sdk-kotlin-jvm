@@ -52,6 +52,19 @@ class ImmutableException private constructor(
          */
         internal fun invalidRequest(message: String) =
             ImmutableException(ImmutableExceptionType.InvalidRequest, "Invalid request: $message")
+
+        /**
+         * Exception for when a workflow fails due to a smart contract transaction failing.
+         *
+         * @param callName used to identify the step of the workflow that failed e.g. Deposit ERC721
+         * @param cause the root cause of the error so the consumer can further diagnose
+         */
+        internal fun contractError(callName: String, cause: Throwable? = null) =
+            ImmutableException(
+                ImmutableExceptionType.ApiError,
+                "Contract transaction failed: $callName",
+                cause
+            )
     }
 }
 

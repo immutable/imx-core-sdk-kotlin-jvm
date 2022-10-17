@@ -15,7 +15,7 @@ private const val CREATE_TRADE = "Create trade"
 private const val COMMA = ","
 
 @Suppress("LongParameterList")
-internal fun buy(
+internal fun createOrder(
     orderId: String,
     fees: List<FeeEntry>,
     signer: Signer,

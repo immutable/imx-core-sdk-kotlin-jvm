@@ -29,7 +29,7 @@ private const val TRADE_ID = 6
 private const val PAYLOAD_HASH = "tradePayloadHash"
 private const val SIGNABLE_MESSAGE = "messageForL1"
 
-class BuyWorkflowTest {
+class CreateOrderWorkflowTest {
     @MockK
     private lateinit var ordersApi: OrdersApi
 
@@ -125,7 +125,7 @@ class BuyWorkflowTest {
         ethSignatureFuture.complete(ETH_SIGNATURE)
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = response,
             expectedError = null
         )
@@ -138,7 +138,7 @@ class BuyWorkflowTest {
         addressFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -150,7 +150,7 @@ class BuyWorkflowTest {
         addressFuture.complete(ADDRESS)
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
@@ -162,7 +162,7 @@ class BuyWorkflowTest {
         addressFuture.complete(ADDRESS)
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
@@ -173,7 +173,7 @@ class BuyWorkflowTest {
         addressFuture.complete(ASSET_OWNER)
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.invalidRequest("")
         )
@@ -185,7 +185,7 @@ class BuyWorkflowTest {
         addressFuture.complete(ADDRESS)
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.invalidRequest("")
         )
@@ -197,7 +197,7 @@ class BuyWorkflowTest {
         starkSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -210,7 +210,7 @@ class BuyWorkflowTest {
         ethSignatureFuture.completeExceptionally(TestException())
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = TestException()
         )
@@ -225,7 +225,7 @@ class BuyWorkflowTest {
         ethSignatureFuture.complete(STARK_SIGNATURE)
 
         testFuture(
-            future = buy(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
+            future = createOrder(ORDER_ID, emptyList(), signer, starkSigner, ordersApi, tradesApi),
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )

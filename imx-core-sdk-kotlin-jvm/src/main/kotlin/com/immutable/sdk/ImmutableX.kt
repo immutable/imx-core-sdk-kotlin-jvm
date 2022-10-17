@@ -661,7 +661,126 @@ class ImmutableX(
     }
 
     /**
-     * This is a utility function that will chain the necessary calls to buy an existing order.
+     * Get details of an order with the given ID
+     *
+     * @param id Order ID
+     * @param includeFees Set flag to true to include fee body for the order (optional)
+     * @param auxiliaryFeePercentages Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients (optional)
+     * @param auxiliaryFeeRecipients Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages (optional)
+     * @return Order
+     * @throws [ImmutableException.apiError]
+     */
+    fun getOrder(
+        id: String,
+        includeFees: Boolean? = null,
+        auxiliaryFeePercentages: String? = null,
+        auxiliaryFeeRecipients: String? = null
+    ) = apiCall("getOrder") {
+        ordersApi.getOrder(id, includeFees, auxiliaryFeePercentages, auxiliaryFeeRecipients)
+    }
+
+    /**
+     * Get a list of orders
+     *
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param user Ethereum address of the user who submitted this order (optional)
+     * @param status Status of this order (optional)
+     * @param minTimestamp Minimum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param maxTimestamp Maximum created at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param updatedMinTimestamp Minimum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param updatedMaxTimestamp Maximum updated at timestamp for this order, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param buyTokenType Token type of the asset this order buys (optional)
+     * @param buyTokenId ERC721 Token ID of the asset this order buys (optional)
+     * @param buyAssetId Internal IMX ID of the asset this order buys (optional)
+     * @param buyTokenAddress Comma separated string of token addresses of the asset this order buys (optional)
+     * @param buyTokenName Token name of the asset this order buys (optional)
+     * @param buyMinQuantity Min quantity for the asset this order buys (optional)
+     * @param buyMaxQuantity Max quantity for the asset this order buys (optional)
+     * @param buyMetadata JSON-encoded metadata filters for the asset this order buys (optional)
+     * @param sellTokenType Token type of the asset this order sells (optional)
+     * @param sellTokenId ERC721 Token ID of the asset this order sells (optional)
+     * @param sellAssetId Internal IMX ID of the asset this order sells (optional)
+     * @param sellTokenAddress Comma separated string of token addresses of the asset this order sells (optional)
+     * @param sellTokenName Token name of the asset this order sells (optional)
+     * @param sellMinQuantity Min quantity for the asset this order sells (optional)
+     * @param sellMaxQuantity Max quantity for the asset this order sells (optional)
+     * @param sellMetadata JSON-encoded metadata filters for the asset this order sells (optional)
+     * @param auxiliaryFeePercentages Comma separated string of fee percentages that are to be paired with auxiliary_fee_recipients (optional)
+     * @param auxiliaryFeeRecipients Comma separated string of fee recipients that are to be paired with auxiliary_fee_percentages (optional)
+     * @param includeFees Set flag to true to include fee object for orders (optional)
+     * @return ListOrdersResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listOrders(
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        user: String? = null,
+        status: String? = null,
+        minTimestamp: String? = null,
+        maxTimestamp: String? = null,
+        updatedMinTimestamp: String? = null,
+        updatedMaxTimestamp: String? = null,
+        buyTokenType: String? = null,
+        buyTokenId: String? = null,
+        buyAssetId: String? = null,
+        buyTokenAddress: String? = null,
+        buyTokenName: String? = null,
+        buyMinQuantity: String? = null,
+        buyMaxQuantity: String? = null,
+        buyMetadata: String? = null,
+        sellTokenType: String? = null,
+        sellTokenId: String? = null,
+        sellAssetId: String? = null,
+        sellTokenAddress: String? = null,
+        sellTokenName: String? = null,
+        sellMinQuantity: String? = null,
+        sellMaxQuantity: String? = null,
+        sellMetadata: String? = null,
+        auxiliaryFeePercentages: String? = null,
+        auxiliaryFeeRecipients: String? = null,
+        includeFees: Boolean? = null
+    ) = apiCall("listOrders") {
+        ordersApi.listOrders(
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            user,
+            status,
+            minTimestamp,
+            maxTimestamp,
+            updatedMinTimestamp,
+            updatedMaxTimestamp,
+            buyTokenType,
+            buyTokenId,
+            buyAssetId,
+            buyTokenAddress,
+            buyTokenName,
+            buyMinQuantity,
+            buyMaxQuantity,
+            buyMetadata,
+            sellTokenType,
+            sellTokenId,
+            sellAssetId,
+            sellTokenAddress,
+            sellTokenName,
+            sellMinQuantity,
+            sellMaxQuantity,
+            sellMetadata,
+            auxiliaryFeePercentages,
+            auxiliaryFeeRecipients,
+            includeFees
+        )
+    }
+
+    /**
+     * This is a utility function that will chain the necessary calls to fulfill an existing order.
      *
      * @param orderId the id of an existing order to be bought
      * @param fees taker fees information to be used in the buy order.
@@ -670,13 +789,29 @@ class ImmutableX(
      *
      * @return a [CompletableFuture] that will provide the Trade id if successful.
      */
-    fun buy(
+    fun createOrder(
         orderId: String,
         fees: List<FeeEntry> = emptyList(),
         signer: Signer,
         starkSigner: StarkSigner
     ): CompletableFuture<CreateTradeResponse> =
-        com.immutable.sdk.workflows.buy(orderId, fees, signer, starkSigner)
+        com.immutable.sdk.workflows.createOrder(orderId, fees, signer, starkSigner)
+
+    /**
+     * This is a utility function that will chain the necessary calls to cancel an existing order.
+     *
+     * @param orderId the id of an existing order to be bought
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     *
+     * @return a [CompletableFuture] that will provide the cancelled Order id if successful.
+     */
+    @Suppress("LongParameterList")
+    fun cancelOrder(
+        orderId: String,
+        signer: Signer,
+        starkSigner: StarkSigner
+    ): CompletableFuture<CancelOrderResponse> =
+        com.immutable.sdk.workflows.cancelOrder(orderId, signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to sell an ERC721 asset.
@@ -705,22 +840,6 @@ class ImmutableX(
             starkSigner
         )
     }
-
-    /**
-     * This is a utility function that will chain the necessary calls to cancel an existing order.
-     *
-     * @param orderId the id of an existing order to be bought
-     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
-     *
-     * @return a [CompletableFuture] that will provide the cancelled Order id if successful.
-     */
-    @Suppress("LongParameterList")
-    fun cancelOrder(
-        orderId: String,
-        signer: Signer,
-        starkSigner: StarkSigner
-    ): CompletableFuture<CancelOrderResponse> =
-        com.immutable.sdk.workflows.cancelOrder(orderId, signer, starkSigner)
 
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.

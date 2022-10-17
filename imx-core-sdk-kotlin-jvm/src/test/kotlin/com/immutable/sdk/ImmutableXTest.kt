@@ -3,7 +3,7 @@ package com.immutable.sdk
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import com.immutable.sdk.workflows.buy
+import com.immutable.sdk.workflows.createOrder
 import com.immutable.sdk.workflows.buyCrypto
 import com.immutable.sdk.workflows.cancelOrder
 import com.immutable.sdk.workflows.registerOffChain
@@ -77,9 +77,9 @@ class ImmutableXTest {
     @Test
     fun testBuy() {
         val future = CompletableFuture<CreateTradeResponse>()
-        mockkStatic(::buy)
-        every { buy("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner, any(), any()) } returns future
-        assertEquals(future, sdk.buy("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
+        mockkStatic(::createOrder)
+        every { createOrder("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner, any(), any()) } returns future
+        assertEquals(future, sdk.createOrder("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
     }
 
     @Test

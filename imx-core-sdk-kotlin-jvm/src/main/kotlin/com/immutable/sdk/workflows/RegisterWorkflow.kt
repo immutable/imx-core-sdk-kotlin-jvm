@@ -1,7 +1,6 @@
 package com.immutable.sdk.workflows
 
 import com.immutable.sdk.*
-import com.immutable.sdk.Constants.HEX_PREFIX
 import com.immutable.sdk.Constants.HEX_RADIX
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
@@ -9,12 +8,12 @@ import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.api.model.RegisterUserRequest
 import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.crypto.Crypto
+import com.immutable.sdk.extensions.hexRemovePrefix
 import org.openapitools.client.infrastructure.ClientException
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
-import java.math.BigInteger
 import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
@@ -154,7 +153,7 @@ internal fun isRegisteredOnChain(
                 ClientTransactionManager(web3j, address),
                 DefaultGasProvider()
             )
-            contract.isRegistered(BigInteger(starkPublicKey.removePrefix(HEX_PREFIX), HEX_RADIX))
+            contract.isRegistered(starkPublicKey.hexRemovePrefix().toBigInteger(HEX_RADIX))
                 .sendAsync()
         }
         .whenComplete { response, error ->

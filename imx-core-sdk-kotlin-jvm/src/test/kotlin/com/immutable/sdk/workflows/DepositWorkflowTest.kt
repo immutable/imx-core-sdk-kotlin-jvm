@@ -9,6 +9,7 @@ import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.IERC20_sol_IERC20
 import com.immutable.sdk.contracts.IERC721_sol_IERC721
 import com.immutable.sdk.contracts.Registration_sol_Registration
+import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.*
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -39,6 +40,8 @@ private const val VAULT_ID = 987_654
 private const val ASSET_ID = "5461"
 private const val ASSET_TYPE = "712"
 private const val STARK_KEY = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485"
+private val STARK_KEY_BIG_INT =
+    BigInteger("2870259069112366000714388987675960825159149244184363600690019399428626068613")
 private const val OPERATOR_SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf11"
@@ -218,9 +221,17 @@ class DepositWorkflowTest {
             )
         }
         verify { usersApi.getUsers(ADDRESS) }
-        verify { registrationContract.isRegistered(any()) }
-        verify { usersApi.getSignableRegistration(any()) }
-        verify { coreContract.registerAndDepositEth(any(), any(), any(), any(), any()) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify { usersApi.getSignableRegistration(GetSignableRegistrationRequest(ADDRESS, STARK_KEY)) }
+        verify {
+            coreContract.registerAndDepositEth(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray(),
+                ASSET_TYPE.toBigInteger(),
+                VAULT_ID.toBigInteger()
+            )
+        }
         verify { signer.signTransaction(any()) }
         verify { web3j.ethSendRawTransaction(any()) }
     }
@@ -267,9 +278,15 @@ class DepositWorkflowTest {
             )
         }
         verify { usersApi.getUsers(ADDRESS) }
-        verify { registrationContract.isRegistered(any()) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
         verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
-        verify { coreContract.depositEth(any(), any(), any()) }
+        verify {
+            coreContract.depositEth(
+                STARK_KEY_BIG_INT,
+                ASSET_TYPE.toBigInteger(),
+                VAULT_ID.toBigInteger()
+            )
+        }
         verify { signer.signTransaction(any()) }
         verify { web3j.ethSendRawTransaction(any()) }
     }
@@ -334,9 +351,20 @@ class DepositWorkflowTest {
             )
         }
         verify { usersApi.getUsers(ADDRESS) }
-        verify { registrationContract.isRegistered(any()) }
-        verify { usersApi.getSignableRegistration(any()) }
-        verify { coreContract.registerAndDepositERC20(any(), any(), any(), any(), any(), any()) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify {
+            usersApi.getSignableRegistration(GetSignableRegistrationRequest(ADDRESS, STARK_KEY))
+        }
+        verify {
+            coreContract.registerAndDepositERC20(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray(),
+                ASSET_TYPE.toBigInteger(),
+                VAULT_ID.toBigInteger(),
+                token.formatQuantity().toBigInteger()
+            )
+        }
         verify { signer.signTransaction(any()) }
         verify { web3j.ethSendRawTransaction(any()) }
     }
@@ -373,9 +401,16 @@ class DepositWorkflowTest {
             )
         }
         verify { usersApi.getUsers(ADDRESS) }
-        verify { registrationContract.isRegistered(any()) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
         verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
-        verify { coreContract.depositERC20(any(), any(), any(), any()) }
+        verify {
+            coreContract.depositERC20(
+                STARK_KEY_BIG_INT,
+                ASSET_TYPE.toBigInteger(),
+                VAULT_ID.toBigInteger(),
+                token.formatQuantity().toBigInteger()
+            )
+        }
         verify { signer.signTransaction(any()) }
         verify { web3j.ethSendRawTransaction(any()) }
     }
@@ -412,9 +447,22 @@ class DepositWorkflowTest {
             )
         }
         verify { usersApi.getUsers(ADDRESS) }
-        verify { registrationContract.isRegistered(any()) }
-        verify { usersApi.getSignableRegistration(any()) }
-        verify { registrationContract.registerAndDepositNft(any(), any(), any(), any(), any(), any()) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify {
+            usersApi.getSignableRegistration(
+                GetSignableRegistrationRequest(ADDRESS, STARK_KEY)
+            )
+        }
+        verify {
+            registrationContract.registerAndDepositNft(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray(),
+                ASSET_TYPE.toBigInteger(),
+                VAULT_ID.toBigInteger(),
+                TOKEN_ID.toBigInteger()
+            )
+        }
         verify { signer.signTransaction(any()) }
         verify { web3j.ethSendRawTransaction(any()) }
     }
@@ -451,9 +499,16 @@ class DepositWorkflowTest {
             )
         }
         verify { usersApi.getUsers(ADDRESS) }
-        verify { registrationContract.isRegistered(any()) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
         verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
-        verify { coreContract.depositNft(any(), any(), any(), any()) }
+        verify {
+            coreContract.depositNft(
+                STARK_KEY_BIG_INT,
+                ASSET_TYPE.toBigInteger(),
+                VAULT_ID.toBigInteger(),
+                TOKEN_ID.toBigInteger()
+            )
+        }
         verify { signer.signTransaction(any()) }
         verify { web3j.ethSendRawTransaction(any()) }
     }

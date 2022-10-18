@@ -1,5 +1,6 @@
 package com.immutable.sdk.workflows
 
+import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.ImmutableConfig.getCoreContractAddress
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
@@ -24,7 +25,7 @@ import java.util.concurrent.CompletableFuture
 
 private const val GET_SIGNABLE_DEPOSIT = "Get signable deposit"
 private const val ENCODE_ASSET = "Encode asset"
-private const val ASSET_TYPE = "asset"
+@VisibleForTesting internal const val ENCODE_ASSET_TYPE = "asset"
 
 @Suppress("LongParameterList")
 internal fun deposit(
@@ -127,7 +128,7 @@ private fun encodeAsset(
             data = encodeAssetTokenData
         )
     )
-    api.encodeAsset(ASSET_TYPE, request)
+    api.encodeAsset(ENCODE_ASSET_TYPE, request)
 }
 
 @Suppress("LongParameterList")

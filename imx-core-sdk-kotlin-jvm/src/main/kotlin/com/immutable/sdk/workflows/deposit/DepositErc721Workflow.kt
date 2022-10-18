@@ -14,6 +14,7 @@ import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.hexRemovePrefix
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.workflows.*
 import com.immutable.sdk.workflows.executeDepositToken
 import com.immutable.sdk.workflows.executeRegisterAndDepositToken
 import com.immutable.sdk.workflows.prepareDeposit
@@ -39,8 +40,16 @@ internal fun depositErc721(
 
     val web3j = Web3j.build(HttpService(nodeUrl))
 
-    approveErc721Token(base, token, web3j, signer)
-        .thenCompose { prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi) }
+    prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
+        .thenCompose { params ->
+            approveErc721Token(
+                token,
+                if (params.isRegistered) ImmutableConfig.getCoreContractAddress(base)
+                else ImmutableConfig.getRegistrationContractAddress(base),
+                web3j,
+                signer
+            ).thenApply { params }
+        }
         .thenCompose { params ->
             // Using individual execute functions instead of `executeDeposit` since registration contract
             // is required (instead of core contract) to register and deposit ERC 721 tokens
@@ -62,7 +71,7 @@ internal fun depositErc721(
                         response.operatorSignature.hexToByteArray(),
                         params.assetType,
                         params.vaultId,
-                        params.amount
+                        token.tokenId.toBigInteger()
                     ).encodeFunctionCall()
                 },
                 usersApi = usersApi
@@ -99,9 +108,10 @@ internal fun depositErc721(
 /**
  * Approve whether an amount of token from an account can be spent by a third-party account
  */
+@Suppress("UnusedPrivateMember")
 private fun approveErc721Token(
-    base: ImmutableXBase,
     token: Erc721Asset,
+    approveForContractAddress: String,
     web3j: Web3j,
     signer: Signer
 ): CompletableFuture<EthSendTransaction> = signer.getAddress()
@@ -117,7 +127,7 @@ private fun approveErc721Token(
             contract = contract,
             contractFunction = IERC721_sol_IERC721.FUNC_APPROVE,
             data = contract.approve(
-                ImmutableConfig.getCoreContractAddress(base),
+                approveForContractAddress,
                 token.tokenId.toBigInteger()
             ).encodeFunctionCall(),
             signer = signer,

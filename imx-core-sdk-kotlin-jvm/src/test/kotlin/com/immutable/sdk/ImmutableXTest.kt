@@ -9,6 +9,7 @@ import com.immutable.sdk.workflows.cancelOrder
 import com.immutable.sdk.workflows.registerOffChain
 import com.immutable.sdk.workflows.createOrder
 import com.immutable.sdk.workflows.transfer
+import com.immutable.sdk.workflows.TransferData
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import junit.framework.TestCase.assertEquals
@@ -78,7 +79,16 @@ class ImmutableXTest {
     fun testBuy() {
         val future = CompletableFuture<CreateTradeResponse>()
         mockkStatic(::createTrade)
-        every { createTrade("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner, any(), any()) } returns future
+        every {
+            createTrade(
+                "orderId",
+                listOf(FeeEntry("address", 5.0)),
+                signer,
+                starkSigner,
+                any(),
+                any()
+            )
+        } returns future
         assertEquals(future, sdk.createTrade("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner))
     }
 
@@ -123,10 +133,10 @@ class ImmutableXTest {
         val future = CompletableFuture<CreateTransferResponse>()
         val asset = Erc721Asset("address", "id")
         mockkStatic(::transfer)
-        every { transfer(asset, "recipientAddress", signer, starkSigner, any()) } returns future
+        every { transfer(listOf(TransferData(asset, "recipientAddress")), signer, starkSigner, any()) } returns future
         assertEquals(
             future,
-            sdk.transfer(asset, "recipientAddress", signer, starkSigner)
+            sdk.transfer(TransferData(asset, "recipientAddress"), signer, starkSigner)
         )
     }
 

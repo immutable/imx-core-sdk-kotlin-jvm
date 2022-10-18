@@ -10,11 +10,13 @@ import com.immutable.sdk.api.model.*
 import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.model.*
 import com.immutable.sdk.workflows.deposit.depositErc20
+import com.immutable.sdk.workflows.deposit.depositErc721
 import com.immutable.sdk.workflows.deposit.depositEth
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
+import org.web3j.tx.Contract
 import org.web3j.tx.gas.DefaultGasProvider
 import org.web3j.utils.Convert
 import java.math.BigInteger
@@ -37,7 +39,7 @@ internal fun deposit(
     return when (token) {
         is EthAsset -> depositEth(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
         is Erc20Asset -> depositErc20(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
-        is Erc721Asset -> CompletableFuture.failedFuture(UnsupportedOperationException())
+        is Erc721Asset -> depositErc721(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
     }
 }
 
@@ -147,39 +149,75 @@ internal fun executeDeposit(
         ClientTransactionManager(web3j, params.address),
         DefaultGasProvider()
     )
-    // This is amount is only used for Eth asset
+    return if (!params.isRegistered) // User is not registered, do both registration and deposit
+        executeRegisterAndDepositToken(
+            web3j,
+            signer,
+            params,
+            contract,
+            registerAndDepositFunction,
+            registerAndDepositData,
+            usersApi
+        )
+    else // User is already registered, continue to deposit
+        executeDepositToken(web3j, signer, params, contract, depositFunction, depositData)
+}
+
+@Suppress("LongParameterList")
+internal fun <C : Contract> executeRegisterAndDepositToken(
+    web3j: Web3j,
+    signer: Signer,
+    params: DepositWorkflowParams,
+    contract: C,
+    contractFunction: String,
+    data: (C, GetSignableRegistrationResponse) -> String,
+    usersApi: UsersApi
+): CompletableFuture<EthSendTransaction> {
+    // This amount is only used for Eth asset
     val transactionAmount =
         if (params.tokenType == TokenType.ETH.name) params.amount else BigInteger.ZERO
 
-    return if (!params.isRegistered) { // User is not registered, do both registration and deposit
-        signer.getAddress()
-            .thenCompose { address ->
-                getSignableRegistrationOnChain(
-                    address,
-                    params.starkKey,
-                    usersApi
-                )
-            }
-            .thenCompose { response ->
-                sendTransaction(
-                    contract = contract,
-                    contractFunction = registerAndDepositFunction,
-                    amount = transactionAmount,
-                    data = registerAndDepositData(contract, response),
-                    signer = signer,
-                    web3j = web3j
-                )
-            }
-    } else { // User is already registered, continue to deposit
-        sendTransaction(
-            contract = contract,
-            contractFunction = depositFunction,
-            amount = transactionAmount,
-            data = depositData(contract),
-            signer = signer,
-            web3j = web3j
-        )
-    }
+    return signer.getAddress()
+        .thenCompose { address ->
+            getSignableRegistrationOnChain(
+                address,
+                params.starkKey,
+                usersApi
+            )
+        }
+        .thenCompose { response ->
+            sendTransaction(
+                contract = contract,
+                contractFunction = contractFunction,
+                amount = transactionAmount,
+                data = data(contract, response),
+                signer = signer,
+                web3j = web3j
+            )
+        }
+}
+
+@Suppress("LongParameterList")
+internal fun <C : Contract> executeDepositToken(
+    web3j: Web3j,
+    signer: Signer,
+    params: DepositWorkflowParams,
+    contract: C,
+    contractFunction: String,
+    data: (C) -> String,
+): CompletableFuture<EthSendTransaction> {
+    // This amount is only used for Eth asset
+    val transactionAmount =
+        if (params.tokenType == TokenType.ETH.name) params.amount else BigInteger.ZERO
+
+    return sendTransaction(
+        contract = contract,
+        contractFunction = contractFunction,
+        amount = transactionAmount,
+        data = data(contract),
+        signer = signer,
+        web3j = web3j
+    )
 }
 
 internal data class DepositWorkflowParams(

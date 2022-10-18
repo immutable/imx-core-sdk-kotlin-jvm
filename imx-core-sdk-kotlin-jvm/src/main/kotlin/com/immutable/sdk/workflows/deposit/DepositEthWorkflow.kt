@@ -46,7 +46,7 @@ internal fun depositEth(
                 },
                 depositFunction = Core_sol_Core.FUNC_DEPOSITETH,
                 depositData = { contract: Core_sol_Core ->
-                    contract.deposit(
+                    contract.depositEth(
                         params.starkKey.hexRemovePrefix().toBigInteger(HEX_RADIX),
                         params.assetType,
                         params.vaultId

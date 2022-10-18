@@ -118,8 +118,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc20Asset("address", 18, "10"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc20Asset("address", 18, "10"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
@@ -137,8 +141,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = EthAsset("10"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = EthAsset("10"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
@@ -156,13 +164,249 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc721Asset("address", "id"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
             ),
             expectedResult = transferResponse,
+            expectedError = null
+        )
+    }
+
+    @Suppress("LongMethod")
+    @Test
+    fun testBatchTransferSuccess() {
+        every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
+            senderStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
+            signableMessage = SIGNABLE_MESSAGE,
+            signableResponses = arrayListOf(
+                SignableTransferResponseDetails(
+                    amount = "1",
+                    assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
+                    expirationTimestamp = 1_325_907,
+                    nonce = 596_252_354,
+                    payloadHash = "one",
+                    receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
+                        "e971a23485",
+                    receiverVaultId = 1_502_450_104,
+                    senderVaultId = 1_502_450_105,
+                    token = Erc721Asset("tokenAddress", "tokenId").toSignableToken()
+                ),
+                SignableTransferResponseDetails(
+                    amount = "1",
+                    assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
+                    expirationTimestamp = 1_325_907,
+                    nonce = 596_252_354,
+                    payloadHash = "two",
+                    receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
+                        "e971a23485",
+                    receiverVaultId = 1_502_450_104,
+                    senderVaultId = 1_502_450_105,
+                    token = Erc721Asset("tokenAddress", "tokenId").toSignableToken()
+                )
+            )
+        )
+        every {
+            api.createTransfer(
+                CreateTransferRequest(
+                    senderStarkKey =
+                    "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
+                    requests = arrayListOf(
+                        TransferRequest(
+                            amount = "1",
+                            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552" +
+                                "471a7abfcb02",
+                            expirationTimestamp = 1_325_907,
+                            nonce = 596_252_354,
+                            starkSignature = STARK_SIGNATURE,
+                            receiverStarkKey =
+                            "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                            receiverVaultId = 1_502_450_104,
+                            senderVaultId = 1_502_450_105
+                        ),
+                        TransferRequest(
+                            amount = "1",
+                            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552" +
+                                "471a7abfcb02",
+                            expirationTimestamp = 1_325_907,
+                            nonce = 596_252_354,
+                            starkSignature = STARK_SIGNATURE,
+                            receiverStarkKey =
+                            "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                            receiverVaultId = 1_502_450_104,
+                            senderVaultId = 1_502_450_105
+                        )
+                    )
+                ),
+                xImxEthAddress = ADDRESS,
+                xImxEthSignature = ETH_SIGNATURE
+            )
+        } returns CreateTransferResponse(
+            transferIds = arrayListOf(5, 6, 7)
+        )
+
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
+
+        starkSignatureFuture = CompletableFuture<String>()
+        every { starkSigner.signMessage("one") } returns CompletableFuture.completedFuture(STARK_SIGNATURE)
+        every { starkSigner.signMessage("two") } returns completeExceptionally(TestException())
+
+        testFuture(
+            transfer(
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    ),
+                    TransferData(
+                        token = EthAsset("10"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    ),
+                    TransferData(
+                        token = Erc20Asset("address", 18, "10"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
+                signer = signer,
+                starkSigner = starkSigner,
+                api = api
+            ),
+            expectedResult = null,
+            expectedError = TestException()
+        )
+    }
+
+    @Suppress("LongMethod")
+    @Test
+    fun testBatchTransferOneStarkSignatureFailed() {
+        every { api.getSignableTransfer(any()) } returns GetSignableTransferResponse(
+            senderStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
+            signableMessage = SIGNABLE_MESSAGE,
+            signableResponses = arrayListOf(
+                SignableTransferResponseDetails(
+                    amount = "1",
+                    assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
+                    expirationTimestamp = 1_325_907,
+                    nonce = 596_252_354,
+                    payloadHash = "hash",
+                    receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
+                        "e971a23485",
+                    receiverVaultId = 1_502_450_104,
+                    senderVaultId = 1_502_450_105,
+                    token = Erc721Asset("tokenAddress", "tokenId").toSignableToken()
+                ),
+                SignableTransferResponseDetails(
+                    amount = "1",
+                    assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
+                    expirationTimestamp = 1_325_907,
+                    nonce = 596_252_354,
+                    payloadHash = "hash",
+                    receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
+                        "e971a23485",
+                    receiverVaultId = 1_502_450_104,
+                    senderVaultId = 1_502_450_105,
+                    token = Erc721Asset("tokenAddress", "tokenId").toSignableToken()
+                ),
+                SignableTransferResponseDetails(
+                    amount = "1",
+                    assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
+                    expirationTimestamp = 1_325_907,
+                    nonce = 596_252_354,
+                    payloadHash = "hash",
+                    receiverStarkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91" +
+                        "e971a23485",
+                    receiverVaultId = 1_502_450_104,
+                    senderVaultId = 1_502_450_105,
+                    token = Erc721Asset("tokenAddress", "tokenId").toSignableToken()
+                )
+            )
+        )
+        every {
+            api.createTransfer(
+                CreateTransferRequest(
+                    senderStarkKey =
+                    "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23486",
+                    requests = arrayListOf(
+                        TransferRequest(
+                            amount = "1",
+                            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552" +
+                                "471a7abfcb02",
+                            expirationTimestamp = 1_325_907,
+                            nonce = 596_252_354,
+                            starkSignature = STARK_SIGNATURE,
+                            receiverStarkKey =
+                            "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                            receiverVaultId = 1_502_450_104,
+                            senderVaultId = 1_502_450_105
+                        ),
+                        TransferRequest(
+                            amount = "1",
+                            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552" +
+                                "471a7abfcb02",
+                            expirationTimestamp = 1_325_907,
+                            nonce = 596_252_354,
+                            starkSignature = STARK_SIGNATURE,
+                            receiverStarkKey =
+                            "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                            receiverVaultId = 1_502_450_104,
+                            senderVaultId = 1_502_450_105
+                        ),
+                        TransferRequest(
+                            amount = "1",
+                            assetId = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552" +
+                                "471a7abfcb02",
+                            expirationTimestamp = 1_325_907,
+                            nonce = 596_252_354,
+                            starkSignature = STARK_SIGNATURE,
+                            receiverStarkKey =
+                            "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+                            receiverVaultId = 1_502_450_104,
+                            senderVaultId = 1_502_450_105
+                        )
+                    )
+                ),
+                xImxEthAddress = ADDRESS,
+                xImxEthSignature = ETH_SIGNATURE
+            )
+        } returns CreateTransferResponse(
+            transferIds = arrayListOf(5, 6, 7)
+        )
+
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
+
+        testFuture(
+            transfer(
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    ),
+                    TransferData(
+                        token = EthAsset("10"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    ),
+                    TransferData(
+                        token = Erc20Asset("address", 18, "10"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
+                signer = signer,
+                starkSigner = starkSigner,
+                api = api
+            ),
+            expectedResult = CreateTransferResponse(
+                transferIds = arrayListOf(5, 6, 7)
+            ),
             expectedError = null
         )
     }
@@ -173,8 +417,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc721Asset("address", "id"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
@@ -191,8 +439,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc721Asset("address", "id"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
@@ -209,8 +461,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc721Asset("address", "id"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
@@ -232,8 +488,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc721Asset("address", "id"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api
@@ -252,8 +512,12 @@ class TransferWorkflowTest {
 
         testFuture(
             transfer(
-                token = Erc721Asset("address", "id"),
-                recipientAddress = RECIPIENT_ADDRESS,
+                transfers = listOf(
+                    TransferData(
+                        token = Erc721Asset("address", "id"),
+                        recipientAddress = RECIPIENT_ADDRESS,
+                    )
+                ),
                 signer = signer,
                 starkSigner = starkSigner,
                 api = api

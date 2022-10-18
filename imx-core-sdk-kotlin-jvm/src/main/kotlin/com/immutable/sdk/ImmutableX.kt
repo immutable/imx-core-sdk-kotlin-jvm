@@ -30,6 +30,7 @@ import com.immutable.sdk.api.model.AddMetadataSchemaToCollectionRequest
 import com.immutable.sdk.api.model.MetadataSchemaRequest
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.workflows.TransferData
 import com.immutable.sdk.workflows.call
 import com.immutable.sdk.workflows.imxTimestampRequest
 import com.immutable.sdk.workflows.isRegisteredOnChain
@@ -1010,8 +1011,7 @@ class ImmutableX(
     /**
      * This is a utility function that will chain the necessary calls to transfer a token.
      *
-     * @param token to be transferred (ETH, ERC20, or ERC721)
-     * @param recipientAddress of the wallet that will receive the token
+     * @param data as to what token is to be transferred (ETH, ERC20, or ERC721) and the address of the receiving wallet
      * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      * @param signer represents the users L1 wallet to get the address
      *
@@ -1019,12 +1019,28 @@ class ImmutableX(
      */
     @Suppress("LongParameterList")
     fun transfer(
-        token: AssetModel,
-        recipientAddress: String,
+        data: TransferData,
         signer: Signer,
         starkSigner: StarkSigner,
     ): CompletableFuture<CreateTransferResponse> =
-        com.immutable.sdk.workflows.transfer(token, recipientAddress, signer, starkSigner)
+        com.immutable.sdk.workflows.transfer(listOf(data), signer, starkSigner)
+
+    /**
+     * This is a utility function that will chain the necessary calls to transfer a token.
+     *
+     * @param transfers list of all transfers and their individual tokens and recipients
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
+     * @param signer represents the users L1 wallet to get the address
+     *
+     * @return a [CompletableFuture] that will provide the transfer id if successful.
+     */
+    @Suppress("LongParameterList")
+    fun batchTransfer(
+        transfers: List<TransferData>,
+        signer: Signer,
+        starkSigner: StarkSigner,
+    ): CompletableFuture<CreateTransferResponse> =
+        com.immutable.sdk.workflows.transfer(transfers, signer, starkSigner)
 
     /**
      * Gets a URL to MoonPay that provides a service for buying crypto directly on Immutable in exchange for fiat.

@@ -3,7 +3,6 @@ package com.immutable.sdk.workflows
 import com.immutable.sdk.Signer
 import com.immutable.sdk.crypto.Crypto
 import java.util.concurrent.CompletableFuture
-import kotlin.math.floor
 
 internal data class ImxTimestamp(val timestamp: String, val signature: String)
 
@@ -19,7 +18,7 @@ internal fun <T> imxTimestampRequest(
 ): CompletableFuture<T> {
     val future = CompletableFuture<T>()
     val seconds = System.currentTimeMillis() / 1000L
-    signer.signMessage(floor(seconds.toDouble()).toString())
+    signer.signMessage(seconds.toString())
         .thenCompose { signature ->
             performRequest(ImxTimestamp(seconds.toString(), Crypto.serialiseEthSignature(signature)))
         }

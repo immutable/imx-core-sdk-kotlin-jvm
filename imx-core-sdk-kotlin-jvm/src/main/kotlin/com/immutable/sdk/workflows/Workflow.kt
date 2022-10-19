@@ -23,7 +23,6 @@ internal fun <T> call(callName: String, call: () -> T): CompletableFuture<T> {
         try {
             future.complete(call())
         } catch (e: Exception) {
-            println("catch " + e.message)
             if (e is NullPointerException)
                 future.completeExceptionally(ImmutableException.invalidResponse(callName, e))
             else

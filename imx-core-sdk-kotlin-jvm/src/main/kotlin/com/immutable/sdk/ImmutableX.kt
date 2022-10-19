@@ -720,6 +720,24 @@ class ImmutableX(
     }
 
     /**
+     * Create a Withdrawal
+     * @param signer the L1 signer
+     * @param token the token type amount in its corresponding unit
+     * @returns a [CompletableFuture] that will provide the transaction hash if successful.
+     */
+    fun prepareWithdrawal(
+        token: AssetModel,
+        signer: Signer,
+        starkSigner: StarkSigner
+    ): CompletableFuture<CreateWithdrawalResponse> =
+        com.immutable.sdk.workflows.withdrawal.prepareWithdrawal(
+            token,
+            signer,
+            starkSigner,
+            withdrawalsApi
+        )
+
+    /**
      * Get details of an order with the given ID
      *
      * @param id Order ID

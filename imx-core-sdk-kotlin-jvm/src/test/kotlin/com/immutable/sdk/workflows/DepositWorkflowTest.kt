@@ -292,6 +292,17 @@ class DepositWorkflowTest {
     }
 
     @Test
+    fun testDeposit_getAddressError() {
+        addressFuture.completeExceptionally(TestException())
+
+        testFuture(
+            future = createDepositFuture(EthAsset(AMOUNT)),
+            expectedResult = null,
+            expectedError = TestException()
+        )
+    }
+
+    @Test
     fun testDeposit_getSignableDepositError() {
         every { depositsApi.getSignableDeposit(any()) } throws ClientException()
 

@@ -7,7 +7,7 @@ import java.math.BigInteger
 /**
  * @return nonce for the given [address]
  */
-fun Web3j.getNonce(address: String): BigInteger {
+internal fun Web3j.getNonce(address: String): BigInteger {
     val ethGetTransactionCount = ethGetTransactionCount(
         address, DefaultBlockParameterName.PENDING
     ).sendAsync().get()

@@ -16,18 +16,8 @@ import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.TradesApi
 import com.immutable.sdk.api.TokensApi
 import com.immutable.sdk.api.TransfersApi
+import com.immutable.sdk.api.model.*
 import com.immutable.sdk.api.model.Collection
-import com.immutable.sdk.api.model.CreateCollectionRequest
-import com.immutable.sdk.api.model.CreateTransferResponse
-import com.immutable.sdk.api.model.CreateOrderResponse
-import com.immutable.sdk.api.model.CreateTradeResponse
-import com.immutable.sdk.api.model.FeeEntry
-import com.immutable.sdk.api.model.CancelOrderResponse
-import com.immutable.sdk.api.model.CreateProjectRequest
-import com.immutable.sdk.api.model.Deposit
-import com.immutable.sdk.api.model.UpdateCollectionRequest
-import com.immutable.sdk.api.model.AddMetadataSchemaToCollectionRequest
-import com.immutable.sdk.api.model.MetadataSchemaRequest
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.workflows.TransferData
@@ -155,6 +145,66 @@ class ImmutableX(
      */
     fun getDeposit(id: String): Deposit = apiCall("getDeposit") {
         depositsApi.getDeposit(id)
+    }
+
+    /**
+     * Get a list of deposits
+     * @param pageSize Page size of the result (optional)
+     * @param cursor Cursor (optional)
+     * @param orderBy Property to sort by (optional)
+     * @param direction Direction to sort (asc/desc) (optional)
+     * @param user Ethereum address of the user who submitted this deposit (optional)
+     * @param status Status of this deposit (optional)
+     * @param updatedMinTimestamp Minimum timestamp for this deposit, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param updatedMaxTimestamp Maximum timestamp for this deposit, in ISO 8601 UTC format. Example: &#39;2022-05-27T00:10:22Z&#39; (optional)
+     * @param tokenType Token type of the deposited asset (optional)
+     * @param tokenId ERC721 Token ID of the minted asset (optional)
+     * @param assetId Internal IMX ID of the minted asset (optional)
+     * @param tokenAddress Token address of the deposited asset (optional)
+     * @param tokenName Token name of the deposited asset (optional)
+     * @param minQuantity Min quantity for the deposited asset (optional)
+     * @param maxQuantity Max quantity for the deposited asset (optional)
+     * @param metadata JSON-encoded metadata filters for the deposited asset (optional)
+     * @return ListDepositsResponse
+     * @throws [ImmutableException.apiError]
+     */
+    @Suppress("LongParameterList")
+    fun listDeposits(
+        pageSize: Int? = null,
+        cursor: String? = null,
+        orderBy: String? = null,
+        direction: String? = null,
+        user: String? = null,
+        status: String? = null,
+        updatedMinTimestamp: String? = null,
+        updatedMaxTimestamp: String? = null,
+        tokenType: String? = null,
+        tokenId: String? = null,
+        assetId: String? = null,
+        tokenAddress: String? = null,
+        tokenName: String? = null,
+        minQuantity: String? = null,
+        maxQuantity: String? = null,
+        metadata: String? = null
+    ): ListDepositsResponse = apiCall("listDeposits") {
+        depositsApi.listDeposits(
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            user,
+            status,
+            updatedMinTimestamp,
+            updatedMaxTimestamp,
+            tokenType,
+            tokenId,
+            assetId,
+            tokenAddress,
+            tokenName,
+            minQuantity,
+            maxQuantity,
+            metadata
+        )
     }
 
     /**

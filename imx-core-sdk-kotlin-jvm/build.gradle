@@ -259,6 +259,7 @@ tasks.create(name: "testCoverage", type: JacocoReport, dependsOn: ["test"]) {
             '**/*$Result$*.*',
             // Auto-generated code
             '**/com/immutable/sdk/api/**',
+            '**/com/immutable/sdk/contracts/**',
             '**/org/openapitools/**',
             'test/**'
     ]

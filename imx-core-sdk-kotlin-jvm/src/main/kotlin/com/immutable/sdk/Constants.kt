@@ -1,8 +1,6 @@
 package com.immutable.sdk
 
 internal object Constants {
-    const val STARK_MESSAGE =
-        "Only sign this request if you’ve initiated an action with Immutable X."
     const val STARK_KEY_PUBLIC_BYTE_LENGTH = 32
 
     const val HEX_PREFIX = "0x"
@@ -13,6 +11,5 @@ internal object Constants {
 
     const val ERC721_AMOUNT = "1"
 
-    const val DEFAULT_CHROME_CUSTOM_TAB_ADDRESS_BAR_COLOUR = "#191E2B"
     const val DEFAULT_MOONPAY_COLOUR_CODE = "#00818e"
 }

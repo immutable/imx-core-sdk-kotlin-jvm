@@ -1,12 +1,16 @@
 package com.immutable.sdk.crypto
 
 import com.immutable.sdk.Constants
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair
+import org.bouncycastle.crypto.generators.ECKeyPairGenerator
 import org.bouncycastle.crypto.params.ECDomainParameters
+import org.bouncycastle.crypto.params.ECKeyGenerationParameters
 import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.bouncycastle.math.ec.ECCurve
 import org.bouncycastle.math.ec.ECPoint
 import org.web3j.crypto.ECKeyPair
 import java.math.BigInteger
+import java.security.SecureRandom
 
 // Curve parameters
 private val p = BigInteger(
@@ -73,5 +77,28 @@ internal object StarkCurve {
             BigInteger(privateKey, Constants.HEX_RADIX),
             pubKey
         )
+    }
+
+    @Suppress("MagicNumber")
+    fun generatePrivateKey(): ByteArray {
+        var length: Int
+        var privateKeyBytes: ByteArray
+        do {
+            val gen = ECKeyPairGenerator()
+            val ecParams = ECDomainParameters(
+                curve,
+                curve.createPoint(pointG.xCoord.toBigInteger(), pointG.yCoord.toBigInteger()),
+                N
+            )
+
+            val secureRandom = SecureRandom()
+            val keyGenParam = ECKeyGenerationParameters(ecParams, secureRandom)
+            gen.init(keyGenParam)
+            val kp: AsymmetricCipherKeyPair = gen.generateKeyPair()
+            val privateKey = kp.private as ECPrivateKeyParameters
+            privateKeyBytes = privateKey.d.toByteArray()
+            length = privateKey.d.toByteArray().size
+        } while (length != 32)
+        return privateKeyBytes
     }
 }

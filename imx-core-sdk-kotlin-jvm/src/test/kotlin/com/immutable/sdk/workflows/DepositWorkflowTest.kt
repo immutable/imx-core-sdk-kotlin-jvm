@@ -47,11 +47,11 @@ private const val OPERATOR_SIGNATURE =
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf11"
 private const val PAYLOAD_HASH = "registerPayloadHash"
 private const val NODE_URL = "https://eth-goerli.g.alchemy.com/v2/apiKey"
-const val CORE_CONTRACT_ADDRESS = "0x4527BE8f31E2ebFbEF4fCADDb5a17447B27d2123"
-const val REGISTRATION_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9f1aBb6207Dabc"
-const val ERC20_CONTRACT_ADDRESS = "0x4527BE8f31E2ebFbEF4fCADDb5a17447B27d2000"
-const val ERC721_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9f1aBb6207D111"
-const val ENCODED_FUNCTION_CALL = "000111000554abc00000000a123def000000"
+private const val CORE_CONTRACT_ADDRESS = "0x4527BE8f31E2ebFbEF4fCADDb5a17447B27d2123"
+private const val REGISTRATION_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9f1aBb6207Dabc"
+private const val ERC20_CONTRACT_ADDRESS = "0x4527BE8f31E2ebFbEF4fCADDb5a17447B27d2000"
+private const val ERC721_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9f1aBb6207D111"
+private const val ENCODED_FUNCTION_CALL = "000111000554abc00000000a123def000000"
 private const val SIGNED_TRANSACTION = "0xSignedTransaction"
 private const val TRANSACTION_HASH = "0xTransactionHash"
 private val NONCE = BigInteger.ONE
@@ -131,6 +131,7 @@ class DepositWorkflowTest {
         every { web3j.ethSendRawTransaction(any()) } returns ethSendRequest
         every { ethSendRequest.send() } returns ethSendTransaction
         every { ethSendTransaction.transactionHash } returns TRANSACTION_HASH
+        every { ethSendTransaction.error } returns null
         val transactionCountRequest = mockk<Request<Any, EthGetTransactionCount>>()
         every { web3j.ethGetTransactionCount(any(), any()) } returns transactionCountRequest
         val count = mockk<EthGetTransactionCount>()
@@ -195,7 +196,7 @@ class DepositWorkflowTest {
 
     @Test
     fun testDepositEthSuccess_registerAndDeposit_registeredOffChainUser() {
-        every { registrationContract.isRegistered(any()) } throws Throwable("USER_UNREGISTERED")
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
         signedTransactionFuture.complete(SIGNED_TRANSACTION)
@@ -332,7 +333,7 @@ class DepositWorkflowTest {
 
     @Test
     fun testDepositErc20Success_registerAndDeposit() {
-        every { registrationContract.isRegistered(any()) } throws Throwable("USER_UNREGISTERED")
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
         signedTransactionFuture.complete(SIGNED_TRANSACTION)
@@ -428,7 +429,7 @@ class DepositWorkflowTest {
 
     @Test
     fun testDepositErc721Success_registerAndDeposit() {
-        every { registrationContract.isRegistered(any()) } throws Throwable("USER_UNREGISTERED")
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
         signedTransactionFuture.complete(SIGNED_TRANSACTION)

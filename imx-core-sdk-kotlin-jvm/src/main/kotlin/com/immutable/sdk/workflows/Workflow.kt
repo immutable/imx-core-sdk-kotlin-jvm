@@ -65,7 +65,11 @@ internal fun sendTransaction(
             )
 
             val signedTransaction = signer.signTransaction(rawTransaction).get()
-            future.complete(web3j.ethSendRawTransaction(signedTransaction).send())
+            val response = web3j.ethSendRawTransaction(signedTransaction).send()
+            if (response.error != null) future.completeExceptionally(
+                ImmutableException.contractError("$contractFunction: ${response.error.message}")
+            )
+            else future.complete(response)
         } catch (e: Exception) {
             future.completeExceptionally(ImmutableException.contractError(contractFunction, e))
         }

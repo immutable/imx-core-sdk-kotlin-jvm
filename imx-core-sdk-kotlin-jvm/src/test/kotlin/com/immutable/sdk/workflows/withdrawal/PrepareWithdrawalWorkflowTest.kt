@@ -1,10 +1,17 @@
 package com.immutable.sdk.workflows.withdrawal
 
 import com.immutable.sdk.*
+import com.immutable.sdk.Constants.ERC721_AMOUNT
 import com.immutable.sdk.api.WithdrawalsApi
-import com.immutable.sdk.api.model.*
+import com.immutable.sdk.api.model.CreateWithdrawalRequest
+import com.immutable.sdk.api.model.CreateWithdrawalResponse
+import com.immutable.sdk.api.model.GetSignableWithdrawalRequest
+import com.immutable.sdk.api.model.GetSignableWithdrawalResponse
 import com.immutable.sdk.crypto.StarkKey
-import com.immutable.sdk.model.*
+import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.model.Erc20Asset
+import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.EthAsset
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
 import org.junit.After
@@ -90,7 +97,7 @@ class PrepareWithdrawalWorkflowTest {
     )
 
     @Test
-    fun testPrepareWithdrawalSuccess() {
+    fun testPrepareWithdrawalSuccess_erc721() {
         addressFuture.complete(ADDRESS)
         starkSignatureFuture.complete(STARK_SIGNATURE)
         ethSignatureFuture.complete(ETH_SIGNATURE)
@@ -112,7 +119,82 @@ class PrepareWithdrawalWorkflowTest {
         verify {
             withdrawalsApi.createWithdrawal(
                 CreateWithdrawalRequest(
-                    amount = AMOUNT,
+                    amount = ERC721_AMOUNT,
+                    assetId = ASSET_ID,
+                    nonce = NONCE,
+                    starkKey = STARK_KEY,
+                    starkSignature = STARK_SIGNATURE,
+                    vaultId = VAULT_ID
+                ),
+                xImxEthAddress = ADDRESS,
+                xImxEthSignature = ETH_SIGNATURE
+            )
+        }
+    }
+
+    @Test
+    fun testPrepareWithdrawalSuccess_erc20() {
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
+
+        val token =
+            Erc20Asset(tokenAddress = TOKEN_ADDRESS, decimals = TOKEN_DECIMALS, quantity = AMOUNT)
+        testFuture(
+            future = prepareWithdrawalFuture(token),
+            expectedResult = response,
+            expectedError = null
+        )
+
+        val amount = "1000000"
+        verify {
+            withdrawalsApi.getSignableWithdrawal(
+                GetSignableWithdrawalRequest(amount, token.toSignableToken(), ADDRESS)
+            )
+        }
+        verify { starkSigner.signMessage(PAYLOAD_HASH) }
+        verify { signer.signMessage(SIGNABLE_MESSAGE) }
+        verify {
+            withdrawalsApi.createWithdrawal(
+                CreateWithdrawalRequest(
+                    amount = "1000000",
+                    assetId = ASSET_ID,
+                    nonce = NONCE,
+                    starkKey = STARK_KEY,
+                    starkSignature = STARK_SIGNATURE,
+                    vaultId = VAULT_ID
+                ),
+                xImxEthAddress = ADDRESS,
+                xImxEthSignature = ETH_SIGNATURE
+            )
+        }
+    }
+
+    @Test
+    fun testPrepareWithdrawalSuccess_eth() {
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
+
+        val token = EthAsset(quantity = AMOUNT)
+        testFuture(
+            future = prepareWithdrawalFuture(token),
+            expectedResult = response,
+            expectedError = null
+        )
+
+        val amount = "1000000000000000000"
+        verify {
+            withdrawalsApi.getSignableWithdrawal(
+                GetSignableWithdrawalRequest(amount, token.toSignableToken(), ADDRESS)
+            )
+        }
+        verify { starkSigner.signMessage(PAYLOAD_HASH) }
+        verify { signer.signMessage(SIGNABLE_MESSAGE) }
+        verify {
+            withdrawalsApi.createWithdrawal(
+                CreateWithdrawalRequest(
+                    amount = amount,
                     assetId = ASSET_ID,
                     nonce = NONCE,
                     starkKey = STARK_KEY,

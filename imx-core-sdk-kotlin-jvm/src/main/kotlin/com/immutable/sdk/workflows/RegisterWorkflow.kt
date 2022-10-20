@@ -22,6 +22,7 @@ private const val REGISTER_USER = "Register user"
 private const val SIGNABLE_REGISTRATION = "Signable registration"
 private const val SIGNABLE_REGISTRATION_ON_CHAIN = "Get signable registration on-chain"
 private const val GET_STARK_KEY = "Get stark key"
+internal const val USER_UNREGISTERED = "USER_UNREGISTERED"
 
 private data class RegisterData(
     val address: String = "",
@@ -157,7 +158,7 @@ internal fun isRegisteredOnChain(
                 .sendAsync()
         }
         .whenComplete { response, error ->
-            if (error?.message?.contains("USER_UNREGISTERED") == true)
+            if (error?.message?.contains(USER_UNREGISTERED) == true)
                 future.complete(false)
             else if (error != null) // Forward exceptions
                 future.completeExceptionally(error)

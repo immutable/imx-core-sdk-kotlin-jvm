@@ -1,6 +1,5 @@
 package com.immutable.sdk.workflows
 
-import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.ImmutableConfig.getCoreContractAddress
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
@@ -24,8 +23,6 @@ import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
 
 private const val GET_SIGNABLE_DEPOSIT = "Get signable deposit"
-private const val ENCODE_ASSET = "Encode asset"
-@VisibleForTesting internal const val ENCODE_ASSET_TYPE = "asset"
 
 @Suppress("LongParameterList")
 internal fun deposit(
@@ -103,32 +100,6 @@ private fun getSignableDeposit(
             user = address
         )
     )
-}
-
-private fun encodeAsset(
-    asset: AssetModel,
-    api: EncodingApi,
-) = call(ENCODE_ASSET) {
-    val tokenType = when (asset) {
-        is EthAsset -> EncodeAssetRequestToken.Type.eTH
-        is Erc20Asset -> EncodeAssetRequestToken.Type.eRC20
-        is Erc721Asset -> EncodeAssetRequestToken.Type.eRC721
-    }
-    val encodeAssetTokenData = when (asset) {
-        is EthAsset -> null
-        is Erc20Asset -> EncodeAssetTokenData(tokenAddress = asset.tokenAddress)
-        is Erc721Asset -> EncodeAssetTokenData(
-            tokenAddress = asset.tokenAddress,
-            tokenId = asset.tokenId
-        )
-    }
-    val request = EncodeAssetRequest(
-        token = EncodeAssetRequestToken(
-            type = tokenType,
-            data = encodeAssetTokenData
-        )
-    )
-    api.encodeAsset(ENCODE_ASSET_TYPE, request)
 }
 
 @Suppress("LongParameterList")

@@ -1,17 +1,15 @@
 package com.immutable.sdk.workflows
 
 import com.immutable.sdk.*
+import com.immutable.sdk.Constants.ERC721_AMOUNT
 import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.crypto.StarkKey
 import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.mockkObject
-import io.mockk.unmockkAll
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -259,19 +257,22 @@ class TransferWorkflowTest {
         every { starkSigner.signMessage("one") } returns CompletableFuture.completedFuture(STARK_SIGNATURE)
         every { starkSigner.signMessage("two") } returns completeExceptionally(TestException())
 
+        val token1 = Erc721Asset("address", "id")
+        val token2 = EthAsset("10")
+        val token3 = Erc20Asset("address", 18, "10")
         testFuture(
             transfer(
                 transfers = listOf(
                     TransferData(
-                        token = Erc721Asset("address", "id"),
+                        token = token1,
                         recipientAddress = RECIPIENT_ADDRESS,
                     ),
                     TransferData(
-                        token = EthAsset("10"),
+                        token = token2,
                         recipientAddress = RECIPIENT_ADDRESS,
                     ),
                     TransferData(
-                        token = Erc20Asset("address", 18, "10"),
+                        token = token3,
                         recipientAddress = RECIPIENT_ADDRESS,
                     )
                 ),
@@ -282,6 +283,31 @@ class TransferWorkflowTest {
             expectedResult = null,
             expectedError = TestException()
         )
+
+        verify {
+            api.getSignableTransfer(
+                GetSignableTransferRequest(
+                    senderEtherKey = ADDRESS,
+                    signableRequests = listOf(
+                        SignableTransferDetails(
+                            amount = ERC721_AMOUNT,
+                            receiver = RECIPIENT_ADDRESS,
+                            token = token1.toSignableToken()
+                        ),
+                        SignableTransferDetails(
+                            amount = "10000000000000000000",
+                            receiver = RECIPIENT_ADDRESS,
+                            token = token2.toSignableToken()
+                        ),
+                        SignableTransferDetails(
+                            amount = "10000000000000000000",
+                            receiver = RECIPIENT_ADDRESS,
+                            token = token3.toSignableToken()
+                        )
+                    )
+                )
+            )
+        }
     }
 
     @Suppress("LongMethod")

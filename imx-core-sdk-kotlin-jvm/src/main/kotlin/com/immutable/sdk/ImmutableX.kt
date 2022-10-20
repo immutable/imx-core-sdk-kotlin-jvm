@@ -121,11 +121,11 @@ class ImmutableX(
      * Deposit based on a token type.
      * For unregistered users, the deposit will be combined with a registration in order to
      * register the user first.
-     * @param signer the L1 signer
      * @param token the token type amount in its corresponding unit
+     * @param signer the L1 signer
      * @returns a [CompletableFuture] that will provide the transaction hash if successful.
      */
-    fun deposit(signer: Signer, token: AssetModel): CompletableFuture<String> {
+    fun deposit(token: AssetModel, signer: Signer): CompletableFuture<String> {
         checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
         return com.immutable.sdk.workflows.deposit(
             base,
@@ -721,8 +721,9 @@ class ImmutableX(
 
     /**
      * Create a Withdrawal
-     * @param signer the L1 signer
      * @param token the token type amount in its corresponding unit
+     * @param signer the L1 signer
+     * @param starkSigner represents the users L2 wallet used to sign and verify the L2 transaction
      * @returns a [CompletableFuture] that will provide the transaction hash if successful.
      */
     fun prepareWithdrawal(
@@ -736,6 +737,26 @@ class ImmutableX(
             starkSigner,
             withdrawalsApi
         )
+
+    /**
+     * Completes a Withdrawal
+     * @param token the token
+     * @param signer the L1 signer
+     * @param starkPublicKey the L2 stark public key
+     * @returns a [CompletableFuture] that will provide the transaction hash if successful.
+     */
+    fun completeWithdrawal(token: AssetModel, signer: Signer, starkPublicKey: String): CompletableFuture<String> {
+        checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
+        return com.immutable.sdk.workflows.completeWithdrawal(
+            base,
+            nodeUrl,
+            token,
+            signer,
+            starkPublicKey,
+            usersApi,
+            encodingApi
+        )
+    }
 
     /**
      * Get details of an order with the given ID

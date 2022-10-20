@@ -6,6 +6,7 @@ import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.crypto.Crypto
 import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.model.formatQuantity
 import java.util.concurrent.CompletableFuture
 
 private const val GET_SIGNABLE_TRANSFER = "Get signable transfer"
@@ -66,7 +67,7 @@ private fun getSignableTransfer(
         senderEtherKey = address,
         signableRequests = transfers.map { data ->
             SignableTransferDetails(
-                amount = data.token.quantity,
+                amount = data.token.formatQuantity(),
                 receiver = data.recipientAddress,
                 token = data.token.toSignableToken()
             )

@@ -10,6 +10,7 @@ import com.immutable.sdk.api.model.GetSignableWithdrawalRequest
 import com.immutable.sdk.api.model.GetSignableWithdrawalResponse
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.model.formatQuantity
 import com.immutable.sdk.workflows.WorkflowSignatures
 import com.immutable.sdk.workflows.call
 import java.util.concurrent.CompletableFuture
@@ -23,7 +24,7 @@ internal fun prepareWithdrawal(
     starkSigner: StarkSigner,
     withdrawalsApi: WithdrawalsApi
 ): CompletableFuture<CreateWithdrawalResponse> {
-    val amount = if (token is Erc721Asset) ERC721_AMOUNT else token.quantity
+    val amount = if (token is Erc721Asset) ERC721_AMOUNT else token.formatQuantity()
 
     return signer.getAddress()
         .thenApply { address -> WorkflowSignatures(address) }

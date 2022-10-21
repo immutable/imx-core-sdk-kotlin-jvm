@@ -16,9 +16,7 @@ internal fun cancelOrder(
     signer: Signer,
     starkSigner: StarkSigner,
     ordersApi: OrdersApi = OrdersApi()
-): CompletableFuture<CancelOrderResponse> {
-    val future = CompletableFuture<CancelOrderResponse>()
-
+): CompletableFuture<CancelOrderResponse> =
     signer.getAddress().thenApply { address -> WorkflowSignatures(address) }
         .thenCompose { signatures ->
             getSignableCancelOrder(orderId, ordersApi).thenApply { response -> signatures to response }
@@ -32,16 +30,6 @@ internal fun cancelOrder(
                 .thenApply { signature -> signatures.apply { ethSignature = signature } }
         }
         .thenCompose { signatures -> cancelOrder(orderId, signatures, ordersApi) }
-        .whenComplete { response, error ->
-            // Forward any exceptions from the compose chain
-            if (error != null)
-                future.completeExceptionally(error)
-            else
-                future.complete(response)
-        }
-
-    return future
-}
 
 private fun getSignableCancelOrder(orderId: String, api: OrdersApi) = call(SIGNABLE_CANCEL_ORDER) {
     api.getSignableCancelOrder(GetSignableCancelOrderRequest(orderId = orderId.toInt()))

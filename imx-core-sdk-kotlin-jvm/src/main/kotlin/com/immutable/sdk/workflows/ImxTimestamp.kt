@@ -19,17 +19,9 @@ internal fun <T> imxTimestampRequest(
     clock: Clock = Clock.systemUTC(),
     performRequest: (ImxTimestamp) -> CompletableFuture<T>
 ): CompletableFuture<T> {
-    val future = CompletableFuture<T>()
     val seconds = Instant.now(clock).epochSecond
-    signer.signMessage(seconds.toString())
+    return signer.signMessage(seconds.toString())
         .thenCompose { signature ->
             performRequest(ImxTimestamp(seconds.toString(), Crypto.serialiseEthSignature(signature)))
         }
-        .whenComplete { collection, throwable ->
-            if (throwable != null)
-                future.completeExceptionally(throwable)
-            else
-                future.complete(collection)
-        }
-    return future
 }

@@ -166,6 +166,5 @@ internal data class CompleteWithdrawalWorkflowParams(
     val address: String,
     val starkKey: String,
     val assetType: BigInteger,
-//    val amount: BigInteger,
     val isRegistered: Boolean = false,
 )

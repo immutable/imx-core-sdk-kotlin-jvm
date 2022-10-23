@@ -8,6 +8,7 @@ import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.model.Erc20Asset
 import com.immutable.sdk.model.EthAsset
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -31,6 +32,8 @@ import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6faaaa"
 private const val AMOUNT = "0.0001"
+private const val TOKEN_ADDRESS = "0xb3dfd3dfb829b394f2467f4396f39ece7818d876"
+private const val TOKEN_DECIMAL = 6
 private const val ASSET_ID = "5461"
 private const val ASSET_TYPE = "712"
 private const val STARK_KEY = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485"
@@ -292,5 +295,98 @@ class WithdrawalWorkflowTest {
             expectedResult = null,
             expectedError = ImmutableException.contractError("")
         )
+    }
+
+    @Test
+    fun testWithdrawErc20Success_registerAndWithdraw_registeredOffChainUser() {
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        val token = Erc20Asset(TOKEN_ADDRESS, TOKEN_DECIMAL, AMOUNT)
+        testFuture(
+            future = createCompleteWithdrawalFuture(token),
+            expectedResult = TRANSACTION_HASH,
+            expectedError = null
+        )
+
+        verify { signer.getAddress() }
+        verify {
+            encodingApi.encodeAsset(
+                ENCODE_ASSET_TYPE,
+                EncodeAssetRequest(
+                    EncodeAssetRequestToken(
+                        type = EncodeAssetRequestToken.Type.eRC20,
+                        data = EncodeAssetTokenData(tokenAddress = TOKEN_ADDRESS)
+                    )
+                )
+            )
+        }
+        verify { usersApi.getUsers(ADDRESS) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify { usersApi.getSignableRegistration(GetSignableRegistrationRequest(ADDRESS, STARK_KEY)) }
+        verify {
+            registrationContract.registerAndWithdraw(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray(),
+                ASSET_TYPE.toBigInteger()
+            )
+        }
+        verify { signer.signTransaction(any()) }
+        verify { web3j.ethSendRawTransaction(any()) }
+    }
+
+    @Test
+    fun testWithdrawErc20Success_registerAndWithdraw_NotRegisteredOffChain() {
+        every { usersApi.getUsers(any()) } throws ClientException()
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc20Asset(TOKEN_ADDRESS, TOKEN_DECIMAL, AMOUNT)),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
+    }
+
+    @Test
+    fun testWithdrawErc20Success_withdraw() {
+        every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        val token = Erc20Asset(TOKEN_ADDRESS, TOKEN_DECIMAL, AMOUNT)
+        testFuture(
+            future = createCompleteWithdrawalFuture(token),
+            expectedResult = TRANSACTION_HASH,
+            expectedError = null
+        )
+
+        verify {
+            encodingApi.encodeAsset(
+                ENCODE_ASSET_TYPE,
+                EncodeAssetRequest(
+                    EncodeAssetRequestToken(
+                        type = EncodeAssetRequestToken.Type.eRC20,
+                        data = EncodeAssetTokenData(tokenAddress = TOKEN_ADDRESS)
+                    )
+                )
+            )
+        }
+        verify { usersApi.getUsers(ADDRESS) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
+        verify {
+            coreContract.withdraw(
+                STARK_KEY_BIG_INT,
+                ASSET_TYPE.toBigInteger()
+            )
+        }
+        verify { signer.signTransaction(any()) }
+        verify { web3j.ethSendRawTransaction(any()) }
     }
 }

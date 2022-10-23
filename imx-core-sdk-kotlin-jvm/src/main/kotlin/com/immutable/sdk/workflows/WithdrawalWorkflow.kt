@@ -9,13 +9,12 @@ import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.model.*
-import com.immutable.sdk.workflows.withdrawal.completeEthWithdrawal
+import com.immutable.sdk.workflows.withdrawal.completeFungibleTokenWithdrawal
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
 import org.web3j.tx.gas.DefaultGasProvider
-import org.web3j.utils.Convert
 import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
 
@@ -29,10 +28,8 @@ internal fun completeWithdrawal(
     usersApi: UsersApi,
     encodingApi: EncodingApi,
 ): CompletableFuture<String> = when (token) {
-    is EthAsset ->
-        completeEthWithdrawal(base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi)
-    is Erc20Asset -> CompletableFuture.failedFuture(UnsupportedOperationException())
     is Erc721Asset -> CompletableFuture.failedFuture(UnsupportedOperationException())
+    else -> completeFungibleTokenWithdrawal(base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi)
 }
 
 /**
@@ -51,12 +48,6 @@ internal fun prepareCompleteWithdrawal(
     usersApi: UsersApi,
     encodingApi: EncodingApi
 ): CompletableFuture<CompleteWithdrawalWorkflowParams> {
-    val amount = when (token) {
-        is EthAsset -> Convert.toWei(token.quantity, Convert.Unit.ETHER).toBigInteger()
-        is Erc20Asset -> token.formatQuantity().toBigInteger()
-        is Erc721Asset -> BigInteger.ONE
-    }
-
     return signer.getAddress()
         .thenCompose { address ->
             encodeAsset(token, encodingApi).thenApply { encodeAssetResponse ->
@@ -65,7 +56,6 @@ internal fun prepareCompleteWithdrawal(
                     address = address,
                     starkKey = starkPublicKey,
                     assetType = encodeAssetResponse.assetType.toBigInteger(),
-                    amount = amount
                 )
             }
         }
@@ -176,6 +166,5 @@ internal data class CompleteWithdrawalWorkflowParams(
     val address: String,
     val starkKey: String,
     val assetType: BigInteger,
-    val amount: BigInteger,
     val isRegistered: Boolean = false,
 )

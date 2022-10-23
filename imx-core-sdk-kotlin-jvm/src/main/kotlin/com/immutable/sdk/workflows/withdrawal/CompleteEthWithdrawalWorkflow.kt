@@ -10,16 +10,16 @@ import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.hexRemovePrefix
 import com.immutable.sdk.extensions.hexToByteArray
-import com.immutable.sdk.model.EthAsset
+import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.workflows.executeCompleteWithdrawal
 import com.immutable.sdk.workflows.prepareCompleteWithdrawal
 import java.util.concurrent.CompletableFuture
 
 @Suppress("LongParameterList", "LongMethod")
-internal fun completeEthWithdrawal(
+internal fun completeFungibleTokenWithdrawal(
     base: ImmutableXBase,
     nodeUrl: String,
-    token: EthAsset,
+    token: AssetModel,
     signer: Signer,
     starkPublicKey: String,
     usersApi: UsersApi,

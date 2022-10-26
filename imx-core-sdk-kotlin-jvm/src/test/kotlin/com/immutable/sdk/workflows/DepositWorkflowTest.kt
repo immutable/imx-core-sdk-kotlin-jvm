@@ -215,7 +215,7 @@ class DepositWorkflowTest {
         }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(type = EncodeAssetRequestToken.Type.eTH, data = null)
                 )
@@ -272,7 +272,7 @@ class DepositWorkflowTest {
         }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(type = EncodeAssetRequestToken.Type.eTH, data = null)
                 )
@@ -353,7 +353,7 @@ class DepositWorkflowTest {
         }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(
                         type = EncodeAssetRequestToken.Type.eRC20,
@@ -403,7 +403,7 @@ class DepositWorkflowTest {
         }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(
                         type = EncodeAssetRequestToken.Type.eRC20,
@@ -449,7 +449,7 @@ class DepositWorkflowTest {
         }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(
                         type = EncodeAssetRequestToken.Type.eRC721,
@@ -501,7 +501,7 @@ class DepositWorkflowTest {
         }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(
                         type = EncodeAssetRequestToken.Type.eRC721,

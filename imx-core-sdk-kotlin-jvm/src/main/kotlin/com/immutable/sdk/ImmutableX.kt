@@ -754,7 +754,8 @@ class ImmutableX(
             signer,
             starkPublicKey,
             usersApi,
-            encodingApi
+            encodingApi,
+            mintsApi
         )
     }
 

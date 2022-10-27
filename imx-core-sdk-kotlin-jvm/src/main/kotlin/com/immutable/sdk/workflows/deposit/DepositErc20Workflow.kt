@@ -34,12 +34,8 @@ internal fun depositErc20(
     usersApi: UsersApi,
     encodingApi: EncodingApi,
     gasProvider: StaticGasProvider,
-): CompletableFuture<String> {
-    val future = CompletableFuture<String>()
-
-    val web3j = Web3j.build(HttpService(nodeUrl))
-
-    approveErc20Token(base, token, web3j, signer, gasProvider)
+): CompletableFuture<String> =
+    approveErc20Token(base, token, Web3j.build(HttpService(nodeUrl)), signer, gasProvider)
         .thenCompose {
             prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
         }
@@ -73,13 +69,7 @@ internal fun depositErc20(
                 gasProvider
             )
         }
-        .whenComplete { response, throwable ->
-            if (throwable != null) future.completeExceptionally(throwable)
-            else future.complete(response.transactionHash)
-        }
-
-    return future
-}
+        .thenApply { it.transactionHash }
 
 /**
  * Approve whether an amount of token from an account can be spent by a third-party account

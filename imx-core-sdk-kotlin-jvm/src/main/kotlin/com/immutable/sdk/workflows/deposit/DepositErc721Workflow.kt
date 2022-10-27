@@ -36,11 +36,9 @@ internal fun depositErc721(
     encodingApi: EncodingApi,
     gasProvider: StaticGasProvider,
 ): CompletableFuture<String> {
-    val future = CompletableFuture<String>()
-
     val web3j = Web3j.build(HttpService(nodeUrl))
 
-    prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
+    return prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
         .thenCompose { params ->
             approveErc721Token(
                 token,
@@ -100,12 +98,7 @@ internal fun depositErc721(
                 gasProvider = gasProvider
             )
         }
-        .whenComplete { response, throwable ->
-            if (throwable != null) future.completeExceptionally(throwable)
-            else future.complete(response.transactionHash)
-        }
-
-    return future
+        .thenApply { it.transactionHash }
 }
 
 /**

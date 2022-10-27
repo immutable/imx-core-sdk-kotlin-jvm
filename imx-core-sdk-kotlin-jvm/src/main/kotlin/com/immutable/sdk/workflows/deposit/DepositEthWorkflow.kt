@@ -26,9 +26,7 @@ internal fun depositEth(
     usersApi: UsersApi,
     encodingApi: EncodingApi,
     gasProvider: StaticGasProvider
-): CompletableFuture<String> {
-    val future = CompletableFuture<String>()
-
+): CompletableFuture<String> =
     prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
         .thenCompose { params ->
             executeDeposit(
@@ -58,10 +56,4 @@ internal fun depositEth(
                 gasProvider
             )
         }
-        .whenComplete { response, throwable ->
-            if (throwable != null) future.completeExceptionally(throwable)
-            else future.complete(response.transactionHash)
-        }
-
-    return future
-}
+        .thenApply { it.transactionHash }

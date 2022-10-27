@@ -27,6 +27,8 @@ import com.immutable.sdk.workflows.isRegisteredOnChain
 import okhttp3.logging.HttpLoggingInterceptor
 import org.openapitools.client.infrastructure.ClientException
 import org.openapitools.client.infrastructure.ServerException
+import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import java.util.concurrent.CompletableFuture
 
 /**
@@ -81,7 +83,7 @@ internal const val KEY_BASE_URL = "org.openapitools.client.baseUrl"
  * @param base the environment the SDK will communicate with
  * @param nodeUrl (optional) Ethereum node URL. This is only required for smart contract interactions.
  */
-@Suppress("TooManyFunctions")
+@Suppress("TooManyFunctions", "LargeClass")
 class ImmutableX(
     private val base: ImmutableXBase = ImmutableXBase.Production,
     private val nodeUrl: String? = null
@@ -123,9 +125,14 @@ class ImmutableX(
      * register the user first.
      * @param token the token type amount in its corresponding unit
      * @param signer the L1 signer
+     * @param gasProvider the gas provider to be used when interacting with smart contracts
      * @returns a [CompletableFuture] that will provide the transaction hash if successful.
      */
-    fun deposit(token: AssetModel, signer: Signer): CompletableFuture<String> {
+    fun deposit(
+        token: AssetModel,
+        signer: Signer,
+        gasProvider: StaticGasProvider = DefaultGasProvider()
+    ): CompletableFuture<String> {
         checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
         return com.immutable.sdk.workflows.deposit(
             base,
@@ -134,7 +141,8 @@ class ImmutableX(
             signer,
             depositsApi,
             usersApi,
-            encodingApi
+            encodingApi,
+            gasProvider
         )
     }
 
@@ -222,12 +230,15 @@ class ImmutableX(
      * Checks if a user is registered on on-chain
      *
      * @param signer represents the users L1 wallet to get the address
-     *
+     * @param gasProvider the gas provider to be used when interacting with smart contracts
      * @returns a [CompletableFuture] with the the value true if the user is registered.
      */
-    fun isRegisteredOnChain(signer: Signer): CompletableFuture<Boolean> {
+    fun isRegisteredOnChain(
+        signer: Signer,
+        gasProvider: StaticGasProvider = DefaultGasProvider()
+    ): CompletableFuture<Boolean> {
         checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
-        return isRegisteredOnChain(base, nodeUrl, signer, usersApi)
+        return isRegisteredOnChain(base, nodeUrl, signer, usersApi, gasProvider)
     }
 
     /**
@@ -249,9 +260,10 @@ class ImmutableX(
      * @return Asset
      * @throws [ImmutableException.apiError]
      */
-    fun getAsset(tokenAddress: String, tokenId: String, includeFees: Boolean? = null) = apiCall("getAsset") {
-        assetsApi.getAsset(tokenAddress, tokenId, includeFees)
-    }
+    fun getAsset(tokenAddress: String, tokenId: String, includeFees: Boolean? = null) =
+        apiCall("getAsset") {
+            assetsApi.getAsset(tokenAddress, tokenId, includeFees)
+        }
 
     /**
      * Get a list of assets
@@ -321,7 +333,10 @@ class ImmutableX(
      * @param signer represents the users L1 wallet to get the address and sign the registration
      * @return CompletableFuture<Collection>
      */
-    fun createCollection(request: CreateCollectionRequest, signer: Signer): CompletableFuture<Collection> =
+    fun createCollection(
+        request: CreateCollectionRequest,
+        signer: Signer
+    ): CompletableFuture<Collection> =
         imxTimestampRequest(signer) { timestamp ->
             call("createCollection") {
                 collectionsApi.createCollection(timestamp.signature, timestamp.timestamp, request)
@@ -335,7 +350,8 @@ class ImmutableX(
      * @return Collection
      * @throws [ImmutableException.apiError]
      */
-    fun getCollection(address: String) = apiCall("getCollection") { collectionsApi.getCollection(address) }
+    fun getCollection(address: String) =
+        apiCall("getCollection") { collectionsApi.getCollection(address) }
 
     /**
      * Get a list of collection filters
@@ -377,7 +393,15 @@ class ImmutableX(
         whitelist: String? = null,
         keyword: String? = null
     ) = apiCall("listCollections") {
-        collectionsApi.listCollections(pageSize, cursor, orderBy, direction, blacklist, whitelist, keyword)
+        collectionsApi.listCollections(
+            pageSize,
+            cursor,
+            orderBy,
+            direction,
+            blacklist,
+            whitelist,
+            keyword
+        )
     }
 
     /**
@@ -743,9 +767,15 @@ class ImmutableX(
      * @param token the token
      * @param signer the L1 signer
      * @param starkPublicKey the L2 stark public key
+     * @param gasProvider the gas provider to be used when interacting with smart contracts
      * @returns a [CompletableFuture] that will provide the transaction hash if successful.
      */
-    fun completeWithdrawal(token: AssetModel, signer: Signer, starkPublicKey: String): CompletableFuture<String> {
+    fun completeWithdrawal(
+        token: AssetModel,
+        signer: Signer,
+        starkPublicKey: String,
+        gasProvider: StaticGasProvider = DefaultGasProvider()
+    ): CompletableFuture<String> {
         checkNotNull(nodeUrl) { "nodeUrl cannot be null" }
         return com.immutable.sdk.workflows.completeWithdrawal(
             base,
@@ -755,7 +785,8 @@ class ImmutableX(
             starkPublicKey,
             usersApi,
             encodingApi,
-            mintsApi
+            mintsApi,
+            gasProvider
         )
     }
 

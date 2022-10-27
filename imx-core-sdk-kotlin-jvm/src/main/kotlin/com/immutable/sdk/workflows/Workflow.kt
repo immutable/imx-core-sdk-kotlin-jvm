@@ -8,7 +8,7 @@ import org.web3j.crypto.RawTransaction
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.tx.Contract
-import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
 
@@ -48,12 +48,12 @@ internal fun sendTransaction(
     data: String,
     signer: Signer,
     web3j: Web3j,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     val future = CompletableFuture<EthSendTransaction>()
     CompletableFuture.runAsync {
         try {
             val address = signer.getAddress().get()
-            val gasProvider = DefaultGasProvider()
 
             val rawTransaction = RawTransaction.createTransaction(
                 web3j.getNonce(address),

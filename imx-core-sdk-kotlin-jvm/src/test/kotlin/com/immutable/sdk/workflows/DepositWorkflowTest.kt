@@ -26,6 +26,7 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.TransactionManager
+import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
 import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
@@ -95,6 +96,9 @@ class DepositWorkflowTest {
 
     @MockK
     private lateinit var ethSendTransaction: EthSendTransaction
+
+    @MockK
+    private lateinit var gasProvider: DefaultGasProvider
 
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var signedTransactionFuture: CompletableFuture<String>
@@ -177,6 +181,9 @@ class DepositWorkflowTest {
         } returns erc721Contract
         every { erc721Contract.approve(any(), any()) } returns txRemoteFunctionCall
         every { erc721Contract.contractAddress } returns ERC721_CONTRACT_ADDRESS
+
+        every { gasProvider.gasPrice } returns DefaultGasProvider.GAS_PRICE
+        every { gasProvider.getGasLimit(any()) } returns DefaultGasProvider.GAS_LIMIT
     }
 
     @After
@@ -185,11 +192,7 @@ class DepositWorkflowTest {
     }
 
     private fun createDepositFuture(token: AssetModel) = deposit(
-        base = ImmutableXBase.Sandbox,
-        nodeUrl = NODE_URL,
-        token,
-        signer,
-        depositsApi, usersApi, encodingApi
+        ImmutableXBase.Sandbox, NODE_URL, token, signer, depositsApi, usersApi, encodingApi, gasProvider
     )
 
     private fun <T> remoteFunctionCall(value: T) = RemoteFunctionCall(function) { value }

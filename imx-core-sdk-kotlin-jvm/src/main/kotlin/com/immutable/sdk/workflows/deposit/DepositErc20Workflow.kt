@@ -21,7 +21,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
-import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import java.util.concurrent.CompletableFuture
 
 @Suppress("LongParameterList", "LongMethod")
@@ -33,13 +33,12 @@ internal fun depositErc20(
     depositsApi: DepositsApi,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
-): CompletableFuture<String> {
-    val future = CompletableFuture<String>()
-
-    val web3j = Web3j.build(HttpService(nodeUrl))
-
-    approveErc20Token(base, token, web3j, signer)
-        .thenCompose { prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi) }
+    gasProvider: StaticGasProvider,
+): CompletableFuture<String> =
+    approveErc20Token(base, token, Web3j.build(HttpService(nodeUrl)), signer, gasProvider)
+        .thenCompose {
+            prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
+        }
         .thenCompose { params ->
             executeDeposit(
                 base,
@@ -66,16 +65,11 @@ internal fun depositErc20(
                         params.amount
                     ).encodeFunctionCall()
                 },
-                usersApi
+                usersApi,
+                gasProvider
             )
         }
-        .whenComplete { response, throwable ->
-            if (throwable != null) future.completeExceptionally(throwable)
-            else future.complete(response.transactionHash)
-        }
-
-    return future
-}
+        .thenApply { it.transactionHash }
 
 /**
  * Approve whether an amount of token from an account can be spent by a third-party account
@@ -84,14 +78,15 @@ private fun approveErc20Token(
     base: ImmutableXBase,
     token: Erc20Asset,
     web3j: Web3j,
-    signer: Signer
+    signer: Signer,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> = signer.getAddress()
     .thenCompose { address ->
         val contract = IERC20_sol_IERC20.load(
             token.tokenAddress,
             web3j,
             ClientTransactionManager(web3j, address),
-            DefaultGasProvider()
+            gasProvider
         )
 
         sendTransaction(
@@ -102,6 +97,7 @@ private fun approveErc20Token(
                 token.formatQuantity().toBigInteger()
             ).encodeFunctionCall(),
             signer = signer,
-            web3j = web3j
+            web3j = web3j,
+            gasProvider = gasProvider
         )
     }

@@ -6,7 +6,9 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.api.DepositsApi
 import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
-import com.immutable.sdk.api.model.*
+import com.immutable.sdk.api.model.GetSignableDepositRequest
+import com.immutable.sdk.api.model.GetSignableDepositResponse
+import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.model.*
 import com.immutable.sdk.workflows.deposit.depositErc20
@@ -17,7 +19,7 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
 import org.web3j.tx.Contract
-import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import org.web3j.utils.Convert
 import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
@@ -33,11 +35,15 @@ internal fun deposit(
     depositsApi: DepositsApi,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<String> {
     return when (token) {
-        is EthAsset -> depositEth(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
-        is Erc20Asset -> depositErc20(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
-        is Erc721Asset -> depositErc721(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
+        is EthAsset ->
+            depositEth(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
+        is Erc20Asset ->
+            depositErc20(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
+        is Erc721Asset ->
+            depositErc721(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
     }
 }
 
@@ -56,7 +62,8 @@ internal fun prepareDeposit(
     signer: Signer,
     depositsApi: DepositsApi,
     usersApi: UsersApi,
-    encodingApi: EncodingApi
+    encodingApi: EncodingApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<DepositWorkflowParams> {
     val amount = when (token) {
         is EthAsset -> Convert.toWei(token.quantity, Convert.Unit.ETHER).toBigInteger()
@@ -82,7 +89,7 @@ internal fun prepareDeposit(
             }
         }
         .thenCompose { params ->
-            isRegisteredOnChain(base, nodeUrl, signer, usersApi)
+            isRegisteredOnChain(base, nodeUrl, signer, usersApi, gasProvider)
                 .thenApply { isRegistered -> params.copy(isRegistered = isRegistered) }
         }
 }
@@ -112,14 +119,15 @@ internal fun executeDeposit(
     registerAndDepositData: (Core_sol_Core, GetSignableRegistrationResponse) -> String,
     depositFunction: String,
     depositData: (Core_sol_Core) -> String,
-    usersApi: UsersApi
+    usersApi: UsersApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     val web3j = Web3j.build(HttpService(nodeUrl))
     val contract = Core_sol_Core.load(
         getCoreContractAddress(base),
         web3j,
         ClientTransactionManager(web3j, params.address),
-        DefaultGasProvider()
+        gasProvider
     )
     return if (!params.isRegistered) // User is not registered, do both registration and deposit
         executeRegisterAndDepositToken(
@@ -129,10 +137,11 @@ internal fun executeDeposit(
             contract,
             registerAndDepositFunction,
             registerAndDepositData,
-            usersApi
+            usersApi,
+            gasProvider
         )
     else // User is already registered, continue to deposit
-        executeDepositToken(web3j, signer, params, contract, depositFunction, depositData)
+        executeDepositToken(web3j, signer, params, contract, depositFunction, depositData, gasProvider)
 }
 
 @Suppress("LongParameterList")
@@ -143,7 +152,8 @@ internal fun <C : Contract> executeRegisterAndDepositToken(
     contract: C,
     contractFunction: String,
     data: (C, GetSignableRegistrationResponse) -> String,
-    usersApi: UsersApi
+    usersApi: UsersApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     // This amount is only used for Eth asset
     val transactionAmount =
@@ -164,7 +174,8 @@ internal fun <C : Contract> executeRegisterAndDepositToken(
                 amount = transactionAmount,
                 data = data(contract, response),
                 signer = signer,
-                web3j = web3j
+                web3j = web3j,
+                gasProvider = gasProvider
             )
         }
 }
@@ -177,6 +188,7 @@ internal fun <C : Contract> executeDepositToken(
     contract: C,
     contractFunction: String,
     data: (C) -> String,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     // This amount is only used for Eth asset
     val transactionAmount =
@@ -188,7 +200,8 @@ internal fun <C : Contract> executeDepositToken(
         amount = transactionAmount,
         data = data(contract),
         signer = signer,
-        web3j = web3j
+        web3j = web3j,
+        gasProvider = gasProvider
     )
 }
 

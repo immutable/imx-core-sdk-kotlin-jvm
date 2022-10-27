@@ -13,6 +13,7 @@ import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.workflows.executeDeposit
 import com.immutable.sdk.workflows.prepareDeposit
+import org.web3j.tx.gas.StaticGasProvider
 import java.util.concurrent.CompletableFuture
 
 @Suppress("LongParameterList", "LongMethod")
@@ -24,10 +25,9 @@ internal fun depositEth(
     depositsApi: DepositsApi,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
-): CompletableFuture<String> {
-    val future = CompletableFuture<String>()
-
-    prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
+    gasProvider: StaticGasProvider
+): CompletableFuture<String> =
+    prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
         .thenCompose { params ->
             executeDeposit(
                 base,
@@ -52,13 +52,8 @@ internal fun depositEth(
                         params.vaultId
                     ).encodeFunctionCall()
                 },
-                usersApi
+                usersApi,
+                gasProvider
             )
         }
-        .whenComplete { response, throwable ->
-            if (throwable != null) future.completeExceptionally(throwable)
-            else future.complete(response.transactionHash)
-        }
-
-    return future
-}
+        .thenApply { it.transactionHash }

@@ -87,7 +87,6 @@ object StarkKey {
     /**
      * Generates a new Stark key pair
      */
-    @Suppress("MagicNumber")
     fun generateStarkPrivateKey(): String {
         val privateKey = StarkCurve.generatePrivateKey()
         return StarkCurve.getKeyPair(grindKey(privateKey.toHexString())).privateKey.toByteArray().toNoPrefixHexString()

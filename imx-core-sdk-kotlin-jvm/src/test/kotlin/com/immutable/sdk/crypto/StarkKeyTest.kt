@@ -1,6 +1,10 @@
 package com.immutable.sdk.crypto
 
-import com.immutable.sdk.*
+import com.immutable.sdk.Constants
+import io.mockk.*
+import org.bouncycastle.crypto.AsymmetricCipherKeyPair
+import org.bouncycastle.crypto.generators.ECKeyPairGenerator
+import org.bouncycastle.crypto.params.ECPrivateKeyParameters
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.web3j.crypto.ECKeyPair
@@ -51,5 +55,28 @@ class StarkKeyTest {
                 "074180eaec7e68712b5a0fbf5d63a70c33940c9b02e60565e36f84d705b669e"
             )
         )
+    }
+
+    @Test
+    fun testGenerateStarkPrivateKey() {
+        mockkObject(StarkKey)
+        mockkObject(StarkCurve)
+        mockkConstructor(ECKeyPairGenerator::class)
+        every { anyConstructed<ECKeyPairGenerator>().init(any()) } returns Unit
+        val kp = mockk<AsymmetricCipherKeyPair>()
+        every { anyConstructed<ECKeyPairGenerator>().generateKeyPair() } returns kp
+        val privateKey = mockk<ECPrivateKeyParameters>()
+        every { kp.private } returns privateKey
+        every { privateKey.d } returns
+            BigInteger("1836448370050608829118549998082879500112197653260742969768389852330536019586")
+
+        assertEquals(
+            "03e049957cf93fdf11937d404828378f97a1d6d0e5882c328460b7d413d65329",
+            StarkKey.generateStarkPrivateKey()
+        )
+        verifyOrder {
+            StarkCurve.generatePrivateKey()
+            StarkCurve.getKeyPair(any())
+        }
     }
 }

@@ -10,6 +10,8 @@ import org.junit.Test
 
 private const val STARK_PRIVATE_KEY = "0520a33a1c3bbdbf4c180fe810269eb4b0169b816c8fdde688d415c53ccc0d0c"
 private const val STARK_PUBLIC_ADDRESS = "0x0752ff93fa18f10f3a564e5ba3a2ba7078a59500817a0e5aedbfe1f35bd888e5"
+private const val MESSAGE = "Sign this"
+private const val SIGNED_MESSAGE = "result"
 
 class StandardStarkSignerTest {
     private lateinit var starkSigner: StandardStarkSigner
@@ -30,14 +32,19 @@ class StandardStarkSignerTest {
     @Test
     fun testStarkSignSuccess() {
         mockkObject(StarkKey)
-        every { StarkKey.sign(starkSigner.keyPair, "Sign this") } returns "result"
-        assertEquals("result", starkSigner.signMessage("Sign this").get())
+        every { StarkKey.sign(starkSigner.keyPair, MESSAGE) } returns SIGNED_MESSAGE
+        assertEquals(SIGNED_MESSAGE, starkSigner.signMessage(MESSAGE).get())
     }
 
     @Test(expected = Exception::class)
     fun testStarkSignError() {
         mockkObject(StarkKey)
-        every { StarkKey.sign(any(), "Sign this") } throws Exception()
-        starkSigner.signMessage("Sign this").get()
+        every { StarkKey.sign(any(), MESSAGE) } throws Exception()
+        starkSigner.signMessage(MESSAGE).get()
+    }
+
+    @Test
+    fun testGetAddress() {
+        assertEquals(STARK_PUBLIC_ADDRESS, starkSigner.getAddress().get())
     }
 }

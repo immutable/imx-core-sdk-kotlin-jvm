@@ -4,11 +4,14 @@ import com.immutable.sdk.ImmutableConfig
 import com.immutable.sdk.ImmutableXBase
 import com.immutable.sdk.Signer
 import com.immutable.sdk.api.EncodingApi
+import com.immutable.sdk.api.MintsApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.Registration_sol_Registration
-import com.immutable.sdk.model.*
+import com.immutable.sdk.model.AssetModel
+import com.immutable.sdk.model.Erc721Asset
+import com.immutable.sdk.workflows.withdrawal.completeErc721Withdrawal
 import com.immutable.sdk.workflows.withdrawal.completeFungibleTokenWithdrawal
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
@@ -27,9 +30,14 @@ internal fun completeWithdrawal(
     starkPublicKey: String,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
+    mintsApi: MintsApi
 ): CompletableFuture<String> = when (token) {
-    is Erc721Asset -> CompletableFuture.failedFuture(UnsupportedOperationException())
-    else -> completeFungibleTokenWithdrawal(base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi)
+    is Erc721Asset -> completeErc721Withdrawal(
+        base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi, mintsApi
+    )
+    else -> completeFungibleTokenWithdrawal(
+        base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi
+    )
 }
 
 /**
@@ -52,7 +60,7 @@ internal fun prepareCompleteWithdrawal(
         .thenCompose { address ->
             encodeAsset(token, encodingApi).thenApply { encodeAssetResponse ->
                 CompleteWithdrawalWorkflowParams(
-                    tokenType = token.toSignableToken().type,
+                    token = token,
                     address = address,
                     starkKey = starkPublicKey,
                     assetType = encodeAssetResponse.assetType.toBigInteger(),
@@ -162,7 +170,7 @@ internal fun executeWithdrawToken(
 }
 
 internal data class CompleteWithdrawalWorkflowParams(
-    val tokenType: String?,
+    val token: AssetModel,
     val address: String,
     val starkKey: String,
     val assetType: BigInteger,

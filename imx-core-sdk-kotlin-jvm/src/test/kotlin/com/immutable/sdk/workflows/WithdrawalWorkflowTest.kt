@@ -2,6 +2,7 @@ package com.immutable.sdk.workflows
 
 import com.immutable.sdk.*
 import com.immutable.sdk.api.EncodingApi
+import com.immutable.sdk.api.MintsApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.contracts.Core_sol_Core
@@ -9,6 +10,7 @@ import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.model.Erc20Asset
+import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -28,11 +30,13 @@ import org.web3j.protocol.http.HttpService
 import org.web3j.tx.TransactionManager
 import java.io.IOException
 import java.math.BigInteger
+import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
 private const val ADDRESS = "0xa76e3eeb2f7143165618ab8feaabcd395b6faaaa"
 private const val AMOUNT = "0.0001"
 private const val TOKEN_ADDRESS = "0xb3dfd3dfb829b394f2467f4396f39ece7818d876"
+private const val TOKEN_ID = "1051"
 private const val TOKEN_DECIMAL = 6
 private const val ASSET_ID = "5461"
 private const val ASSET_TYPE = "712"
@@ -50,6 +54,7 @@ private const val ENCODED_FUNCTION_CALL = "000111000554abc00000000a123def000000"
 private const val SIGNED_TRANSACTION = "0xSignedTransaction"
 private const val TRANSACTION_HASH = "0x28ca2abed368dca3f304fbb2be6db1f56cdcb138cdd3a68f86dcbb40ddda7545"
 private val NONCE = BigInteger.ONE
+private const val BLUEPRINT = "1546abc420145def"
 
 class WithdrawalWorkflowTest {
     @MockK
@@ -57,6 +62,9 @@ class WithdrawalWorkflowTest {
 
     @MockK
     private lateinit var encodingApi: EncodingApi
+
+    @MockK
+    private lateinit var mintsApi: MintsApi
 
     @MockK
     private lateinit var signer: Signer
@@ -81,6 +89,9 @@ class WithdrawalWorkflowTest {
 
     @MockK
     private lateinit var ethSendTransaction: EthSendTransaction
+
+    @MockK
+    private lateinit var mintableTokenDetails: MintableTokenDetails
 
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var signedTransactionFuture: CompletableFuture<String>
@@ -126,6 +137,12 @@ class WithdrawalWorkflowTest {
         every {
             registrationContract.registerAndWithdraw(any(), any(), any(), any())
         } returns txRemoteFunctionCall
+        every {
+            registrationContract.registerAndWithdrawNft(any(), any(), any(), any(), any())
+        } returns txRemoteFunctionCall
+        every {
+            registrationContract.regsiterAndWithdrawAndMint(any(), any(), any(), any(), any())
+        } returns txRemoteFunctionCall
         every { registrationContract.contractAddress } returns REGISTRATION_CONTRACT_ADDRESS
 
         mockkStatic(Core_sol_Core::class)
@@ -133,7 +150,11 @@ class WithdrawalWorkflowTest {
             Core_sol_Core.load(any(), any(), any<TransactionManager>(), any())
         } returns coreContract
         every { coreContract.withdraw(any(), any()) } returns txRemoteFunctionCall
+        every { coreContract.withdrawNft(any(), any(), any()) } returns txRemoteFunctionCall
+        every { coreContract.withdrawAndMint(any(), any(), any()) } returns txRemoteFunctionCall
         every { coreContract.contractAddress } returns CORE_CONTRACT_ADDRESS
+
+        every { mintableTokenDetails.blueprint } returns BLUEPRINT
     }
 
     @After
@@ -148,7 +169,8 @@ class WithdrawalWorkflowTest {
         signer,
         STARK_KEY,
         usersApi,
-        encodingApi
+        encodingApi,
+        mintsApi
     )
 
     private fun <T> remoteFunctionCall(value: T) = RemoteFunctionCall(function) { value }
@@ -170,7 +192,7 @@ class WithdrawalWorkflowTest {
         verify { signer.getAddress() }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(type = EncodeAssetRequestToken.Type.eTH, data = null)
                 )
@@ -221,7 +243,7 @@ class WithdrawalWorkflowTest {
 
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(type = EncodeAssetRequestToken.Type.eTH, data = null)
                 )
@@ -314,7 +336,7 @@ class WithdrawalWorkflowTest {
         verify { signer.getAddress() }
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(
                         type = EncodeAssetRequestToken.Type.eRC20,
@@ -368,7 +390,7 @@ class WithdrawalWorkflowTest {
 
         verify {
             encodingApi.encodeAsset(
-                ENCODE_ASSET_TYPE,
+                EncodeAssetType.Asset.value,
                 EncodeAssetRequest(
                     EncodeAssetRequestToken(
                         type = EncodeAssetRequestToken.Type.eRC20,
@@ -384,6 +406,230 @@ class WithdrawalWorkflowTest {
             coreContract.withdraw(
                 STARK_KEY_BIG_INT,
                 ASSET_TYPE.toBigInteger()
+            )
+        }
+        verify { signer.signTransaction(any()) }
+        verify { web3j.ethSendRawTransaction(any()) }
+    }
+
+    @Test
+    fun testWithdrawErc721Success_registerAndWithdraw_registeredOffChainUser() {
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
+        every { mintsApi.getMintableTokenDetailsByClientTokenId(any(), any()) } throws ClientException(
+            statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        )
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = TRANSACTION_HASH,
+            expectedError = null
+        )
+
+        verify { signer.getAddress() }
+        verify { mintsApi.getMintableTokenDetailsByClientTokenId(TOKEN_ADDRESS, TOKEN_ID) }
+        verify {
+            encodingApi.encodeAsset(
+                EncodeAssetType.Asset.value,
+                EncodeAssetRequest(
+                    EncodeAssetRequestToken(
+                        EncodeAssetTokenData(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
+                        EncodeAssetRequestToken.Type.eRC721
+                    )
+                )
+            )
+        }
+        verify { usersApi.getUsers(ADDRESS) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify { usersApi.getSignableRegistration(GetSignableRegistrationRequest(ADDRESS, STARK_KEY)) }
+        verify {
+            registrationContract.registerAndWithdrawNft(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray(),
+                ASSET_TYPE.toBigInteger(),
+                TOKEN_ID.toBigInteger()
+            )
+        }
+        verify { signer.signTransaction(any()) }
+        verify { web3j.ethSendRawTransaction(any()) }
+    }
+
+    @Test
+    fun testWithdrawErc721_getMintableTokenDetailsByClientTokenIdError() {
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
+        every { mintsApi.getMintableTokenDetailsByClientTokenId(any(), any()) } throws ClientException()
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
+    }
+
+    @Test
+    fun testWithdrawErc721Success_registerAndWithdraw_NotRegisteredOffChain() {
+        every { usersApi.getUsers(any()) } throws ClientException()
+        every { mintsApi.getMintableTokenDetailsByClientTokenId(any(), any()) } throws ClientException(
+            statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        )
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
+    }
+
+    @Test
+    fun testWithdrawErc721Success_withdraw() {
+        every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
+        every { mintsApi.getMintableTokenDetailsByClientTokenId(any(), any()) } throws ClientException(
+            statusCode = HttpURLConnection.HTTP_NOT_FOUND
+        )
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = TRANSACTION_HASH,
+            expectedError = null
+        )
+
+        verify { mintsApi.getMintableTokenDetailsByClientTokenId(TOKEN_ADDRESS, TOKEN_ID) }
+        verify {
+            encodingApi.encodeAsset(
+                EncodeAssetType.Asset.value,
+                EncodeAssetRequest(
+                    EncodeAssetRequestToken(
+                        EncodeAssetTokenData(tokenAddress = TOKEN_ADDRESS, tokenId = TOKEN_ID),
+                        EncodeAssetRequestToken.Type.eRC721,
+                    )
+                )
+            )
+        }
+        verify { usersApi.getUsers(ADDRESS) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
+        verify {
+            coreContract.withdrawNft(
+                STARK_KEY_BIG_INT,
+                ASSET_TYPE.toBigInteger(),
+                TOKEN_ID.toBigInteger()
+            )
+        }
+        verify { signer.signTransaction(any()) }
+        verify { web3j.ethSendRawTransaction(any()) }
+    }
+
+    @Test
+    fun testWithdrawMintableErc721Success_registerAndWithdraw_registeredOffChainUser() {
+        every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
+        every {
+            mintsApi.getMintableTokenDetailsByClientTokenId(any(), any())
+        } returns mintableTokenDetails
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = TRANSACTION_HASH,
+            expectedError = null
+        )
+
+        verify { signer.getAddress() }
+        verify { mintsApi.getMintableTokenDetailsByClientTokenId(TOKEN_ADDRESS, TOKEN_ID) }
+        verify {
+            encodingApi.encodeAsset(
+                EncodeAssetType.MintableAsset.value,
+                EncodeAssetRequest(
+                    EncodeAssetRequestToken(
+                        EncodeAssetTokenData(
+                            blueprint = BLUEPRINT,
+                            tokenAddress = TOKEN_ADDRESS,
+                            id = TOKEN_ID
+                        ),
+                        EncodeAssetRequestToken.Type.eRC721
+                    )
+                )
+            )
+        }
+        verify { usersApi.getUsers(ADDRESS) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify { usersApi.getSignableRegistration(GetSignableRegistrationRequest(ADDRESS, STARK_KEY)) }
+        verify {
+            registrationContract.regsiterAndWithdrawAndMint(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray(),
+                ASSET_TYPE.toBigInteger(),
+                "{$TOKEN_ID}:{$BLUEPRINT}".toByteArray()
+            )
+        }
+        verify { signer.signTransaction(any()) }
+        verify { web3j.ethSendRawTransaction(any()) }
+    }
+
+    @Test
+    fun testWithdrawMintableErc721Success_registerAndWithdraw_NotRegisteredOffChain() {
+        every { usersApi.getUsers(any()) } throws ClientException()
+        every {
+            mintsApi.getMintableTokenDetailsByClientTokenId(any(), any())
+        } returns mintableTokenDetails
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = null,
+            expectedError = ImmutableException.apiError("")
+        )
+    }
+
+    @Test
+    fun testWithdrawMintableErc721Success_withdraw() {
+        every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
+        every {
+            mintsApi.getMintableTokenDetailsByClientTokenId(any(), any())
+        } returns mintableTokenDetails
+
+        addressFuture.complete(ADDRESS)
+        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+
+        testFuture(
+            future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
+            expectedResult = TRANSACTION_HASH,
+            expectedError = null
+        )
+
+        verify { mintsApi.getMintableTokenDetailsByClientTokenId(TOKEN_ADDRESS, TOKEN_ID) }
+        verify {
+            encodingApi.encodeAsset(
+                EncodeAssetType.MintableAsset.value,
+                EncodeAssetRequest(
+                    EncodeAssetRequestToken(
+                        EncodeAssetTokenData(tokenAddress = TOKEN_ADDRESS, id = TOKEN_ID, blueprint = BLUEPRINT),
+                        EncodeAssetRequestToken.Type.eRC721,
+                    )
+                )
+            )
+        }
+        verify { usersApi.getUsers(ADDRESS) }
+        verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
+        verify {
+            coreContract.withdrawAndMint(
+                STARK_KEY_BIG_INT,
+                ASSET_TYPE.toBigInteger(),
+                "{$TOKEN_ID}:{$BLUEPRINT}".toByteArray()
             )
         }
         verify { signer.signTransaction(any()) }

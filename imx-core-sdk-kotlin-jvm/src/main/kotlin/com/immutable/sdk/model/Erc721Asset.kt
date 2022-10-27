@@ -10,8 +10,8 @@ import com.immutable.sdk.api.model.Token
  * @property tokenAddress The address of this ERC721 contract
  * @property tokenId The token id of this ERC721 asset
  */
-class Erc721Asset(
-    val tokenAddress: String,
+open class Erc721Asset(
+    open val tokenAddress: String,
     val tokenId: String
 ) : AssetModel(ERC721_AMOUNT) {
     override fun toSignableToken(): SignableToken = SignableToken(

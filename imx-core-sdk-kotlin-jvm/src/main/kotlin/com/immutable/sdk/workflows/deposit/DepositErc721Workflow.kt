@@ -14,7 +14,6 @@ import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.hexRemovePrefix
 import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.Erc721Asset
-import com.immutable.sdk.workflows.*
 import com.immutable.sdk.workflows.executeDepositToken
 import com.immutable.sdk.workflows.executeRegisterAndDepositToken
 import com.immutable.sdk.workflows.prepareDeposit
@@ -23,7 +22,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
-import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import java.util.concurrent.CompletableFuture
 
 @Suppress("LongParameterList", "LongMethod")
@@ -35,19 +34,21 @@ internal fun depositErc721(
     depositsApi: DepositsApi,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
+    gasProvider: StaticGasProvider,
 ): CompletableFuture<String> {
     val future = CompletableFuture<String>()
 
     val web3j = Web3j.build(HttpService(nodeUrl))
 
-    prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi)
+    prepareDeposit(base, nodeUrl, token, signer, depositsApi, usersApi, encodingApi, gasProvider)
         .thenCompose { params ->
             approveErc721Token(
                 token,
                 if (params.isRegistered) ImmutableConfig.getCoreContractAddress(base)
                 else ImmutableConfig.getRegistrationContractAddress(base),
                 web3j,
-                signer
+                signer,
+                gasProvider
             ).thenApply { params }
         }
         .thenCompose { params ->
@@ -61,7 +62,7 @@ internal fun depositErc721(
                     ImmutableConfig.getRegistrationContractAddress(base),
                     web3j,
                     ClientTransactionManager(web3j, params.address),
-                    DefaultGasProvider()
+                    gasProvider
                 ),
                 contractFunction = Registration_sol_Registration.FUNC_REGISTERANDDEPOSITNFT,
                 data = { contract: Registration_sol_Registration, response: GetSignableRegistrationResponse ->
@@ -74,7 +75,8 @@ internal fun depositErc721(
                         token.tokenId.toBigInteger()
                     ).encodeFunctionCall()
                 },
-                usersApi = usersApi
+                usersApi = usersApi,
+                gasProvider = gasProvider
             )
             else executeDepositToken(
                 web3j = web3j,
@@ -84,7 +86,7 @@ internal fun depositErc721(
                     ImmutableConfig.getCoreContractAddress(base),
                     web3j,
                     ClientTransactionManager(web3j, params.address),
-                    DefaultGasProvider()
+                    gasProvider
                 ),
                 contractFunction = Core_sol_Core.FUNC_DEPOSITNFT,
                 data = { contract: Core_sol_Core ->
@@ -94,7 +96,8 @@ internal fun depositErc721(
                         params.vaultId,
                         token.tokenId.toBigInteger()
                     ).encodeFunctionCall()
-                }
+                },
+                gasProvider = gasProvider
             )
         }
         .whenComplete { response, throwable ->
@@ -113,14 +116,15 @@ private fun approveErc721Token(
     token: Erc721Asset,
     approveForContractAddress: String,
     web3j: Web3j,
-    signer: Signer
+    signer: Signer,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> = signer.getAddress()
     .thenCompose { address ->
         val contract = IERC721_sol_IERC721.load(
             token.tokenAddress,
             web3j,
             ClientTransactionManager(web3j, address),
-            DefaultGasProvider()
+            gasProvider
         )
 
         sendTransaction(
@@ -131,6 +135,7 @@ private fun approveErc721Token(
                 token.tokenId.toBigInteger()
             ).encodeFunctionCall(),
             signer = signer,
-            web3j = web3j
+            web3j = web3j,
+            gasProvider = gasProvider
         )
     }

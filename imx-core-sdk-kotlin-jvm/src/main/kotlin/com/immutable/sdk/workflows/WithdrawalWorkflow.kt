@@ -17,7 +17,7 @@ import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
-import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import java.math.BigInteger
 import java.util.concurrent.CompletableFuture
 
@@ -30,13 +30,14 @@ internal fun completeWithdrawal(
     starkPublicKey: String,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
-    mintsApi: MintsApi
+    mintsApi: MintsApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<String> = when (token) {
     is Erc721Asset -> completeErc721Withdrawal(
-        base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi, mintsApi
+        base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi, mintsApi, gasProvider
     )
     else -> completeFungibleTokenWithdrawal(
-        base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi
+        base, nodeUrl, token, signer, starkPublicKey, usersApi, encodingApi, gasProvider
     )
 }
 
@@ -54,7 +55,8 @@ internal fun prepareCompleteWithdrawal(
     signer: Signer,
     starkPublicKey: String,
     usersApi: UsersApi,
-    encodingApi: EncodingApi
+    encodingApi: EncodingApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<CompleteWithdrawalWorkflowParams> {
     return signer.getAddress()
         .thenCompose { address ->
@@ -68,7 +70,7 @@ internal fun prepareCompleteWithdrawal(
             }
         }
         .thenCompose { params ->
-            isRegisteredOnChain(base, nodeUrl, signer, usersApi)
+            isRegisteredOnChain(base, nodeUrl, signer, usersApi, gasProvider)
                 .thenApply { isRegistered -> params.copy(isRegistered = isRegistered) }
         }
 }
@@ -83,7 +85,8 @@ internal fun executeCompleteWithdrawal(
     registerAndWithdrawData: (Registration_sol_Registration, GetSignableRegistrationResponse) -> String,
     withdrawFunction: String,
     withdrawData: (Core_sol_Core) -> String,
-    usersApi: UsersApi
+    usersApi: UsersApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     val web3j = Web3j.build(HttpService(nodeUrl))
 
@@ -95,7 +98,8 @@ internal fun executeCompleteWithdrawal(
             params,
             registerAndWithdrawFunction,
             registerAndWithdrawData,
-            usersApi
+            usersApi,
+            gasProvider
         )
     else // User is already registered, continue to complete withdrawal
         executeWithdrawToken(
@@ -104,7 +108,8 @@ internal fun executeCompleteWithdrawal(
             signer,
             params,
             withdrawFunction,
-            withdrawData
+            withdrawData,
+            gasProvider
         )
 }
 
@@ -116,13 +121,14 @@ internal fun executeRegisterAndWithdrawToken(
     params: CompleteWithdrawalWorkflowParams,
     contractFunction: String,
     data: (Registration_sol_Registration, GetSignableRegistrationResponse) -> String,
-    usersApi: UsersApi
+    usersApi: UsersApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     val contract = Registration_sol_Registration.load(
         ImmutableConfig.getRegistrationContractAddress(base),
         web3j,
         ClientTransactionManager(web3j, params.address),
-        DefaultGasProvider()
+        gasProvider
     )
 
     return signer.getAddress()
@@ -139,7 +145,8 @@ internal fun executeRegisterAndWithdrawToken(
                 contractFunction = contractFunction,
                 data = data(contract, response),
                 signer = signer,
-                web3j = web3j
+                web3j = web3j,
+                gasProvider = gasProvider
             )
         }
 }
@@ -152,12 +159,13 @@ internal fun executeWithdrawToken(
     params: CompleteWithdrawalWorkflowParams,
     contractFunction: String,
     data: (Core_sol_Core) -> String,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<EthSendTransaction> {
     val contract = Core_sol_Core.load(
         ImmutableConfig.getCoreContractAddress(base),
         web3j,
         ClientTransactionManager(web3j, params.address),
-        DefaultGasProvider()
+        gasProvider
     )
 
     return sendTransaction(
@@ -165,7 +173,8 @@ internal fun executeWithdrawToken(
         contractFunction = contractFunction,
         data = data(contract),
         signer = signer,
-        web3j = web3j
+        web3j = web3j,
+        gasProvider = gasProvider
     )
 }
 

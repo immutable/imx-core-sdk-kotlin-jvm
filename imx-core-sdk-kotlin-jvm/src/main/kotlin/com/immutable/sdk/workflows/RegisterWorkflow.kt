@@ -13,7 +13,7 @@ import org.openapitools.client.infrastructure.ClientException
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
-import org.web3j.tx.gas.DefaultGasProvider
+import org.web3j.tx.gas.StaticGasProvider
 import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
@@ -136,7 +136,8 @@ internal fun isRegisteredOnChain(
     base: ImmutableXBase,
     nodeUrl: String,
     signer: Signer,
-    api: UsersApi
+    api: UsersApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<Boolean> {
     val future = CompletableFuture<Boolean>()
 
@@ -152,7 +153,7 @@ internal fun isRegisteredOnChain(
                 ImmutableConfig.getRegistrationContractAddress(base),
                 web3j,
                 ClientTransactionManager(web3j, address),
-                DefaultGasProvider()
+                gasProvider
             )
             contract.isRegistered(starkPublicKey.hexRemovePrefix().toBigInteger(HEX_RADIX))
                 .sendAsync()

@@ -13,6 +13,7 @@ import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.AssetModel
 import com.immutable.sdk.workflows.executeCompleteWithdrawal
 import com.immutable.sdk.workflows.prepareCompleteWithdrawal
+import org.web3j.tx.gas.StaticGasProvider
 import java.util.concurrent.CompletableFuture
 
 @Suppress("LongParameterList", "LongMethod")
@@ -24,6 +25,7 @@ internal fun completeFungibleTokenWithdrawal(
     starkPublicKey: String,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
+    gasProvider: StaticGasProvider,
 ): CompletableFuture<String> = signer.getAddress()
     .thenCompose {
         prepareCompleteWithdrawal(
@@ -33,7 +35,8 @@ internal fun completeFungibleTokenWithdrawal(
             signer,
             starkPublicKey,
             usersApi,
-            encodingApi
+            encodingApi,
+            gasProvider
         )
     }
     .thenCompose { params ->
@@ -58,7 +61,8 @@ internal fun completeFungibleTokenWithdrawal(
                     params.assetType,
                 ).encodeFunctionCall()
             },
-            usersApi
+            usersApi,
+            gasProvider
         )
     }
     .thenApply { it.transactionHash }

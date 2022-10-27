@@ -17,6 +17,7 @@ import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.workflows.executeCompleteWithdrawal
 import com.immutable.sdk.workflows.prepareCompleteWithdrawal
 import org.openapitools.client.infrastructure.ClientException
+import org.web3j.tx.gas.StaticGasProvider
 import java.net.HttpURLConnection
 import java.util.concurrent.CompletableFuture
 
@@ -31,7 +32,8 @@ internal fun completeErc721Withdrawal(
     starkPublicKey: String,
     usersApi: UsersApi,
     encodingApi: EncodingApi,
-    mintsApi: MintsApi
+    mintsApi: MintsApi,
+    gasProvider: StaticGasProvider
 ): CompletableFuture<String> = getMintableTokenDetails(token, mintsApi)
     .thenCompose { assetToken ->
         prepareCompleteWithdrawal(
@@ -41,7 +43,8 @@ internal fun completeErc721Withdrawal(
             signer,
             starkPublicKey,
             usersApi,
-            encodingApi
+            encodingApi,
+            gasProvider
         )
     }
     .thenCompose { params ->
@@ -83,7 +86,8 @@ internal fun completeErc721Withdrawal(
                     token.tokenId.toBigInteger()
                 ).encodeFunctionCall()
             },
-            usersApi
+            usersApi,
+            gasProvider
         )
     }
     .thenApply { it.transactionHash }

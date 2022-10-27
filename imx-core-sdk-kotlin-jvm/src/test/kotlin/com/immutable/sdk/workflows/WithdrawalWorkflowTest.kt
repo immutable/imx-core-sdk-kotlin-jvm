@@ -28,6 +28,7 @@ import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.TransactionManager
+import org.web3j.tx.gas.DefaultGasProvider
 import java.io.IOException
 import java.math.BigInteger
 import java.net.HttpURLConnection
@@ -93,6 +94,9 @@ class WithdrawalWorkflowTest {
     @MockK
     private lateinit var mintableTokenDetails: MintableTokenDetails
 
+    @MockK
+    private lateinit var gasProvider: DefaultGasProvider
+
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var signedTransactionFuture: CompletableFuture<String>
 
@@ -155,6 +159,9 @@ class WithdrawalWorkflowTest {
         every { coreContract.contractAddress } returns CORE_CONTRACT_ADDRESS
 
         every { mintableTokenDetails.blueprint } returns BLUEPRINT
+
+        every { gasProvider.gasPrice } returns DefaultGasProvider.GAS_PRICE
+        every { gasProvider.getGasLimit(any()) } returns DefaultGasProvider.GAS_LIMIT
     }
 
     @After
@@ -170,7 +177,8 @@ class WithdrawalWorkflowTest {
         STARK_KEY,
         usersApi,
         encodingApi,
-        mintsApi
+        mintsApi,
+        gasProvider
     )
 
     private fun <T> remoteFunctionCall(value: T) = RemoteFunctionCall(function) { value }

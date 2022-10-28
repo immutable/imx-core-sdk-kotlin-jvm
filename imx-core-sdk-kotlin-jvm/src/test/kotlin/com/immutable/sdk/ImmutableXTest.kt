@@ -1,6 +1,7 @@
 package com.immutable.sdk
 
 import com.immutable.sdk.api.DepositsApi
+import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.WithdrawalsApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.model.Erc721Asset
@@ -13,6 +14,7 @@ import com.immutable.sdk.workflows.createOrder
 import com.immutable.sdk.workflows.transfer
 import com.immutable.sdk.workflows.deposit
 import com.immutable.sdk.workflows.completeWithdrawal
+import com.immutable.sdk.workflows.isRegisteredOnChain
 import com.immutable.sdk.workflows.withdrawal.prepareWithdrawal
 import com.immutable.sdk.workflows.TransferData
 import io.mockk.*
@@ -275,5 +277,32 @@ class ImmutableXTest {
         sdk.completeWithdrawal(
             Erc721Asset(TOKEN_ADDRESS, TOKEN_ID), signer, STARK_ADDRESS, gasProvider
         ).get()
+    }
+
+    @Test
+    fun testIsRegisteredOnChain() {
+        mockkStatic(::isRegisteredOnChain)
+        every {
+            isRegisteredOnChain(any(), any(), any(), any(), any())
+        } returns CompletableFuture.completedFuture(true)
+
+        assertEquals(true, sdk.isRegisteredOnChain(signer, gasProvider).get())
+    }
+
+    @Test(expected = IllegalStateException::class)
+    fun testIsRegisteredOnChain_noNodeUrlSet() {
+        sdk = spyk(ImmutableX(ImmutableXBase.Sandbox))
+
+        sdk.isRegisteredOnChain(signer, gasProvider).get()
+    }
+
+    @Test
+    fun testGetUser() {
+        val response = mockk<GetUsersApiResponse>()
+        mockkConstructor(UsersApi::class)
+        every { anyConstructed<UsersApi>().getUsers(ADDRESS) } returns response
+
+        assertEquals(response, sdk.getUser(ADDRESS))
+        verify { anyConstructed<UsersApi>().getUsers(ADDRESS) }
     }
 }

@@ -1,11 +1,17 @@
 package com.immutable.sdk
 
 import com.immutable.sdk.api.AssetsApi
+import com.immutable.sdk.api.BalancesApi
 import com.immutable.sdk.api.CollectionsApi
 import com.immutable.sdk.api.DepositsApi
 import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.MetadataApi
+import com.immutable.sdk.api.MintsApi
+import com.immutable.sdk.api.OrdersApi
 import com.immutable.sdk.api.ProjectsApi
+import com.immutable.sdk.api.TokensApi
+import com.immutable.sdk.api.TradesApi
+import com.immutable.sdk.api.TransfersApi
 import com.immutable.sdk.api.WithdrawalsApi
 import com.immutable.sdk.api.model.*
 import com.immutable.sdk.api.model.Collection
@@ -123,8 +129,8 @@ class ImmutableXTest {
         mockkStatic(::createTrade)
         every {
             createTrade(
-                "orderId",
-                listOf(FeeEntry("address", 5.0)),
+                ID,
+                listOf(FeeEntry(ADDRESS, 5.0)),
                 signer,
                 starkSigner,
                 any(),
@@ -133,21 +139,21 @@ class ImmutableXTest {
         } returns future
         assertEquals(
             future,
-            sdk.createTrade("orderId", listOf(FeeEntry("address", 5.0)), signer, starkSigner)
+            sdk.createTrade(ID, listOf(FeeEntry(ADDRESS, 5.0)), signer, starkSigner)
         )
     }
 
     @Test
     fun testSell() {
         val future = CompletableFuture<CreateOrderResponse>()
-        val asset = Erc721Asset("address", "id")
-        val sellToken = EthAsset("1")
+        val asset = Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)
+        val sellToken = EthAsset(Constants.ERC721_AMOUNT)
         mockkStatic(::createOrder)
         every {
             createOrder(
                 asset,
                 sellToken,
-                listOf(FeeEntry("address", 5.0)),
+                listOf(FeeEntry(ADDRESS, 5.0)),
                 signer,
                 starkSigner,
                 any()
@@ -158,7 +164,7 @@ class ImmutableXTest {
             sdk.createOrder(
                 asset,
                 sellToken,
-                listOf(FeeEntry("address", 5.0)),
+                listOf(FeeEntry(ADDRESS, 5.0)),
                 signer,
                 starkSigner
             )
@@ -169,18 +175,18 @@ class ImmutableXTest {
     fun testCancelOrder() {
         val future = CompletableFuture<CancelOrderResponse>()
         mockkStatic(::cancelOrder)
-        every { cancelOrder("orderId", signer, starkSigner, any()) } returns future
-        assertEquals(future, sdk.cancelOrder("orderId", signer, starkSigner))
+        every { cancelOrder(ID, signer, starkSigner, any()) } returns future
+        assertEquals(future, sdk.cancelOrder(ID, signer, starkSigner))
     }
 
     @Test
     fun testTransfer() {
         val future = CompletableFuture<CreateTransferResponse>()
-        val asset = Erc721Asset("address", "id")
+        val asset = Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)
         mockkStatic(::transfer)
         every {
             transfer(
-                listOf(TransferData(asset, "recipientAddress")),
+                listOf(TransferData(asset, ADDRESS)),
                 signer,
                 starkSigner,
                 any()
@@ -188,7 +194,26 @@ class ImmutableXTest {
         } returns future
         assertEquals(
             future,
-            sdk.transfer(TransferData(asset, "recipientAddress"), signer, starkSigner)
+            sdk.transfer(TransferData(asset, ADDRESS), signer, starkSigner)
+        )
+    }
+
+    @Test
+    fun testBatchTransfer() {
+        val future = CompletableFuture<CreateTransferResponse>()
+        val asset = Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)
+        mockkStatic(::transfer)
+        every {
+            transfer(
+                listOf(TransferData(asset, ADDRESS)),
+                signer,
+                starkSigner,
+                any()
+            )
+        } returns future
+        assertEquals(
+            future,
+            sdk.batchTransfer(arrayListOf(TransferData(asset, ADDRESS)), signer, starkSigner)
         )
     }
 
@@ -464,5 +489,127 @@ class ImmutableXTest {
         verify {
             anyConstructed<ProjectsApi>().getProjects(imXSignature = ETH_SIGNATURE, imXTimestamp = TIMESTAMP_STRING)
         }
+    }
+
+    @Test
+    fun testGetBalance() {
+        val response = mockk<Balance>()
+        mockkConstructor(BalancesApi::class)
+        every { anyConstructed<BalancesApi>().getBalance(ADDRESS, TOKEN_ADDRESS) } returns response
+
+        assertEquals(response, sdk.getBalance(ADDRESS, TOKEN_ADDRESS))
+        verify { anyConstructed<BalancesApi>().getBalance(ADDRESS, TOKEN_ADDRESS) }
+    }
+
+    @Test
+    fun testListBalances() {
+        val response = mockk<ListBalancesResponse>()
+        mockkConstructor(BalancesApi::class)
+        every { anyConstructed<BalancesApi>().listBalances(ADDRESS) } returns response
+
+        assertEquals(response, sdk.listBalances(ADDRESS))
+        verify { anyConstructed<BalancesApi>().listBalances(ADDRESS) }
+    }
+
+    @Test
+    fun testGetMint() {
+        val response = mockk<Mint>()
+        mockkConstructor(MintsApi::class)
+        every { anyConstructed<MintsApi>().getMint(ID) } returns response
+
+        assertEquals(response, sdk.getMint(ID))
+        verify { anyConstructed<MintsApi>().getMint(ID) }
+    }
+
+    @Test
+    fun testListMints() {
+        val response = mockk<ListMintsResponse>()
+        mockkConstructor(MintsApi::class)
+        every { anyConstructed<MintsApi>().listMints(tokenAddress = TOKEN_ADDRESS) } returns response
+
+        assertEquals(response, sdk.listMints(tokenAddress = TOKEN_ADDRESS))
+        verify { anyConstructed<MintsApi>().listMints(tokenAddress = TOKEN_ADDRESS) }
+    }
+
+    @Test
+    fun testGetOrder() {
+        val response = mockk<Order>()
+        mockkConstructor(OrdersApi::class)
+        every { anyConstructed<OrdersApi>().getOrder(ID) } returns response
+
+        assertEquals(response, sdk.getOrder(ID))
+        verify { anyConstructed<OrdersApi>().getOrder(ID, null, null, null) }
+    }
+
+    @Test
+    fun testListOrders() {
+        val response = mockk<ListOrdersResponse>()
+        mockkConstructor(OrdersApi::class)
+        val status = "imx"
+        every { anyConstructed<OrdersApi>().listOrders(status = status) } returns response
+
+        assertEquals(response, sdk.listOrders(status = status))
+        verify { anyConstructed<OrdersApi>().listOrders(status = status) }
+    }
+
+    @Test
+    fun testGetTrade() {
+        val response = mockk<Trade>()
+        mockkConstructor(TradesApi::class)
+        every { anyConstructed<TradesApi>().getTrade(ID) } returns response
+
+        assertEquals(response, sdk.getTrade(ID))
+        verify { anyConstructed<TradesApi>().getTrade(ID) }
+    }
+
+    @Test
+    fun testListTrades() {
+        val response = mockk<ListTradesResponse>()
+        mockkConstructor(TradesApi::class)
+        every { anyConstructed<TradesApi>().listTrades(partyATokenAddress = TOKEN_ADDRESS) } returns response
+
+        assertEquals(response, sdk.listTrades(partyATokenAddress = TOKEN_ADDRESS))
+        verify { anyConstructed<TradesApi>().listTrades(partyATokenAddress = TOKEN_ADDRESS) }
+    }
+
+    @Test
+    fun testGetToken() {
+        val response = mockk<TokenDetails>()
+        mockkConstructor(TokensApi::class)
+        every { anyConstructed<TokensApi>().getToken(ADDRESS) } returns response
+
+        assertEquals(response, sdk.getToken(ADDRESS))
+        verify { anyConstructed<TokensApi>().getToken(ADDRESS) }
+    }
+
+    @Test
+    fun testListTokens() {
+        val response = mockk<ListTokensResponse>()
+        mockkConstructor(TokensApi::class)
+        val symbols = "?symbols&#x3D;IMX,ETH"
+        every { anyConstructed<TokensApi>().listTokens(ADDRESS, symbols) } returns response
+
+        assertEquals(response, sdk.listTokens(ADDRESS, symbols))
+        verify { anyConstructed<TokensApi>().listTokens(ADDRESS, symbols) }
+    }
+
+    @Test
+    fun testGetTransfer() {
+        val response = mockk<Transfer>()
+        mockkConstructor(TransfersApi::class)
+        every { anyConstructed<TransfersApi>().getTransfer(ID) } returns response
+
+        assertEquals(response, sdk.getTransfer(ID))
+        verify { anyConstructed<TransfersApi>().getTransfer(ID) }
+    }
+
+    @Test
+    fun testListTransfers() {
+        val response = mockk<ListTransfersResponse>()
+        mockkConstructor(TransfersApi::class)
+        every { anyConstructed<TransfersApi>().listTransfers(assetId = ID) } returns response
+
+        assertEquals(response, sdk.listTransfers(assetId = ID))
+        verify { anyConstructed<TransfersApi>().listTransfers(assetId = ID) }
     }
 }

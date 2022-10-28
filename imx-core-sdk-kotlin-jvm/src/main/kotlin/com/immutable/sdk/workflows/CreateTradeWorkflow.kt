@@ -1,5 +1,6 @@
 package com.immutable.sdk.workflows
 
+import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.ImmutableException
 import com.immutable.sdk.Signer
 import com.immutable.sdk.StarkSigner
@@ -12,7 +13,8 @@ import java.util.concurrent.CompletableFuture
 private const val SIGNABLE_TRADE = "Signable trade"
 private const val ORDER_DETAILS = "Order details"
 private const val CREATE_TRADE = "Create trade"
-private const val COMMA = ","
+@VisibleForTesting
+internal const val COMMA = ","
 
 @Suppress("LongParameterList")
 internal fun createTrade(

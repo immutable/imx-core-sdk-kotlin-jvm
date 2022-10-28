@@ -5,11 +5,8 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationOffchainResponse
 import com.immutable.sdk.api.model.GetUsersApiResponse
 import com.immutable.sdk.api.model.RegisterUserResponse
-import io.mockk.MockKAnnotations
-import io.mockk.every
+import io.mockk.*
 import io.mockk.impl.annotations.MockK
-import io.mockk.unmockkAll
-import io.mockk.verify
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -71,6 +68,7 @@ class RegisterWorkflowTest {
     fun testPreRegisteredUserRegisterOffChainSuccess() {
         every { api.getUsers(ADDRESS) } returns GetUsersApiResponse(listOf("account"))
         addressFuture.complete(ADDRESS)
+        starkAddressFuture.complete(STARK_ADDRESS)
         starkSignatureFuture.complete(SIGNATURE)
 
         testFuture(
@@ -79,6 +77,14 @@ class RegisterWorkflowTest {
             assert(throwable == null)
             assert(ecKeyPair != null)
         }
+
+        verifyOrder {
+            signer.getAddress()
+            starkSigner.getAddress()
+            api.getUsers(ADDRESS)
+        }
+        verify(exactly = 0) { api.getSignableRegistration(any()) }
+        verify(exactly = 0) { api.registerUser(any()) }
     }
 
     @Test

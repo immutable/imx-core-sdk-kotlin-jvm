@@ -28,6 +28,19 @@ private const val ORDER_ID = "5"
 private const val TRADE_ID = 6
 private const val PAYLOAD_HASH = "tradePayloadHash"
 private const val SIGNABLE_MESSAGE = "messageForL1"
+private const val RECIPIENT_ADDRESS1 = "0xa76e3eeb2f7143165618ab8feaabcd395b6f1234"
+private const val RECIPIENT_ADDRESS2 = "0xa76e3eeb2f7143165618ab8feaabcd395b6fabcd"
+private const val FEE_PERCENTAGE1 = 5.0
+private const val FEE_PERCENTAGE2 = 2.5
+private const val STARK_KEY = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485"
+private const val ASSET_ID_SELL = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02"
+private const val ASSET_ID_BUY = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb01"
+private const val VAULT_ID_SELL = 1_502_450_104
+private const val VAULT_ID_BUY = 1_502_450_105
+private const val AMOUNT_SELL = "10100000000000000"
+private const val AMOUNT_BUY = "1"
+private const val NONCE = 639_749_977
+private const val EXPIRATION_TIMESTAMP = 1_325_765
 
 class CreateTradeWorkflowTest {
     @MockK
@@ -44,6 +57,9 @@ class CreateTradeWorkflowTest {
 
     @MockK
     private lateinit var order: Order
+
+    @MockK
+    private lateinit var feeInfo: FeeInfo
 
     private lateinit var addressFuture: CompletableFuture<String>
     private lateinit var starkSignatureFuture: CompletableFuture<String>
@@ -90,17 +106,18 @@ class CreateTradeWorkflowTest {
         )
 
         every { tradesApi.getSignableTrade(any()) } returns GetSignableTradeResponse(
-            assetIdSell = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb02",
-            assetIdBuy = "0x0400018c7bd712ffd55027823f43277c11070bbaae94c8817552471a7abfcb01",
-            vaultIdSell = 1_502_450_104,
-            vaultIdBuy = 1_502_450_105,
-            amountSell = "10100000000000000",
-            amountBuy = "1",
-            nonce = 639_749_977,
-            expirationTimestamp = 1_325_765,
-            starkKey = "0x06588251eea34f39848302f991b8bc7098e2bb5fd2eba120255f91e971a23485",
+            assetIdSell = ASSET_ID_SELL,
+            assetIdBuy = ASSET_ID_BUY,
+            vaultIdSell = VAULT_ID_SELL,
+            vaultIdBuy = VAULT_ID_BUY,
+            amountSell = AMOUNT_SELL,
+            amountBuy = AMOUNT_BUY,
+            nonce = NONCE,
+            expirationTimestamp = EXPIRATION_TIMESTAMP,
+            starkKey = STARK_KEY,
             payloadHash = PAYLOAD_HASH,
-            signableMessage = SIGNABLE_MESSAGE
+            signableMessage = SIGNABLE_MESSAGE,
+            feeInfo = feeInfo
         )
     }
 
@@ -229,5 +246,67 @@ class CreateTradeWorkflowTest {
             expectedResult = null,
             expectedError = ImmutableException.apiError("")
         )
+    }
+
+    @Test
+    fun testBuyWithFeesSuccess() {
+        every { ordersApi.getOrder(any(), any(), any(), any()) } returns order
+
+        val response = CreateTradeResponse(tradeId = TRADE_ID, status = OrderStatus.Filled.value)
+        val slot = slot<CreateTradeRequestV1>()
+        every {
+            tradesApi.createTrade(
+                capture(slot),
+                ADDRESS,
+                ETH_SIGNATURE
+            )
+        } returns response
+        addressFuture.complete(ADDRESS)
+        starkSignatureFuture.complete(STARK_SIGNATURE)
+        ethSignatureFuture.complete(ETH_SIGNATURE)
+
+        val fees = arrayListOf(
+            FeeEntry(RECIPIENT_ADDRESS1, FEE_PERCENTAGE1),
+            FeeEntry(RECIPIENT_ADDRESS2, FEE_PERCENTAGE2)
+        )
+        testFuture(
+            future = createTrade(ORDER_ID, fees, signer, starkSigner, ordersApi, tradesApi),
+            expectedResult = response,
+            expectedError = null
+        )
+
+        assert(slot.captured.starkSignature == STARK_SIGNATURE)
+        verifyOrder {
+            signer.getAddress()
+            ordersApi.getOrder(
+                ORDER_ID,
+                true,
+                "$FEE_PERCENTAGE1$COMMA$FEE_PERCENTAGE2",
+                "$RECIPIENT_ADDRESS1$COMMA$RECIPIENT_ADDRESS2"
+            )
+            tradesApi.getSignableTrade(GetSignableTradeRequest(ORDER_ID.toInt(), ADDRESS, fees = fees))
+            starkSigner.signMessage(PAYLOAD_HASH)
+            signer.signMessage(SIGNABLE_MESSAGE)
+            tradesApi.createTrade(
+                CreateTradeRequestV1(
+                    amountBuy = AMOUNT_BUY,
+                    amountSell = AMOUNT_SELL,
+                    assetIdBuy = ASSET_ID_BUY,
+                    assetIdSell = ASSET_ID_SELL,
+                    expirationTimestamp = EXPIRATION_TIMESTAMP,
+                    nonce = NONCE,
+                    orderId = ORDER_ID.toInt(),
+                    starkKey = STARK_KEY,
+                    starkSignature = STARK_SIGNATURE,
+                    vaultIdBuy = VAULT_ID_BUY,
+                    vaultIdSell = VAULT_ID_SELL,
+                    feeInfo = feeInfo,
+                    fees = fees,
+                    includeFees = true
+                ),
+                xImxEthAddress = ADDRESS,
+                xImxEthSignature = ETH_SIGNATURE
+            )
+        }
     }
 }

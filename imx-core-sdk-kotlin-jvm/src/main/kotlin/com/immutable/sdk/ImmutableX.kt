@@ -666,6 +666,16 @@ class ImmutableX(
     }
 
     /**
+     * Mint tokens in a batch with fees
+     * @param request - the request object to be provided in the API request
+     * @param signer - the L1 signer
+     * @returns a [CompletableFuture] that will provide all minting results if successful.
+     */
+    fun mint(request: UnsignedMintRequest, signer: Signer): CompletableFuture<List<MintResultDetails>> {
+        return com.immutable.sdk.workflows.mint(request, signer, mintsApi)
+    }
+
+    /**
      * Get a list of withdrawals
      *
      * @param withdrawnToWallet Withdrawal has been transferred to user&#39;s Layer 1 wallet (optional)

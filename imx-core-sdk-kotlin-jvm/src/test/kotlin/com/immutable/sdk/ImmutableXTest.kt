@@ -27,6 +27,8 @@ import com.immutable.sdk.workflows.deposit
 import com.immutable.sdk.workflows.completeWithdrawal
 import com.immutable.sdk.workflows.isRegisteredOnChain
 import com.immutable.sdk.workflows.withdrawal.prepareWithdrawal
+import com.immutable.sdk.workflows.mint
+import com.immutable.sdk.workflows.completeExceptionally
 import com.immutable.sdk.workflows.TransferData
 import io.mockk.*
 import io.mockk.impl.annotations.MockK
@@ -40,6 +42,7 @@ import java.time.Clock
 import java.time.Instant
 import java.util.*
 import java.util.concurrent.CompletableFuture
+import java.util.concurrent.ExecutionException
 
 private const val API_URL = "url"
 private const val NODE_URL = "alchemy"
@@ -56,6 +59,8 @@ private const val TIMESTAMP_STRING = "1666932846"
 private const val ETH_SIGNATURE =
     "0x5a263fad6f17f23e7c7ea833d058f3656d3fe464baf13f6f5ccba9a2466ba2ce4c4a250231bcac" +
         "7beb165aec4c9b049b4ba40ad8dd287dc79b92b1ffcf20cdcf1a"
+private const val CONTRACT_ADDRESS = "0x0281d479BADBfDfb354e099a4Eb7df9911eE9800"
+private const val BLUEPRINT = "blueprint"
 
 class ImmutableXTest {
 
@@ -529,6 +534,35 @@ class ImmutableXTest {
 
         assertEquals(response, sdk.listMints(tokenAddress = TOKEN_ADDRESS))
         verify { anyConstructed<MintsApi>().listMints(tokenAddress = TOKEN_ADDRESS) }
+    }
+
+    @Test
+    fun testMint() {
+        val response = MintResultDetails(CONTRACT_ADDRESS, TOKEN_ID, ID.toInt())
+        mockkStatic(::mint)
+        every { mint(any(), any(), any()) } returns CompletableFuture.completedFuture(arrayListOf(response))
+
+        val request = UnsignedMintRequest(
+            CONTRACT_ADDRESS,
+            users = arrayListOf(
+                MintUser(arrayListOf(MintTokenDataV2(TOKEN_ID, BLUEPRINT)), ADDRESS)
+            )
+        )
+        assertEquals(arrayListOf(response), sdk.mint(request, signer).get())
+    }
+
+    @Test(expected = ExecutionException::class)
+    fun testMintError() {
+        mockkStatic(::mint)
+        every { mint(any(), any(), any()) } returns completeExceptionally(RuntimeException())
+
+        val request = UnsignedMintRequest(
+            CONTRACT_ADDRESS,
+            users = arrayListOf(
+                MintUser(arrayListOf(MintTokenDataV2(TOKEN_ID, BLUEPRINT)), ADDRESS)
+            )
+        )
+        sdk.mint(request, signer).get()
     }
 
     @Test

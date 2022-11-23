@@ -17,6 +17,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.openapitools.client.infrastructure.ClientException
+import org.web3j.abi.datatypes.Bool
 import org.web3j.abi.datatypes.Function
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.RemoteFunctionCall
@@ -92,6 +93,9 @@ class DepositWorkflowTest {
     private lateinit var txRemoteFunctionCall: RemoteFunctionCall<TransactionReceipt>
 
     @MockK
+    private lateinit var isApprovedRemoteFunctionCall: RemoteFunctionCall<Boolean>
+
+    @MockK
     private lateinit var ethSendRequest: Request<Any, EthSendTransaction>
 
     @MockK
@@ -143,6 +147,7 @@ class DepositWorkflowTest {
         every { count.transactionCount } returns NONCE
 
         every { txRemoteFunctionCall.encodeFunctionCall() } returns ENCODED_FUNCTION_CALL
+        every { isApprovedRemoteFunctionCall.encodeFunctionCall() } returns ENCODED_FUNCTION_CALL
 
         mockkStatic(Registration_sol_Registration::class)
         every {
@@ -166,6 +171,7 @@ class DepositWorkflowTest {
         } returns txRemoteFunctionCall
         every { coreContract.depositERC20(any(), any(), any(), any()) } returns txRemoteFunctionCall
         every { coreContract.depositNft(any(), any(), any(), any()) } returns txRemoteFunctionCall
+        every { coreContract.registerUser(any(), any(), any()) } returns txRemoteFunctionCall
         every { coreContract.contractAddress } returns CORE_CONTRACT_ADDRESS
 
         mockkStatic(IERC20_sol_IERC20::class)
@@ -179,7 +185,8 @@ class DepositWorkflowTest {
         every {
             IERC721_sol_IERC721.load(any(), any(), any<TransactionManager>(), any())
         } returns erc721Contract
-        every { erc721Contract.approve(any(), any()) } returns txRemoteFunctionCall
+        every { erc721Contract.isApprovedForAll(any(), any()) } returns isApprovedRemoteFunctionCall
+        every { erc721Contract.setApprovalForAll(any(), any()) } returns txRemoteFunctionCall
         every { erc721Contract.contractAddress } returns ERC721_CONTRACT_ADDRESS
 
         every { gasProvider.gasPrice } returns DefaultGasProvider.GAS_PRICE
@@ -431,8 +438,9 @@ class DepositWorkflowTest {
     }
 
     @Test
-    fun testDepositErc721Success_registerAndDeposit() {
+    fun testDepositErc721Success_registerAndDeposit_notApproved() {
         every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
+        every { isApprovedRemoteFunctionCall.decodeFunctionResponse(any()) } returns listOf(Bool(false))
 
         addressFuture.complete(ADDRESS)
         signedTransactionFuture.complete(SIGNED_TRANSACTION)
@@ -444,7 +452,6 @@ class DepositWorkflowTest {
             expectedError = null
         )
 
-        verify { erc721Contract.approve(any(), any()) }
         verify {
             depositsApi.getSignableDeposit(
                 GetSignableDepositRequest(token.formatQuantity(), token.toSignableToken(), ADDRESS)
@@ -463,16 +470,23 @@ class DepositWorkflowTest {
         }
         verify { usersApi.getUsers(ADDRESS) }
         verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify { erc721Contract.isApprovedForAll(ADDRESS, CORE_CONTRACT_ADDRESS) }
+        verify { erc721Contract.setApprovalForAll(CORE_CONTRACT_ADDRESS, true) }
         verify {
             usersApi.getSignableRegistration(
                 GetSignableRegistrationRequest(ADDRESS, STARK_KEY)
             )
         }
         verify {
-            registrationContract.registerAndDepositNft(
+            coreContract.registerUser(
                 ADDRESS,
                 STARK_KEY_BIG_INT,
-                OPERATOR_SIGNATURE.hexToByteArray(),
+                OPERATOR_SIGNATURE.hexToByteArray()
+            )
+        }
+        verify {
+            coreContract.depositNft(
+                STARK_KEY_BIG_INT,
                 ASSET_TYPE.toBigInteger(),
                 VAULT_ID.toBigInteger(),
                 TOKEN_ID.toBigInteger()
@@ -483,8 +497,9 @@ class DepositWorkflowTest {
     }
 
     @Test
-    fun testDepositErc721Success_deposit() {
+    fun testDepositErc721Success_deposit_alreadyApproved() {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
+        every { isApprovedRemoteFunctionCall.decodeFunctionResponse(any()) } returns listOf(Bool(true))
 
         addressFuture.complete(ADDRESS)
         signedTransactionFuture.complete(SIGNED_TRANSACTION)
@@ -496,7 +511,6 @@ class DepositWorkflowTest {
             expectedError = null
         )
 
-        verify { erc721Contract.approve(any(), any()) }
         verify {
             depositsApi.getSignableDeposit(
                 GetSignableDepositRequest(token.formatQuantity(), token.toSignableToken(), ADDRESS)
@@ -515,7 +529,16 @@ class DepositWorkflowTest {
         }
         verify { usersApi.getUsers(ADDRESS) }
         verify { registrationContract.isRegistered(STARK_KEY_BIG_INT) }
+        verify { erc721Contract.isApprovedForAll(ADDRESS, CORE_CONTRACT_ADDRESS) }
+        verify(exactly = 0) { erc721Contract.setApprovalForAll(CORE_CONTRACT_ADDRESS, true) }
         verify(exactly = 0) { usersApi.getSignableRegistration(any()) }
+        verify(exactly = 0) {
+            coreContract.registerUser(
+                ADDRESS,
+                STARK_KEY_BIG_INT,
+                OPERATOR_SIGNATURE.hexToByteArray()
+            )
+        }
         verify {
             coreContract.depositNft(
                 STARK_KEY_BIG_INT,

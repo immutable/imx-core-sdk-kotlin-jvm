@@ -6,11 +6,14 @@ import com.immutable.sdk.api.UsersApi
 import com.immutable.sdk.api.model.GetSignableRegistrationRequest
 import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.api.model.RegisterUserRequest
+import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.crypto.Crypto
 import com.immutable.sdk.extensions.hexRemovePrefix
+import com.immutable.sdk.extensions.hexToByteArray
 import org.openapitools.client.infrastructure.ClientException
 import org.web3j.protocol.Web3j
+import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.ClientTransactionManager
 import org.web3j.tx.gas.StaticGasProvider
@@ -181,3 +184,38 @@ internal fun getSignableRegistrationOnChain(
         )
     )
 }
+
+@Suppress("LongParameterList")
+internal fun registerOnChain(
+    base: ImmutableXBase,
+    nodeUrl: String,
+    signer: Signer,
+    starkPublicKey: String,
+    api: UsersApi,
+    gasProvider: StaticGasProvider
+): CompletableFuture<EthSendTransaction> = signer.getAddress()
+    .thenCompose { address ->
+        getSignableRegistrationOnChain(address, starkPublicKey, api)
+            .thenApply { response -> address to response }
+    }
+    .thenCompose { (address, response) ->
+        val web3j = Web3j.build(HttpService(nodeUrl))
+        val contract = Core_sol_Core.load(
+            ImmutableConfig.getCoreContractAddress(base),
+            web3j,
+            ClientTransactionManager(web3j, address),
+            gasProvider
+        )
+        sendTransaction(
+            contract = contract,
+            contractFunction = Core_sol_Core.FUNC_REGISTERUSER,
+            data = contract.registerUser(
+                address,
+                starkPublicKey.hexRemovePrefix().toBigInteger(HEX_RADIX),
+                response.operatorSignature.hexToByteArray()
+            ).encodeFunctionCall(),
+            signer = signer,
+            web3j = web3j,
+            gasProvider = gasProvider
+        )
+    }

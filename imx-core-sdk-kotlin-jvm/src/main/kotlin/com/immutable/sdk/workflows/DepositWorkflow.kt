@@ -145,7 +145,7 @@ internal fun executeDeposit(
 }
 
 @Suppress("LongParameterList")
-internal fun <C : Contract> executeRegisterAndDepositToken(
+private fun <C : Contract> executeRegisterAndDepositToken(
     web3j: Web3j,
     signer: Signer,
     params: DepositWorkflowParams,

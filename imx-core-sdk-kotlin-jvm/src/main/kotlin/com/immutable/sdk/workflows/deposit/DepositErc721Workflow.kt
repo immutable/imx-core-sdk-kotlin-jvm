@@ -7,16 +7,13 @@ import com.immutable.sdk.Signer
 import com.immutable.sdk.api.DepositsApi
 import com.immutable.sdk.api.EncodingApi
 import com.immutable.sdk.api.UsersApi
-import com.immutable.sdk.api.model.GetSignableRegistrationResponse
 import com.immutable.sdk.contracts.Core_sol_Core
 import com.immutable.sdk.contracts.IERC721_sol_IERC721
-import com.immutable.sdk.contracts.Registration_sol_Registration
 import com.immutable.sdk.extensions.hexRemovePrefix
-import com.immutable.sdk.extensions.hexToByteArray
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.workflows.executeDepositToken
-import com.immutable.sdk.workflows.executeRegisterAndDepositToken
 import com.immutable.sdk.workflows.prepareDeposit
+import com.immutable.sdk.workflows.registerOnChain
 import com.immutable.sdk.workflows.sendTransaction
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.methods.response.EthSendTransaction
@@ -42,41 +39,22 @@ internal fun depositErc721(
         .thenCompose { params ->
             approveErc721Token(
                 token,
-                if (params.isRegistered) ImmutableConfig.getCoreContractAddress(base)
-                else ImmutableConfig.getRegistrationContractAddress(base),
+                ImmutableConfig.getCoreContractAddress(base),
                 web3j,
                 signer,
                 gasProvider
             ).thenApply { params }
         }
         .thenCompose { params ->
-            // Using individual execute functions instead of `executeDeposit` since registration contract
-            // is required (instead of core contract) to register and deposit ERC 721 tokens
-            if (!params.isRegistered) executeRegisterAndDepositToken(
-                web3j = web3j,
-                signer = signer,
-                params = params,
-                contract = Registration_sol_Registration.load(
-                    ImmutableConfig.getRegistrationContractAddress(base),
-                    web3j,
-                    ClientTransactionManager(web3j, params.address),
-                    gasProvider
-                ),
-                contractFunction = Registration_sol_Registration.FUNC_REGISTERANDDEPOSITNFT,
-                data = { contract: Registration_sol_Registration, response: GetSignableRegistrationResponse ->
-                    contract.registerAndDepositNft(
-                        params.address,
-                        params.starkKey.hexRemovePrefix().toBigInteger(HEX_RADIX),
-                        response.operatorSignature.hexToByteArray(),
-                        params.assetType,
-                        params.vaultId,
-                        token.tokenId.toBigInteger()
-                    ).encodeFunctionCall()
-                },
-                usersApi = usersApi,
-                gasProvider = gasProvider
-            )
-            else executeDepositToken(
+            // Proxy registration contract registerAndDepositNft method is not used as it currently fails
+            // ERC721 transfer ownership check
+            if (!params.isRegistered)
+                registerOnChain(base, nodeUrl, signer, params.starkKey, usersApi, gasProvider)
+                    .thenApply { params }
+            else CompletableFuture.completedFuture(params)
+        }
+        .thenCompose { params ->
+            executeDepositToken(
                 web3j = web3j,
                 signer = signer,
                 params = params,
@@ -122,13 +100,27 @@ private fun approveErc721Token(
 
         sendTransaction(
             contract = contract,
-            contractFunction = IERC721_sol_IERC721.FUNC_APPROVE,
-            data = contract.approve(
-                approveForContractAddress,
-                token.tokenId.toBigInteger()
-            ).encodeFunctionCall(),
+            contractFunction = IERC721_sol_IERC721.FUNC_ISAPPROVEDFORALL,
+            data = contract.isApprovedForAll(address, approveForContractAddress)
+                .encodeFunctionCall(),
             signer = signer,
             web3j = web3j,
             gasProvider = gasProvider
-        )
+        ).thenApply { response ->
+            val approved = contract.isApprovedForAll(address, approveForContractAddress)
+                .decodeFunctionResponse(response.transactionHash)
+                .first().value as? Boolean
+            contract to (approved ?: false)
+        }
+    }
+    .thenCompose { (contract, isApprovedForAll) ->
+        if (!isApprovedForAll) sendTransaction(
+            contract = contract,
+            contractFunction = IERC721_sol_IERC721.FUNC_SETAPPROVALFORALL,
+            data = contract.setApprovalForAll(approveForContractAddress, true)
+                .encodeFunctionCall(),
+            signer = signer,
+            web3j = web3j,
+            gasProvider = gasProvider
+        ) else CompletableFuture.completedFuture(EthSendTransaction())
     }

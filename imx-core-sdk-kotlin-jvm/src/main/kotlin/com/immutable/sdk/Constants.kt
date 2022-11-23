@@ -12,4 +12,6 @@ internal object Constants {
     const val ERC721_AMOUNT = "1"
 
     const val DEFAULT_MOONPAY_COLOUR_CODE = "#00818e"
+
+    const val UNCOMPRESSED_PUBLIC_KEY_PREFIX = "0x04"
 }

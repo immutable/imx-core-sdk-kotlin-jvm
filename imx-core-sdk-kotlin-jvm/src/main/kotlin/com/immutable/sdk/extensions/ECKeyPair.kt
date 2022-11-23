@@ -11,3 +11,9 @@ internal fun ECKeyPair.getStarkPublicKey() =
         .sanitizeBytes()
         .hexToByteArray()
         .toHexString(byteLength = Constants.STARK_KEY_PUBLIC_BYTE_LENGTH)
+
+/**
+ * The public key in hex format with the prefix 0x04
+ */
+fun ECKeyPair.getUncompressedPublicKey() =
+    "${Constants.UNCOMPRESSED_PUBLIC_KEY_PREFIX}${publicKey.toString(Constants.HEX_RADIX)}"

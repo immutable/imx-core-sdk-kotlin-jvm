@@ -61,7 +61,7 @@ class ImmutableException private constructor(
          */
         internal fun contractError(callName: String, cause: Throwable? = null) =
             ImmutableException(
-                ImmutableExceptionType.ApiError,
+                ImmutableExceptionType.ContractError,
                 "Contract transaction failed: $callName",
                 cause
             )
@@ -90,5 +90,10 @@ enum class ImmutableExceptionType {
     /**
      * Exception for when the issue is due to SDK logic
      */
-    ClientError
+    ClientError,
+
+    /**
+     * Exception for when a workflow fails due to a smart contract transaction failing.
+     */
+    ContractError
 }

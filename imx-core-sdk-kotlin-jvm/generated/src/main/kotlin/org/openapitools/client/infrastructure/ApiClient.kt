@@ -33,8 +33,8 @@ import java.util.Locale
 import com.squareup.moshi.adapter
 import okhttp3.logging.HttpLoggingInterceptor
 
-internal open class ApiClient(val baseUrl: String) {
-    internal companion object {
+open class ApiClient(val baseUrl: String) {
+    companion object {
         protected const val ContentType = "Content-Type"
         protected const val Accept = "Accept"
         protected const val Authorization = "Authorization"

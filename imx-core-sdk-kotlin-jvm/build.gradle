@@ -51,9 +51,6 @@ openApiGenerate {
             // AssetOrderDetails model (with List<SellOrders>) for 'Asset.orders' field to use.
             OrderDetails: "com.immutable.sdk.api.model.AssetOrderDetails"
     ]
-    additionalProperties = [
-            nonPublicApi: true
-    ]
 }
 
 sourceSets {

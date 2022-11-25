@@ -15,6 +15,7 @@ for new features.
 
 * Changed `Crypto` object to internal
 * Changed `ECKeyPair.getStarkPublicKey()` extension to internal
+* ImmutableX class exposes APIs for users who need access outside of basic workflows
 
 ### Deprecated
 

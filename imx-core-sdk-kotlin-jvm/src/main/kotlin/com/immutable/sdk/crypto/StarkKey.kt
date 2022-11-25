@@ -134,7 +134,7 @@ object StarkKey {
      * @returns the private key as a hex string
      */
     @Suppress("MagicNumber")
-    fun generateLegacyKeyPair(seed: String, ethereumAddress: String): String {
+    fun generateLegacyStarkPrivateKey(seed: String, ethereumAddress: String): String {
         val bytes = seed.hexToByteArray()
         val s = bytes.copyOfRange(32, 64).toNoPrefixHexString()
         return getKeyPairFromPath(s, getAccountPath(ethereumAddress))

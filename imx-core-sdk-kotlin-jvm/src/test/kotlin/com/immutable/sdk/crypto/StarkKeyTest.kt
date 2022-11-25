@@ -107,7 +107,7 @@ class StarkKeyTest {
 
     @Test
     fun testGenerateLegacyKeyPair() {
-        val pk = StarkKey.generateLegacyKeyPair(
+        val pk = StarkKey.generateLegacyStarkPrivateKey(
             "0xe834136cc3206a8f80acd81922d80b377ca769dc973d83ee2bd8bed4b7cdc3565f2a3aded8de5c93f85" +
                 "327d5c1fb535959bdc3068318875b95788b074f3ab2931c",
             "0x2cD7944D8398017d0D142Ea2Ec483bc230f01A84"

@@ -2,32 +2,37 @@
 
 All notable changes to this project will be documented in this file.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
-and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project
+adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html)
 
-## [Unreleased]
+## [1.0.0-beta.1] - 2022-11-23
 
 ### Added
 
-for new features.
+* Added Deposit and Withdraw ETH/ERC20/ERC721 workflows
+* Ability to check if user is registered on chain
+* Support for Sandbox environment
+* Added `StarkKey.generateStarkPrivateKey` and `StarkKey.generateLegacyStarkPrivateKey`
 
 ### Changed
 
 * Changed `Crypto` object to internal
 * Changed `ECKeyPair.getStarkPublicKey()` extension to internal
+* Expose fewer public methods to make it easier for us to maintain the SDK.
+* Introduced a [single entry point](https://github.com/immutable/imx-core-sdk-kotlin-jvm/blob/main/imx-core-sdk-kotlin-jvm/src/main/kotlin/com/immutable/sdk/ImmutableX.kt) for the SDK to improve discoverability
 * ImmutableX class exposes APIs for users who need access outside of basic workflows
 
 ### Deprecated
 
-for soon-to-be removed features.
+* Ropsten test network
 
 ### Removed
 
-for now removed features.
+* Key derivation
 
 ### Fixed
 
-for any bug fixes.
+* Incorrect transfer amount in Transfer workflow
 
 ## [0.6.0] - 2022-08-12
 
@@ -37,7 +42,8 @@ for any bug fixes.
 
 ### Changed
 
-* Updated OpenAPI spec which includes breaking change to the `Transfer` object, replacing `data` and `type` with `token` field.
+* Updated OpenAPI spec which includes breaking change to the `Transfer` object, replacing `data`
+  and `type` with `token` field.
 * Renamed `cancel` workflow to `cancelOrder`
 * `StarkKey.sign` was made private, use `StandardStarkSigner` to handle this case
 
@@ -45,14 +51,16 @@ for any bug fixes.
 
 ### Added
 
-* Added `ethSignature` and `ethAddress` headers to workflows 
+* Added `ethSignature` and `ethAddress` headers to workflows
 
 ### Fixed
 
 * `StarkKey.fixMessage` not stripping hex
 
 ## [0.5.1] - 2022-06-20
+
 Initial release with a client for the public API and the following workflows:
+
 * Buy
 * Sell
 * Cancel sell

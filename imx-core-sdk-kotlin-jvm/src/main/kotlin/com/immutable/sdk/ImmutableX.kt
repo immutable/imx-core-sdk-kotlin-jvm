@@ -88,20 +88,20 @@ class ImmutableX(
     private val base: ImmutableXBase = ImmutableXBase.Production,
     private val nodeUrl: String? = null
 ) {
-    private val assetsApi by lazy { AssetsApi() }
-    private val balancesApi by lazy { BalancesApi() }
-    private val collectionsApi by lazy { CollectionsApi() }
-    private val depositsApi by lazy { DepositsApi() }
-    private val metadataApi by lazy { MetadataApi() }
-    private val mintsApi by lazy { MintsApi() }
-    private val ordersApi by lazy { OrdersApi() }
-    private val projectsApi by lazy { ProjectsApi() }
-    private val tokensApi by lazy { TokensApi() }
-    private val tradesApi by lazy { TradesApi() }
-    private val transfersApi by lazy { TransfersApi() }
-    private val usersApi by lazy { UsersApi() }
-    private val withdrawalsApi by lazy { WithdrawalsApi() }
-    private val encodingApi by lazy { EncodingApi() }
+    val assetsApi by lazy { AssetsApi() }
+    val balancesApi by lazy { BalancesApi() }
+    val collectionsApi by lazy { CollectionsApi() }
+    val depositsApi by lazy { DepositsApi() }
+    val metadataApi by lazy { MetadataApi() }
+    val mintsApi by lazy { MintsApi() }
+    val ordersApi by lazy { OrdersApi() }
+    val projectsApi by lazy { ProjectsApi() }
+    val tokensApi by lazy { TokensApi() }
+    val tradesApi by lazy { TradesApi() }
+    val transfersApi by lazy { TransfersApi() }
+    val usersApi by lazy { UsersApi() }
+    val withdrawalsApi by lazy { WithdrawalsApi() }
+    val encodingApi by lazy { EncodingApi() }
 
     init {
         setBaseUrl()

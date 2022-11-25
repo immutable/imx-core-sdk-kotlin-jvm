@@ -5,7 +5,7 @@ import java.lang.RuntimeException
 import org.json.JSONException
 import org.json.JSONObject
 
-internal  class ApiErrorModel(val body: Any? = null) {
+ class ApiErrorModel(val body: Any? = null) {
     val code: String?
     val message: String?
 
@@ -25,16 +25,16 @@ internal  class ApiErrorModel(val body: Any? = null) {
     }
 }
 
-internal open class ClientException(message: kotlin.String? = null, val statusCode: Int = -1, val response: Response? = null, val errorModel: ApiErrorModel? = null) : RuntimeException(message) {
+open class ClientException(message: kotlin.String? = null, val statusCode: Int = -1, val response: Response? = null, val errorModel: ApiErrorModel? = null) : RuntimeException(message) {
 
-    internal companion object {
+    companion object {
         private const val serialVersionUID: Long = 123L
     }
 }
 
-internal open class ServerException(message: kotlin.String? = null, val statusCode: Int = -1, val response: Response? = null, val errorModel: ApiErrorModel? = null) : RuntimeException(message) {
+open class ServerException(message: kotlin.String? = null, val statusCode: Int = -1, val response: Response? = null, val errorModel: ApiErrorModel? = null) : RuntimeException(message) {
 
-    internal companion object {
+    companion object {
         private const val serialVersionUID: Long = 456L
     }
 }

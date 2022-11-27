@@ -4,10 +4,12 @@ on:
   push:
     tags:
       - "v*.*.*"
+  workflow_dispatch:
 
 jobs:
   release:
     runs-on: ubuntu-latest
+    if: contains('["nattb8", "dom-murray"]', github.actor)
 
     steps:
       - uses: actions/checkout@v3

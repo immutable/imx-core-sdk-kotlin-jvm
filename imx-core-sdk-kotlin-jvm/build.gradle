@@ -153,11 +153,10 @@ publishing {
             signing {
                 required !version.endsWith('SNAPSHOT')
                 if (!version.endsWith('SNAPSHOT')) {
-                    useInMemoryPgpKeys(
-                            findProperty("signing.keyId"),
-                            findProperty("signing.key"),
-                            findProperty("signing.password"),
-                    )
+                    def keyId = findProperty("signing.keyId") ?: System.getenv("SIGNING_KEY_ID")
+                    def key = findProperty("signing.key") ?: System.getenv("SIGNING_KEY")
+                    def password = findProperty("signing.key") ?: System.getenv("SIGNING_KEY_PASSWORD")
+                    useInMemoryPgpKeys(keyId, key, password)
                     sign publishing.publications
                 }
             }
@@ -171,8 +170,8 @@ publishing {
             url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 
             credentials {
-                username project.findProperty('mavenCentralUsername')
-                password project.findProperty('mavenCentralPassword')
+                username project.findProperty('mavenCentralUsername') ?: System.getenv("SONATYPE_NEXUS_USERNAME")
+                password project.findProperty('mavenCentralPassword') ?: System.getenv("SONATYPE_NEXUS_PASSWORD")
             }
         }
     }

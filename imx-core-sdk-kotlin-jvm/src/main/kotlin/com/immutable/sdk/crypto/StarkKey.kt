@@ -2,7 +2,8 @@ package com.immutable.sdk.crypto
 
 import com.google.common.annotations.VisibleForTesting
 import com.immutable.sdk.Constants
-import com.immutable.sdk.Constants.HEX_RADIX
+import com.immutable.sdk.Constants.STARK_MESSAGE
+import com.immutable.sdk.Signer
 import com.immutable.sdk.extensions.*
 import org.bouncycastle.crypto.digests.SHA256Digest
 import org.bouncycastle.crypto.signers.ECDSASigner
@@ -13,6 +14,7 @@ import org.web3j.crypto.ECDSASignature
 import org.web3j.crypto.ECKeyPair
 import java.math.BigInteger
 import java.security.MessageDigest
+import java.util.concurrent.CompletableFuture
 
 private const val LAYER = "starkex"
 private const val APPLICATION = "immutablex"
@@ -104,7 +106,7 @@ object StarkKey {
     }
 
     /**
-     * Generates the Stark key pair from the [seed] and [path]
+     * Generates the Stark key private key from the [seed] and [path]
      */
     private fun getKeyPairFromPath(seed: String, path: String): String {
         val master =
@@ -134,11 +136,17 @@ object StarkKey {
      * @returns the private key as a hex string
      */
     @Suppress("MagicNumber")
-    fun generateLegacyStarkPrivateKey(seed: String, ethereumAddress: String): String {
-        val bytes = seed.hexToByteArray()
-        val s = bytes.copyOfRange(32, 64).toNoPrefixHexString()
-        return getKeyPairFromPath(s, getAccountPath(ethereumAddress))
-    }
+    fun generateLegacyStarkPrivateKey(signer: Signer): CompletableFuture<String> =
+        signer.signMessage(STARK_MESSAGE)
+            .thenCompose { seed ->
+                signer.getAddress()
+                    .thenApply { address -> seed to address }
+            }
+            .thenApply { (seed, address) ->
+                val bytes = seed.hexToByteArray()
+                val s = bytes.copyOfRange(32, 64).toNoPrefixHexString()
+                getKeyPairFromPath(s, getAccountPath(address))
+            }
 
     /**
      * Signs the given [msg] with the given [keyPair]

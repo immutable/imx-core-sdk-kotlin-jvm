@@ -12,6 +12,7 @@ import org.junit.Before
 import org.junit.Test
 import org.web3j.crypto.ECKeyPair
 import java.math.BigInteger
+import java.util.concurrent.CompletableFuture
 
 class StarkKeyTest {
     @MockK
@@ -107,11 +108,15 @@ class StarkKeyTest {
 
     @Test
     fun testGenerateLegacyKeyPair() {
-        val pk = StarkKey.generateLegacyStarkPrivateKey(
-            "0xe834136cc3206a8f80acd81922d80b377ca769dc973d83ee2bd8bed4b7cdc3565f2a3aded8de5c93f85" +
-                "327d5c1fb535959bdc3068318875b95788b074f3ab2931c",
-            "0x2cD7944D8398017d0D142Ea2Ec483bc230f01A84"
-        )
+        every { signer.getAddress() } returns
+            CompletableFuture.completedFuture("0x2cD7944D8398017d0D142Ea2Ec483bc230f01A84")
+        every { signer.signMessage(any()) } returns
+            CompletableFuture.completedFuture(
+                "0xe834136cc3206a8f80acd81922d80b377ca769dc973d83ee2bd8bed4b7cdc3565f2a3aded8de5c93f85" +
+                    "327d5c1fb535959bdc3068318875b95788b074f3ab2931c"
+            )
+
+        val pk = StarkKey.generateLegacyStarkPrivateKey(signer).get()
         assertEquals("0512653c071aa6fb61615354cb850c1d6c122635c08329ce3b5c1f23ec844d19", pk)
     }
 }

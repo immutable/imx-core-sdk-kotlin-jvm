@@ -27,11 +27,11 @@ interface Signer {
     fun signMessage(message: String): CompletableFuture<String>
 
     /**
-     * Signs the [rawTransaction]
+     * Signs and sends the provided [rawTransaction]
      *
-     * @return a [CompletableFuture] with the signed transaction in hex format.
+     * @return a [CompletableFuture] with the transaction hash.
      */
-    fun signTransaction(rawTransaction: RawTransaction): CompletableFuture<String>
+    fun sendTransaction(rawTransaction: RawTransaction): CompletableFuture<String>
 }
 
 /**

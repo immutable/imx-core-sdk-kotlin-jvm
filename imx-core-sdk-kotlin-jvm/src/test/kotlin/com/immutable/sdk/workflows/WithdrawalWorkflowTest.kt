@@ -22,9 +22,7 @@ import org.web3j.abi.datatypes.Function
 import org.web3j.protocol.Web3j
 import org.web3j.protocol.core.RemoteFunctionCall
 import org.web3j.protocol.core.Request
-import org.web3j.protocol.core.Response
 import org.web3j.protocol.core.methods.response.EthGetTransactionCount
-import org.web3j.protocol.core.methods.response.EthSendTransaction
 import org.web3j.protocol.core.methods.response.TransactionReceipt
 import org.web3j.protocol.http.HttpService
 import org.web3j.tx.TransactionManager
@@ -52,7 +50,6 @@ private const val NODE_URL = "https://eth-goerli.g.alchemy.com/v2/apiKey"
 private const val CORE_CONTRACT_ADDRESS = "0x4527BE8f31E2ebFbEF4fCADDb5a17447B27d2123"
 private const val REGISTRATION_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9f1aBb6207Dabc"
 private const val ENCODED_FUNCTION_CALL = "000111000554abc00000000a123def000000"
-private const val SIGNED_TRANSACTION = "0xSignedTransaction"
 private const val TRANSACTION_HASH = "0x28ca2abed368dca3f304fbb2be6db1f56cdcb138cdd3a68f86dcbb40ddda7545"
 private val NONCE = BigInteger.ONE
 private const val BLUEPRINT = "1546abc420145def"
@@ -86,19 +83,13 @@ class WithdrawalWorkflowTest {
     private lateinit var txRemoteFunctionCall: RemoteFunctionCall<TransactionReceipt>
 
     @MockK
-    private lateinit var ethSendRequest: Request<Any, EthSendTransaction>
-
-    @MockK
-    private lateinit var ethSendTransaction: EthSendTransaction
-
-    @MockK
     private lateinit var mintableTokenDetails: MintableTokenDetails
 
     @MockK
     private lateinit var gasProvider: DefaultGasProvider
 
     private lateinit var addressFuture: CompletableFuture<String>
-    private lateinit var signedTransactionFuture: CompletableFuture<String>
+    private lateinit var sendTransactionFuture: CompletableFuture<String>
 
     @Suppress("LongMethod")
     @Before
@@ -107,8 +98,8 @@ class WithdrawalWorkflowTest {
 
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
-        signedTransactionFuture = CompletableFuture<String>()
-        every { signer.signTransaction(any()) } returns signedTransactionFuture
+        sendTransactionFuture = CompletableFuture<String>()
+        every { signer.sendTransaction(any()) } returns sendTransactionFuture
 
         every { encodingApi.encodeAsset(any(), any()) } returns EncodeAssetResponse(ASSET_ID, ASSET_TYPE)
         every { usersApi.getUsers(any()) } returns GetUsersApiResponse(arrayListOf(STARK_KEY))
@@ -122,10 +113,6 @@ class WithdrawalWorkflowTest {
 
         mockkStatic(Web3j::class)
         every { Web3j.build(any<HttpService>()) } returns web3j
-        every { web3j.ethSendRawTransaction(any()) } returns ethSendRequest
-        every { ethSendRequest.send() } returns ethSendTransaction
-        every { ethSendTransaction.transactionHash } returns TRANSACTION_HASH
-        every { ethSendTransaction.error } returns null
         val transactionCountRequest = mockk<Request<Any, EthGetTransactionCount>>()
         every { web3j.ethGetTransactionCount(any(), any()) } returns transactionCountRequest
         val count = mockk<EthGetTransactionCount>()
@@ -188,7 +175,7 @@ class WithdrawalWorkflowTest {
         every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = EthAsset(AMOUNT)
         testFuture(
@@ -217,8 +204,7 @@ class WithdrawalWorkflowTest {
                 ASSET_TYPE.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -226,7 +212,7 @@ class WithdrawalWorkflowTest {
         every { usersApi.getUsers(any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(EthAsset(AMOUNT)),
@@ -240,7 +226,7 @@ class WithdrawalWorkflowTest {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = EthAsset(AMOUNT)
         testFuture(
@@ -266,8 +252,7 @@ class WithdrawalWorkflowTest {
                 ASSET_TYPE.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -286,7 +271,7 @@ class WithdrawalWorkflowTest {
         every { encodingApi.encodeAsset(any(), any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(EthAsset(AMOUNT)),
@@ -298,27 +283,9 @@ class WithdrawalWorkflowTest {
     @Test
     fun testWithdraw_sendTransactionError() {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
-        every { ethSendRequest.send() } throws IOException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
-
-        testFuture(
-            future = createCompleteWithdrawalFuture(EthAsset(AMOUNT)),
-            expectedResult = null,
-            expectedError = ImmutableException.contractError("")
-        )
-    }
-
-    @Test
-    fun testWithdraw_sendTransactionError2() {
-        every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
-        val error = mockk<Response.Error>()
-        every { ethSendTransaction.error } returns error
-        every { error.message } returns ""
-
-        addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.completeExceptionally(IOException())
 
         testFuture(
             future = createCompleteWithdrawalFuture(EthAsset(AMOUNT)),
@@ -332,7 +299,7 @@ class WithdrawalWorkflowTest {
         every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = Erc20Asset(TOKEN_ADDRESS, TOKEN_DECIMAL, AMOUNT)
         testFuture(
@@ -364,8 +331,7 @@ class WithdrawalWorkflowTest {
                 ASSET_TYPE.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -373,7 +339,7 @@ class WithdrawalWorkflowTest {
         every { usersApi.getUsers(any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc20Asset(TOKEN_ADDRESS, TOKEN_DECIMAL, AMOUNT)),
@@ -387,7 +353,7 @@ class WithdrawalWorkflowTest {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = Erc20Asset(TOKEN_ADDRESS, TOKEN_DECIMAL, AMOUNT)
         testFuture(
@@ -416,8 +382,7 @@ class WithdrawalWorkflowTest {
                 ASSET_TYPE.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -428,7 +393,7 @@ class WithdrawalWorkflowTest {
         )
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
@@ -461,8 +426,7 @@ class WithdrawalWorkflowTest {
                 TOKEN_ID.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -485,7 +449,7 @@ class WithdrawalWorkflowTest {
         )
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
@@ -502,7 +466,7 @@ class WithdrawalWorkflowTest {
         )
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
@@ -532,8 +496,7 @@ class WithdrawalWorkflowTest {
                 TOKEN_ID.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -544,7 +507,7 @@ class WithdrawalWorkflowTest {
         } returns mintableTokenDetails
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
@@ -581,8 +544,7 @@ class WithdrawalWorkflowTest {
                 "{$TOKEN_ID}:{$BLUEPRINT}".toByteArray()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -593,7 +555,7 @@ class WithdrawalWorkflowTest {
         } returns mintableTokenDetails
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
@@ -610,7 +572,7 @@ class WithdrawalWorkflowTest {
         } returns mintableTokenDetails
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        sendTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createCompleteWithdrawalFuture(Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)),
@@ -640,7 +602,6 @@ class WithdrawalWorkflowTest {
                 "{$TOKEN_ID}:{$BLUEPRINT}".toByteArray()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 }

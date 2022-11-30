@@ -54,7 +54,6 @@ private const val REGISTRATION_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9
 private const val ERC20_CONTRACT_ADDRESS = "0x4527BE8f31E2ebFbEF4fCADDb5a17447B27d2000"
 private const val ERC721_CONTRACT_ADDRESS = "0x6C21EC8DE44AE44D0992ec3e2d9f1aBb6207D111"
 private const val ENCODED_FUNCTION_CALL = "000111000554abc00000000a123def000000"
-private const val SIGNED_TRANSACTION = "0xSignedTransaction"
 private const val TRANSACTION_HASH = "0xTransactionHash"
 private val NONCE = BigInteger.ONE
 
@@ -96,9 +95,6 @@ class DepositWorkflowTest {
     private lateinit var isApprovedRemoteFunctionCall: RemoteFunctionCall<Boolean>
 
     @MockK
-    private lateinit var ethSendRequest: Request<Any, EthSendTransaction>
-
-    @MockK
     private lateinit var ethSendTransaction: EthSendTransaction
 
     @MockK
@@ -115,7 +111,7 @@ class DepositWorkflowTest {
         addressFuture = CompletableFuture<String>()
         every { signer.getAddress() } returns addressFuture
         signedTransactionFuture = CompletableFuture<String>()
-        every { signer.signTransaction(any()) } returns signedTransactionFuture
+        every { signer.sendTransaction(any()) } returns signedTransactionFuture
 
         every { depositsApi.getSignableDeposit(any()) } returns GetSignableDepositResponse(
             amount = AMOUNT,
@@ -136,8 +132,6 @@ class DepositWorkflowTest {
 
         mockkStatic(Web3j::class)
         every { Web3j.build(any<HttpService>()) } returns web3j
-        every { web3j.ethSendRawTransaction(any()) } returns ethSendRequest
-        every { ethSendRequest.send() } returns ethSendTransaction
         every { ethSendTransaction.transactionHash } returns TRANSACTION_HASH
         every { ethSendTransaction.error } returns null
         val transactionCountRequest = mockk<Request<Any, EthGetTransactionCount>>()
@@ -209,7 +203,7 @@ class DepositWorkflowTest {
         every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = EthAsset(AMOUNT)
         testFuture(
@@ -243,8 +237,7 @@ class DepositWorkflowTest {
                 VAULT_ID.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -252,7 +245,7 @@ class DepositWorkflowTest {
         every { usersApi.getUsers(any()) } returns GetUsersApiResponse(arrayListOf())
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createDepositFuture(EthAsset(AMOUNT)),
@@ -266,7 +259,7 @@ class DepositWorkflowTest {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = EthAsset(AMOUNT)
         testFuture(
@@ -298,8 +291,7 @@ class DepositWorkflowTest {
                 VAULT_ID.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -318,7 +310,7 @@ class DepositWorkflowTest {
         every { depositsApi.getSignableDeposit(any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createDepositFuture(EthAsset(AMOUNT)),
@@ -332,7 +324,7 @@ class DepositWorkflowTest {
         every { encodingApi.encodeAsset(any(), any()) } throws ClientException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         testFuture(
             future = createDepositFuture(EthAsset(AMOUNT)),
@@ -346,7 +338,7 @@ class DepositWorkflowTest {
         every { registrationContract.isRegistered(any()) } throws Throwable(USER_UNREGISTERED)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = Erc20Asset(TOKEN_ADDRESS, DECIMAL, AMOUNT)
         testFuture(
@@ -387,8 +379,7 @@ class DepositWorkflowTest {
                 token.formatQuantity().toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -396,7 +387,7 @@ class DepositWorkflowTest {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = Erc20Asset(TOKEN_ADDRESS, DECIMAL, AMOUNT)
         testFuture(
@@ -433,8 +424,7 @@ class DepositWorkflowTest {
                 token.formatQuantity().toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -443,7 +433,7 @@ class DepositWorkflowTest {
         every { isApprovedRemoteFunctionCall.decodeFunctionResponse(any()) } returns listOf(Bool(false))
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)
         testFuture(
@@ -492,8 +482,7 @@ class DepositWorkflowTest {
                 TOKEN_ID.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
@@ -502,7 +491,7 @@ class DepositWorkflowTest {
         every { isApprovedRemoteFunctionCall.decodeFunctionResponse(any()) } returns listOf(Bool(true))
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.complete(TRANSACTION_HASH)
 
         val token = Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)
         testFuture(
@@ -547,17 +536,15 @@ class DepositWorkflowTest {
                 TOKEN_ID.toBigInteger()
             )
         }
-        verify { signer.signTransaction(any()) }
-        verify { web3j.ethSendRawTransaction(any()) }
+        verify { signer.sendTransaction(any()) }
     }
 
     @Test
     fun testDeposit_sendTransactionError() {
         every { registrationContract.isRegistered(any()) } returns remoteFunctionCall(true)
-        every { ethSendRequest.send() } throws IOException()
 
         addressFuture.complete(ADDRESS)
-        signedTransactionFuture.complete(SIGNED_TRANSACTION)
+        signedTransactionFuture.completeExceptionally(IOException())
 
         val token = Erc721Asset(TOKEN_ADDRESS, TOKEN_ID)
         testFuture(

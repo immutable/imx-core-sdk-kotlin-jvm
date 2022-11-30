@@ -13,7 +13,7 @@ for new features.
 
 ### Changed
 
-for changes in existing functionality.
+* `Signer` `signTransaction` method to `sendTransaction`
 
 ### Deprecated
 

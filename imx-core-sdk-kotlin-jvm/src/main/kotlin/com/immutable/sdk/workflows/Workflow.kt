@@ -39,6 +39,8 @@ internal fun <T> completeExceptionally(ex: Throwable): CompletableFuture<T> =
 
 /**
  * Signs a transaction with [data] and calls the given [contract] [contractFunction]
+ *
+ * @return a [CompletableFuture] with the transaction hash.
  */
 @Suppress("LongParameterList", "TooGenericExceptionCaught")
 internal fun sendTransaction(
@@ -64,12 +66,8 @@ internal fun sendTransaction(
                 data
             )
 
-            val signedTransaction = signer.signTransaction(rawTransaction).get()
-            val response = web3j.ethSendRawTransaction(signedTransaction).send()
-            if (response.error != null) future.completeExceptionally(
-                ImmutableException.contractError("$contractFunction: ${response.error.message}")
-            )
-            else future.complete(response)
+            val transactionHash = signer.sendTransaction(rawTransaction).get()
+            future.complete(EthSendTransaction().apply { result = transactionHash })
         } catch (e: Exception) {
             future.completeExceptionally(ImmutableException.contractError(contractFunction, e))
         }

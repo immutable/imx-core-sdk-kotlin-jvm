@@ -13,7 +13,7 @@ for new features.
 
 ### Changed
 
-* `Signer` `signTransaction` method to `sendTransaction`
+for changes in existing functionality.
 
 ### Deprecated
 
@@ -26,6 +26,13 @@ for now removed features.
 ### Fixed
 
 for any bug fixes.
+
+## [1.0.0-beta.2] - 2022-12-01
+
+### Changed
+
+* `Signer` `signTransaction` method to `sendTransaction`
+* `StarkKey.generateLegacyStarkPrivateKey` to take in a `signer` instead of the seed and address
 
 ## [1.0.0-beta.1] - 2022-11-28
 

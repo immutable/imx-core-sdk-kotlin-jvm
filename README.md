@@ -18,6 +18,9 @@ See the [developer guides](https://docs.x.immutable.com) for information on buil
 
 See the [API reference documentation](https://docs.x.immutable.com/reference) for more information on our API's.
 
+### Examples
+* **Sample code** - see the [sample](./sample/) folder for examples of key SDK functionality.
+
 ## Installation
 
 1. Add Maven Central to your repositories

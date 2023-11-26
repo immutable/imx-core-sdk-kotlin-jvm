@@ -1,7 +1,6 @@
 package com.immutable.sdk
 
 import com.google.common.annotations.VisibleForTesting
-import com.immutable.sdk.Constants.DEFAULT_MOONPAY_COLOUR_CODE
 import com.immutable.sdk.api.AssetsApi
 import com.immutable.sdk.api.BalancesApi
 import com.immutable.sdk.api.CollectionsApi
@@ -1172,26 +1171,6 @@ class ImmutableX(
         starkSigner: StarkSigner,
     ): CompletableFuture<CreateTransferResponse> =
         com.immutable.sdk.workflows.transfer(transfers, signer, starkSigner)
-
-    /**
-     * Gets a URL to MoonPay that provides a service for buying crypto directly on Immutable in exchange for fiat.
-     *
-     * It is recommended to open this URL in a Chrome Custom Tab.
-     *
-     * @param signer represents the users L1 wallet to get the address
-     * @param colourCodeHex The color code in hex (e.g. #00818e) for the Moon pay widget main color. It is used for buttons,
-     * links and highlighted text.
-     * @throws Throwable if any error occurs
-     */
-    fun buyCrypto(
-        signer: Signer,
-        colourCodeHex: String = DEFAULT_MOONPAY_COLOUR_CODE
-    ): CompletableFuture<String> =
-        com.immutable.sdk.workflows.buyCrypto(
-            base = base,
-            signer = signer,
-            colourCodeHex = colourCodeHex
-        )
 
     @Suppress("TooGenericExceptionCaught")
     private fun <T> apiCall(callName: String, call: () -> T): T {

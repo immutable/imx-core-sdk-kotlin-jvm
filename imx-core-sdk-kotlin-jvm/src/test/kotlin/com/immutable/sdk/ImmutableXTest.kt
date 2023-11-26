@@ -18,7 +18,6 @@ import com.immutable.sdk.api.model.Collection
 import com.immutable.sdk.model.Erc721Asset
 import com.immutable.sdk.model.EthAsset
 import com.immutable.sdk.workflows.createTrade
-import com.immutable.sdk.workflows.buyCrypto
 import com.immutable.sdk.workflows.cancelOrder
 import com.immutable.sdk.workflows.registerOffChain
 import com.immutable.sdk.workflows.createOrder
@@ -220,14 +219,6 @@ class ImmutableXTest {
             future,
             sdk.batchTransfer(arrayListOf(TransferData(asset, ADDRESS)), signer, starkSigner)
         )
-    }
-
-    @Test
-    fun testBuyCrypto() {
-        val future = CompletableFuture<String>()
-        mockkStatic(::buyCrypto)
-        every { buyCrypto(any(), signer, any(), "colorCode", any()) } returns future
-        assertEquals(future, sdk.buyCrypto(signer, "colorCode"))
     }
 
     @Test

@@ -1,3 +1,7 @@
+# [1.1.0](https://github.com/immutable/imx-core-sdk-kotlin-jvm/compare/v1.0.0-beta.2...v1.0.0) (2024-02-14)
+
+Deprecate this SDK. If you're building apps with Immutable, please use [Immutable's Unified SDK](https://github.com/immutable/ts-immutable-sdk)
+
 # [1.0.0](https://github.com/immutable/imx-core-sdk-kotlin-jvm/compare/v1.0.0-beta.2...v1.0.0) (2024-02-14)
 
 

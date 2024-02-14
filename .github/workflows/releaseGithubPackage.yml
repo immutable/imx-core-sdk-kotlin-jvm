@@ -6,7 +6,6 @@ on:
 jobs:
   release-github-package:
     runs-on: ubuntu-latest
-    if: contains('["nattb8", "dom-murray"]', github.actor)
 
     steps:
       - uses: actions/checkout@v2
